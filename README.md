@@ -1,377 +1,187 @@
-# QECTOR Decoder Workbench v3.1 — Professional QEC Analysis Suite
+```markdown
+# QECTOR Decoder Workbench v3.1: Professional Quantum Error Correction Analysis Suite
 
-## Welcome to the Next Generation of QECTOR
+**Professional Quantum Error Correction Analysis Suite**
 
-Welcome to **QECTOR Decoder Workbench v3** — a complete professional-grade quantum error correction analysis platform. This application has been comprehensively upgraded with enterprise-level features, professional documentation, and production-ready infrastructure.
+[![CI](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml/badge.svg)](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml) [![PyPI](https://img.shields.io/pypi/v/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/) [![Python](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/) [![License](https://img.shields.io/badge/License-Source_Available-blue)](LICENSE)
 
-## What's New in v3
+> Next-generation professional-grade platform for exploring, decoding, benchmarking, and analyzing quantum error correction codes with enterprise features, beautiful documentation export, and production-ready infrastructure.
 
-### ✨ Core Enhancements
+## What's New in v3.1
 
-- **📊 Professional Documentation Generation**: Export code analysis in Markdown, HTML, LaTeX, and JSON formats with beautiful styling
-- **⚙️ Settings Management**: Persistent user preferences and configuration system
-- **📋 Result Tracking**: Complete history of all operations with statistics and export
-- **🔍 Help System**: Built-in documentation accessible from the UI
-- **📝 Comprehensive Logging**: All actions logged to file for debugging and auditing
-- **💾 Configuration Persistence**: User settings saved between sessions
+### Core Enhancements
+- **Professional Documentation Generation**: Export to Markdown, HTML, LaTeX, and JSON with clean, publication-ready styling
+- **Persistent Settings and Configuration**: Full user preferences system with JSON config
+- **Result Tracking and History**: Complete operation log with statistics and one-click export
+- **Built-in Help System**: Contextual documentation accessible directly from the UI
+- **Comprehensive Logging**: All actions logged to file with rotation and crash reports
+- **Input Validation and Error Recovery**: Robust handling with user-friendly messages
 
-### 🎨 UI/UX Improvements
+### UI/UX Improvements
+- Professional header with status indicator and quick-access buttons
+- Enhanced console with log export, clear history, and improved formatting
+- Dedicated Settings and Help dialogs
+- Refined layout, spacing, and visual hierarchy
+- Clearer error reporting throughout the application
 
-- **Professional Header**: Better layout with status indicator and quick access buttons
-- **Enhanced Console**: Export logs, clear history, better formatting
-- **Settings Dialog**: Customize behavior, defaults, and preferences
-- **Help Dialog**: Quick access to feature documentation
-- **Better Error Messages**: User-friendly error reporting
-- **Improved Layout**: Better spacing and organization
+### Developer and Infrastructure
+- Structured logging to `logs/qector.log` plus timestamped crash reports
+- Modern Python type hints throughout
+- Local result caching for performance
+- Clean modular architecture: config.py, logger.py, results_tracker.py, doc_generator.py, dialogs.py
 
-### 🛠️ Developer Features
-
-- **Comprehensive Logging**: Debug log file at `logs/qector.log`
-- **Crash Reporting**: Detailed crash logs with full traceback
-- **Input Validation**: All user inputs validated before processing
-- **Type Hints**: Modern Python type annotations throughout
-- **Error Recovery**: Graceful handling of failures
-- **Results Caching**: Local JSON cache for performance
-
-### 📦 New Infrastructure Modules
-
-| Module | Purpose |
-|--------|---------|
-| `config.py` | Centralized configuration management |
-| `logger.py` | Professional logging system with rotation |
-| `utils.py` | Common utilities and helpers |
-| `results_tracker.py` | Operation result tracking |
-| `doc_generator.py` | Multi-format documentation export |
-| `dialogs.py` | Professional dialog windows |
-
-## Getting Started
-
-### Installation
+## Installation
 
 ```bash
-# Install/update dependencies
+# Install dependencies
 pip install -r requirements.txt
 
-# Run the application
+# Launch the application
 python main.py
 ```
 
-### First Run
+On first launch the workbench automatically creates:
+- `~/.qector/.qector_config.json`
+- `logs/` directory with rotation support
+- `.cache/` for results
 
-1. The application will auto-create configuration files
-2. Hardware will be auto-detected (if enabled in settings)
-3. Logs will be created in the `logs/` directory
-4. Configuration saved to `.qector_config.json`
+## Quick Start
 
-## Features Guide
+1. Launch the app. Hardware is auto-detected when enabled in settings.
+2. Go to the Code Explorer tab, choose a code family, configure parameters, then click Build Code.
+3. Generate professional documentation in any format: Markdown, HTML, LaTeX, or JSON.
+4. Use Decoder Lab, Benchmark, or Batch and Streaming tabs for deeper analysis.
+5. Access Settings and Help directly from the header.
 
-### Code Explorer Tab
+## Features by Tab
 
-**Explore quantum error correction codes with professional documentation.**
+### Code Explorer
+Professional code exploration and documentation:
+- Families supported: Repetition, Ring, Rotated/Unrotated Surface, Toric, Heavy-hex
+- Real-time parameter validation
+- Code generation powered by qector_decoder_v3
+- One-click export to Markdown, HTML, LaTeX, or JSON. Files are saved in the exports folder.
 
-1. **Select a Code Family**
-   - Repetition code
-   - Ring code
-   - Rotated/Unrotated surface codes
-   - Toric code
-   - Heavy-hex code
+### Decoder Lab
+Interactive single-syndrome decoding and diagnostics:
+- Multiple decoder algorithms available
+- Configurable error rate and reproducible random seed
+- Detailed decode results with full tracking
 
-2. **Set Parameters**
-   - Each family has specific parameter constraints
-   - Validation ensures valid parameters
+### Benchmark
+Performance and latency profiling:
+- Adjustable sample sizes
+- Native Rust-backed throughput measurements
+- Results automatically cached and exportable
 
-3. **Build Code**
-   - Real code generation from qector_decoder_v3
-   - Summary displays key properties
+### Batch and Streaming
+High-volume and real-time workflows:
+- Batch Decode: CPU, CUDA, and OpenCL backends with success-rate tracking
+- Streaming Session: Sliding-window multi-round decoding with live syndrome injection
 
-4. **Generate Documentation**
-   - ✓ Markdown - Clean readable format
-   - ✓ HTML - Beautiful web-viewable docs
-   - ✓ JSON - Structured data export
-   - ✓ LaTeX - Academic publishing format
-   - Files saved to `exports/` directory
+### Hardware and Routing
+Intelligent system detection and recommendations:
+- Auto-detects CPU, CUDA, GPU, memory, and Python environment
+- AI-powered decoder suggestion engine. Optimize for speed, accuracy, or balanced priority.
 
-### Decoder Lab Tab
+## Settings and Preferences
 
-**Test individual syndromes and decoders interactively.**
+Open via the gear icon in the header. All settings persist across sessions.
 
-- Select decoder algorithm
-- Set physical error rate
-- Choose random seed for reproducibility
-- View decode results and diagnostics
-- Result tracked and saved
+| Category   | Key Options                                      |
+|------------|--------------------------------------------------|
+| UI         | Dark/light theme, auto hardware detection        |
+| Behavior   | Logging toggle, log level, auto-open exports     |
+| Defaults   | Error rate, batch size, random seed              |
+| Export     | Default formats and output directory             |
 
-### Benchmark Tab
-
-**Performance testing and latency analysis.**
-
-- Run latency benchmarks
-- Configurable sample size
-- Get throughput statistics
-- Real Rust-native measurements
-- Results exported and cached
-
-### Batch & Streaming Tab
-
-**Process multiple syndromes efficiently.**
-
-- **Batch Decode**: Decode many syndromes in parallel
-  - CPU backend (always available)
-  - CUDA backend (if GPU present)
-  - OpenCL backend (if available)
-  - Track success rate and performance
-
-- **Streaming Session**: Multi-round decoding
-  - Sliding window decoder
-  - Real-time error correction
-  - Multiple rounds of syndrome injection
-
-### Hardware & Routing Tab
-
-**System detection and decoder recommendations.**
-
-- **Hardware Detection**
-  - CPU info
-  - CUDA support detection
-  - GPU availability
-  - Memory info
-  - Python version
-
-- **Decoder Recommendation**
-  - Input code family and parameters
-  - Get optimal decoder suggestion
-  - Choose priority (speed/accuracy/balanced)
-  - AI-powered recommendation engine
-
-## Advanced Features
-
-### Settings & Preferences
-
-Click **⚙️** in the header to access settings:
-
-- **UI Preferences**
-  - Theme mode (dark/light)
-  - Auto-detect hardware on startup
-
-- **Behavior**
-  - Enable/disable logging
-  - Set log level (DEBUG/INFO/WARNING/ERROR)
-  - Auto-open exported files
-
-- **Defaults**
-  - Default error rate
-  - Default batch size
-  - Default seed
-
-- **Export**
-  - Default formats
-  - Export directory
-  - Auto-open exports
-
-### Result Export
-
-From any tab's results, export to:
-- **CSV**: Spreadsheet-compatible format
-- **JSON**: Machine-readable structured data
-- **HTML**: Beautiful web-viewable documents
-- **LaTeX**: Academic paper format
-
-### Help System
-
-Click **?** in the header to access:
-- Feature overview for each tab
-- Quick usage tips
-- Best practices
-
-### Logging System
-
-All actions automatically logged to:
-- **Console**: Real-time colored output in the app
-- **File**: `logs/qector.log` (rotates at 50MB)
-- **Crashes**: `logs/crash_TIMESTAMP.log` (detailed traceback)
-
-Export console logs using the "Save Log" button.
+Configuration file location: `~/.qector/.qector_config.json`
 
 ## File Organization
 
 ```
 ~/.qector/
-├── .qector_config.json    # User configuration
+├── .qector_config.json
 ├── logs/
-│   ├── qector.log         # Main application log
-│   └── crash_*.log         # Crash reports
+│   ├── qector.log
+│   └── crash_TIMESTAMP.log
 ├── .cache/
-│   └── results.json       # Cached operation results
+│   └── results.json
 └── exports/
-    └── code_doc.*         # Exported documentation
+    └── code_doc files
 ```
 
-## Configuration File
+## Logging and Diagnostics
 
-Edit `~/.qector_config.json` to customize:
-- Window size and position
-- Default parameters
-- Export formats
-- Logging level
-- Hardware detection
-- And more...
+- In-app Console: Real-time colored output
+- File Log: logs/qector.log (rotating)
+- Crash Reports: logs/crash_TIMESTAMP.log with complete traceback
+- Export any console session with the Save Log button
 
-Example:
-```json
-{
-  "theme_mode": "dark",
-  "default_error_rate": 0.05,
-  "default_batch_size": 500,
-  "enable_logging": true,
-  "log_level": "INFO"
-}
-```
+## Scripting and API
 
-## Keyboard Shortcuts
-
-(Keyboard shortcuts infrastructure ready for expansion)
-
-- **Ctrl+Q**: Quit application
-- **Ctrl+Shift+E**: Export results
-- **Ctrl+L**: Clear console
-- More shortcuts coming in future versions
-
-## Error Handling
-
-If an error occurs:
-1. Check the console output for error message
-2. Review `logs/qector.log` for details
-3. Check `logs/crash_*.log` if app crashed
-4. Report issues with crash log details
-
-## Performance Tips
-
-1. **Batch Operations**: Use batch decoding for multiple syndromes
-2. **Caching**: Results are automatically cached locally
-3. **Hardware**: GPU backends available if CUDA/OpenCL installed
-4. **Memory**: Old results cleaned up automatically (100 max)
-
-## System Requirements
-
-- **Python**: 3.8 or higher
-- **RAM**: 2GB minimum, 4GB+ recommended
-- **Disk**: 200MB for logs and cache
-- **GPU**: Optional - CUDA 11.0+ for accelerated decoding
-
-## Troubleshooting
-
-### Missing Dependencies
-```
-Error: No module named 'qector_decoder_v3'
-Solution: pip install -r requirements.txt
-```
-
-### CUDA Not Available
-- Install NVIDIA drivers and CUDA toolkit
-- Batch decoding will fall back to CPU
-
-### Icon Display Issues
-- App will work without icons, just restart
-- Ensure PIL/Pillow is installed: `pip install Pillow`
-
-### Console Not Updating
-- Try clicking in the app to focus it
-- Check logs/qector.log for issues
-
-## Advanced Usage
-
-### Command Line Help
-```bash
-python main.py --help     # Future: command-line options
-```
-
-### Log Levels
-Set in settings or config:
-- **DEBUG**: Verbose output, all details
-- **INFO**: Standard logging
-- **WARNING**: Only warnings and errors
-- **ERROR**: Only errors
-
-### Result Analysis
-Export results to JSON and analyze programmatically:
-```python
-import json
-with open('exports/results.json') as f:
-    results = json.load(f)
-# Analyze results...
-```
-
-## API Documentation
-
-Core functions available for scripting:
+Full backend access for automation and custom workflows:
 
 ```python
 import backend as be
 
-# Build a code
+# Build a quantum error correction code
 code = be.build_code('rotated_surface', 5)
 
-# Get code summary
+# Get human-readable summary
 summary = be.code_summary(code)
 
-# Run single decode
-result = be.run_single_decode(code, 0.05, 'union_find', seed=42)
+# Run a single decode
+result = be.run_single_decode(code, error_rate=0.05, decoder='union_find', seed=42)
 
-# Run benchmark
-bench = be.run_benchmark(code, 5000, seed=42)
+# Performance benchmark
+bench = be.run_benchmark(code, samples=5000, seed=42)
 
-# Batch decode
-batch = be.run_batch_decode(code, 'cpu', 500, 0.05, seed=42)
+# High-volume batch decode
+batch = be.run_batch_decode(code, backend='cpu', batch_size=500, error_rate=0.05, seed=42)
 ```
 
-## FAQ
+## Troubleshooting
 
-**Q: How do I export my results?**
-A: Use the export buttons in each tab, or the "Save Log" button for console output.
+Missing qector_decoder_v3 module:
+```bash
+pip install -r requirements.txt
+```
 
-**Q: Can I use different error rates?**
-A: Yes! Set defaults in Settings dialog, or override per-operation in each tab.
+CUDA backend unavailable:
+Install NVIDIA drivers and CUDA toolkit. The workbench automatically falls back to CPU.
 
-**Q: Does it work on Linux/Mac?**
-A: Yes! The app is cross-platform. Install Python 3.8+ and follow standard install steps.
+Console not refreshing:
+Click inside the application window or check logs/qector.log for details.
 
-**Q: How do I report bugs?**
-A: Include the crash log from `logs/crash_*.log` if available, and `logs/qector.log`.
+Missing icons:
+Restart the app. Ensure Pillow is installed.
 
-**Q: Can I use my own decoder?**
-A: The qector_decoder_v3 backend provides the decoders. Custom decoders coming in future versions.
+## System Requirements
 
-## Support & Contact
-
-- **Report Issues**: Include crash logs and steps to reproduce
-- **Feature Requests**: Describe use case and expected behavior
-- **Questions**: Check Help dialog and documentation first
+- Python 3.8 or higher
+- RAM: 2 GB minimum (4 GB+ recommended)
+- Disk space: approximately 200 MB for logs and cache
+- GPU: Optional. CUDA 11.0+ enables accelerated batch decoding
 
 ## Version History
 
-- **v3.0** (2026-07-04): Complete professional upgrade
-  - Configuration system
-  - Logging infrastructure
-  - Multi-format documentation
-  - Settings dialog
-  - Result tracking
-  - Professional UI/UX
-
-- **v2.0**: Previous release with basic features
-- **v1.0**: Initial release
+- v3.1 (2026-07-05): Professional upgrade featuring multi-format documentation export, persistent settings, structured logging, result tracking, and refined UI/UX
+- v3.0: Major infrastructure and professional tooling release
+- v2.0: Expanded feature set
+- v1.0: Initial release
 
 ## License
 
-See EULA.txt for full license terms.
+Source-available under the terms in EULA.txt.
+Free for personal, academic, and non-commercial research use.
+Commercial and OEM licensing available on request.
 
-**Developer**: Guillaume Lessard © 2026
+Developer: Guillaume Lessard 2026
 
 ## Acknowledgments
 
-Built on top of the excellent **qector_decoder_v3** library.
+Built on the powerful qector_decoder_v3 quantum error correction library.
 
----
-
-**QECTOR Decoder Workbench v3** — Professional Quantum Error Correction Analysis Suite
-
-*Your gateway to understanding and analyzing quantum error correction codes.*
+QECTOR Decoder Workbench v3.1: Professional Quantum Error Correction Analysis Suite
+```
