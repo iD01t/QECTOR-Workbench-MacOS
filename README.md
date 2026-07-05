@@ -1,4 +1,3 @@
-```markdown
 # QECTOR Decoder Workbench v3.1: Professional Quantum Error Correction Analysis Suite
 
 **Professional Quantum Error Correction Analysis Suite**
