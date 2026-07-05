@@ -1,4 +1,3 @@
-```markdown
 # QECTOR Workbench v3.1.0-pro: Release Notes
 
 **Build:** v3.1.0-pro  
