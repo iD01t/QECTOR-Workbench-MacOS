@@ -1,4 +1,5 @@
-# QECTOR Decoder Workbench v3.4 — Scientific QEC Analysis Suite (Production Ready)
+# QECTOR Decoder Workbench v3.4
+# Scientific QEC Analysis Suite 
 
 **Professional Quantum Error Correction Analysis Suite**
 
