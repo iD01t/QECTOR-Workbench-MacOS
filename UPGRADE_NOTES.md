@@ -317,3 +317,26 @@ python main.py
 ---
 
 **QECTOR Decoder Workbench v3** — Professional Quantum Error Correction Analysis Suite
+
+## v3.4.0 — Production Release, Installer Upgrade & Repo Cleanup (2026-07)
+
+### Major Changes
+- **Version bump** to 3.4.0 (production)
+- **Installer upgraded**:
+  - Inno Setup: 64-bit only, lzma2 compression, full VersionInfo metadata, modern Windows min version
+  - Clean output naming and desktop integration
+- **Production packaging**:
+  - `pyinstaller --clean`
+  - Full bundles with standalone exe, installer .exe, sample premium docs, RELEASE_MANIFEST.txt + SHA256 checksums
+  - Artifacts attached to GitHub Releases only (never committed)
+- **Repo fully cleaned**:
+  - Added strict `.gitignore` covering: build/, dist/, .venv/, __pycache__/, release zips, old production folders, logs, caches
+  - Removed >1.5 GB of committed/untracked bloat (old zips, production dirs, venvs, build artifacts)
+  - Source tree is now lean (~source only)
+- All prior 10/10 GUI, 25-tool MCP server (verified), and premium doc generator features remain and are production-ready.
+
+See GitHub Releases for the v3.4.0 production zip + installer.
+
+---
+
+**QECTOR Decoder Workbench v3** — Professional Quantum Error Correction Analysis Suite

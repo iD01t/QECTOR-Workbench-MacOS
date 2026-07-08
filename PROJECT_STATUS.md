@@ -363,9 +363,15 @@ scipy                  >=1.9.0   ✅
 
 ---
 
-**Report Generated:** 2024
-**QECTOR Version:** 3.0 (Production)
-**Status:** ✅ READY FOR DEPLOYMENT
+**Report Generated:** 2026-07
+**QECTOR Version:** 3.4.0 (Production)
+**Status:** ✅ FULLY WIRED + CLEAN REPO + PRODUCTION PACKAGE READY
+
+### Latest (v3.4.0)
+- Repo cleaned: comprehensive .gitignore, removed >1 GB of build zips, old production folders, venvs
+- Installer upgraded to 64-bit production quality
+- All docs updated for current state (MCP 25 tools verified, 10/10 GUI, premium generator)
+- Production bundles generated cleanly and released on GitHub only
 
 ---
 

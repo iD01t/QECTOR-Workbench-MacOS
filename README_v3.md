@@ -59,14 +59,36 @@ All 25 functions verified passing.
 - Seeded RNGs
 - Document exports include timestamp, versions, author/ORCID
 
-## Packaging
+## Packaging & Clean Builds
+
+The source repo is kept lean (build artifacts, venvs, large zips are gitignored).
 
 ```bash
-python -m pip install pyinstaller
-pyinstaller -y QectorWorkbench.spec
+# Clean build standalone
+pyinstaller -y --clean QectorWorkbench.spec
+
+# Build installer (Inno Setup)
+& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /Q installer.iss
 ```
 
-Windows release zip checksum manifest is generated in CI.
+Production release bundles (v3.4.0+) include:
+- Standalone exe + _internal
+- Full installer .exe
+- Sample docs, manifests, SHA256 checksums
+
+See release assets for `QectorWorkbench-v3.4.0-production.zip` and `QectorWorkbenchSetup.exe`.
+
+Never commit `dist/`, `build/`, `*.zip`, or `QectorWorkbench_v*_production/`.
+
+## .gitignore
+
+The repo uses a strict .gitignore to prevent committing:
+- PyInstaller outputs (build/, dist/)
+- Python caches, venvs (.venv/)
+- Release zips and old production folders
+- Logs, caches, temp files
+
+This keeps the source repo small and clean.
 
 ## License
 
