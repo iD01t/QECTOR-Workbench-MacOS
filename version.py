@@ -1,4 +1,4 @@
----
+"""
 version.py — Central version information for QECTOR Decoder Workbench.
 """
 

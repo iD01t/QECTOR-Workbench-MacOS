@@ -24,9 +24,49 @@ python -m pytest -q
 python app.py
 ```
 
+## Requirements
+
+- Python 3.11+
+- OS: Windows 10+, Linux
+- RAM: 4 GB+ recommended
+- GPU: optional; CUDA/OpenCL batch backends require matching drivers
+
 ## MCP Server
 
-... (full details in docs) 
+The Workbench includes a complete MCP (Model Context Protocol) server exposing **25 tools** across code analysis, decoders, benchmarks, results, config, hardware, resources, clients, and premium documentation generation.
+
+All 25 functions verified passing.
+
+## Supported code families
+
+- Repetition code
+- Ring code
+- Rotated surface code
+- Unrotated surface code
+- Toric code
+- Heavy-hex code
+
+## Supported decoders
+
+- union_find
+- fast_union_find
+- blossom
+- sparse_blossom
+- bp_osd
+
+## Reproducibility
+
+- Seeded RNGs
+- Document exports include timestamp, versions, author/ORCID
+
+## Packaging
+
+```bash
+python -m pip install pyinstaller
+pyinstaller -y QectorWorkbench.spec
+```
+
+Windows release zip checksum manifest is generated in CI.
 
 ## License
 
