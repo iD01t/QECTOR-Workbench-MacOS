@@ -4,45 +4,84 @@
 
 [![Release](https://img.shields.io/github/v/release/qectorlab/qector-decoder-workbench?label=v3.4.0)](https://github.com/qectorlab/qector-decoder-workbench/releases/tag/v3.4.0)
 
-> Professional Quantum Error Correction Analysis Suite with polished 10/10 GUI, full MCP server (25 tools), and publication-quality documentation export.
+> Professional Quantum Error Correction Analysis Suite with polished 10/10 CustomTkinter GUI, full MCP server (25 tools), and publication-quality documentation export.
+
+**Official Release Page:** https://github.com/qectorlab/qector-decoder-workbench/releases/tag/v3.4.0
 
 ### Download v3.4.0 (Recommended)
 
-**Go to the official release page:**
+**Direct from the release:**
 
-https://github.com/qectorlab/qector-decoder-workbench/releases/tag/v3.4.0
+- `QectorWorkbenchSetup.exe` — Full Windows installer (64-bit Inno Setup with modern settings)
+- `QectorWorkbench-v3.4.0-production.zip` — Complete production bundle including:
+  - Standalone `QectorWorkbench.exe` + `_internal`
+  - `QectorWorkbenchSetup.exe`
+  - Updated docs (README, UPGRADE_NOTES, PROJECT_STATUS)
+  - Sample premium documentation exports
+  - `RELEASE_MANIFEST.txt` with SHA256 checksums
 
-**Direct assets:**
-- `QectorWorkbenchSetup.exe` — Full Windows installer (64-bit, Inno Setup)
-- `QectorWorkbench-v3.4.0-production.zip` — Standalone production bundle + installer + docs + checksums
+**Checksums (SHA256) are included in the production zip and manifest.**
 
 ### Quick Install from Release
 
-1. Download `QectorWorkbenchSetup.exe` from the link above.
-2. Run the installer (or extract the zip for portable use).
-3. Launch **QectorWorkbench.exe**.
+1. Go to https://github.com/qectorlab/qector-decoder-workbench/releases/tag/v3.4.0
+2. Download `QectorWorkbenchSetup.exe`
+3. Run the installer (requires admin for system-wide install, or use the portable exe from the zip)
+4. Launch QectorWorkbench.exe
 
-The first run will create config, logs, and exports folders.
+The app will create config, logs, and exports folders on first run.
 
-### What's Included in v3.4.0
+### v3.4.0 Release-Specific Notes
 
-- **10/10 GUI** — Modern quantum dark theme, refined layouts, premium controls, high-quality embedded visualizations.
-- **Full MCP Server** — 25 tools (code analysis, decoders, benchmarks, resources, hardware, clients, and `generate_documentation`). All verified working.
-- **Premium Documentation Generator** — Beautiful self-contained HTML, Markdown with TOC, LaTeX, JSON + SVG/PDF figures with full provenance and reproducible snippets.
-- **Production Packaging** — Clean 64-bit installer and standalone bundle with checksums and manifests.
-- **All Wiring Verified** — End-to-end: qector_decoder_v3 0.6.2 ↔ backend ↔ MCP ↔ docs ↔ GUI.
+This is the first full **production** release after extensive verification and cleanup:
 
-### Key Features
+- **Upgraded Installer**:
+  - Switched to 64-bit only (`x64compatible`)
+  - lzma2 compression for smaller/faster packages
+  - Full VersionInfo metadata (company, description, product version)
+  - Modern minimum Windows version (10.0.17763+)
+  - Clean output directory and desktop shortcut options
 
-- Code Explorer with real code families (surface, toric, repetition, etc.)
-- Decoder Lab (union_find, blossom, bp_osd, ...)
-- Real benchmark & batch decoding (CPU / CUDA / OpenCL)
-- Streaming & hardware routing recommendations
-- One-click professional multi-format exports
+- **Production Packaging**:
+  - Built with `pyinstaller --clean -y QectorWorkbench.spec`
+  - Inno Setup built with `/Q` for reproducible output
+  - All large build artifacts (dist/, build/, old production folders) removed from source control
+  - Bundles now include only what users need + verification files
+
+- **Repository Cleanup**:
+  - Added comprehensive `.gitignore` covering build artifacts, venvs, caches, logs, old zips, and production folders
+  - Removed >1.5 GB of bloat (previous QectorWorkbench_v* folders, release zips, .venv, dist/, build/)
+  - Source repo is now lean and focused on code + docs
+
+- **Full Verification Completed**:
+  - All 25 MCP tools tested and passing (via `test_mcp_all.py`)
+  - End-to-end wiring verified: qector_decoder_v3 0.6.2 ↔ backend ↔ MCP server ↔ doc generator ↔ GUI tabs
+  - Self-tests pass (`python main.py --self-test`)
+  - Production builds confirmed functional
+
+- **10/10 GUI & Tooling Polish** (carried forward and stabilized):
+  - Modern quantum dark theme with expanded palette and professional fonts (Inter, Cascadia, JetBrains Mono)
+  - Consistent card-based layouts, premium controls, and high-quality matplotlib integration
+  - Complete MCP server (stdio + HTTP on port 8765) exposing 25 tools for automation/LLM integration
+  - ProfessionalDocGenerator producing premium self-contained HTML, Markdown (with TOC), LaTeX, and JSON with provenance, repro snippets, and figures
+
+- **Documentation Refresh**:
+  - All docs (README_v3.md, UPGRADE_NOTES.md, PROJECT_STATUS.md, api.md, architecture.md) updated for v3.4.0
+  - Clear notes on production packaging and repo hygiene
+
+### Key Features (v3.4.0)
+
+- **Code Explorer**: Real qector_decoder_v3 code families with matrix/tanner/circuit views and one-click premium exports
+- **Decoder Lab**: Interactive single-syndrome decoding with multiple algorithms (union_find, blossom, bp_osd, etc.)
+- **Benchmark**: Real Rust-backed latency and throughput measurements
+- **Batch & Streaming**: High-volume and sliding-window workflows with CPU/CUDA/OpenCL support
+- **Hardware & Routing**: Auto-detection and intelligent decoder recommendations
+- **MCP Server**: Full control surface for external tools and agents
+- **Docs Studio**: Publication-grade multi-format exports
 
 ### Documentation & Source
 
-For the complete feature guide, architecture, and building from source, see the files inside the production zip or the repository.
+For the complete feature guide, architecture, and building from source, see the files inside the `QectorWorkbench-v3.4.0-production.zip` or browse the repository.
 
 **Source (for developers):** https://github.com/qectorlab/qector-decoder-workbench
 
@@ -54,7 +93,7 @@ Commercial licensing available.
 
 Developer: Guillaume Lessard © 2026
 
-Built on qector_decoder_v3.
+Built on qector_decoder_v3 (v0.6.2).
 
 ---
 
