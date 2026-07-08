@@ -1,0 +1,75 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtualenv
+.venv/
+venv/
+ENV/
+env/
+
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# PyInstaller
+*.manifest
+*.spec  # keep the main one manually if needed, but we have QectorWorkbench.spec
+build/
+dist/
+
+# Inno Setup outputs
+*.exe
+*.zip
+Output/
+
+# Project specific bloat
+QectorWorkbench_v*_production/
+QectorWorkbench_v*_final*/
+release_assets/
+release_ready/
+*.zip
+QECTOR*.zip
+*.log
+logs/
+.cache/
+.mcp_cache/
+.pytest_cache/
+.qector_config.json
+install_log.txt
+*.pdb
+*.exp
+*.lib
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test / debug
+_test*.*
+_screenshot.*
+diag*.*
+exports/
+!exports/  # allow some samples? but for clean, perhaps ignore or keep small
+# Actually for source, keep a few sample docs, ignore large ones
