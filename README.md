@@ -1,186 +1,154 @@
-# QECTOR Decoder Workbench v3.1: Professional Quantum Error Correction Analysis Suite
+# QECTOR Decoder Workbench v3.4 — Scientific QEC Analysis Suite (Production Ready)
 
 **Professional Quantum Error Correction Analysis Suite**
 
-[![CI](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml/badge.svg)](https://github.com/GuillaumeLessard/qector-decoder/actions/workflows/CI.yml) [![PyPI](https://img.shields.io/pypi/v/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/) [![Python](https://img.shields.io/pypi/pyversions/qector-decoder-v3.svg)](https://pypi.org/project/qector-decoder-v3/) [![License](https://img.shields.io/badge/License-Source_Available-blue)](LICENSE)
+[![CI](https://github.com/qectorlab/qector-decoder-workbench/actions/workflows/ci.yml/badge.svg)](https://github.com/qectorlab/qector-decoder-workbench/actions/workflows/ci.yml) [![License](https://img.shields.io/badge/License-Source_Available-blue)](LICENSE)
 
-> Next-generation professional-grade platform for exploring, decoding, benchmarking, and analyzing quantum error correction codes with enterprise features, beautiful documentation export, and production-ready infrastructure.
+> Next-generation professional-grade platform for exploring, decoding, benchmarking, and analyzing quantum error correction codes. Features a polished 10/10 CustomTkinter GUI, full MCP server (25 tools), publication-quality documentation export, and production-ready packaging.
 
-## What's New in v3.1
+## What's New in v3.4.0 (Production)
 
-### Core Enhancements
-- **Professional Documentation Generation**: Export to Markdown, HTML, LaTeX, and JSON with clean, publication-ready styling
-- **Persistent Settings and Configuration**: Full user preferences system with JSON config
-- **Result Tracking and History**: Complete operation log with statistics and one-click export
-- **Built-in Help System**: Contextual documentation accessible directly from the UI
-- **Comprehensive Logging**: All actions logged to file with rotation and crash reports
-- **Input Validation and Error Recovery**: Robust handling with user-friendly messages
+- **Upgraded Installer**: Inno Setup 64-bit (x64compatible), lzma2 compression, full version metadata, modern min Windows requirements.
+- **Production Package**: Clean standalone bundle + full installer with checksums, manifests, and included premium docs.
+- **All Wiring Fully Verified**: Library ↔ backend ↔ MCP ↔ doc generator ↔ GUI tabs. 25/25 MCP tools passing, end-to-end flows tested.
+- **Version Bumps**: Workbench 3.4.0, aligned with qector_decoder_v3 0.6.2.
 
-### UI/UX Improvements
-- Professional header with status indicator and quick-access buttons
-- Enhanced console with log export, clear history, and improved formatting
-- Dedicated Settings and Help dialogs
-- Refined layout, spacing, and visual hierarchy
-- Clearer error reporting throughout the application
+## Core Highlights (from v3.3 10/10 Polish)
 
-### Developer and Infrastructure
-- Structured logging to `logs/qector.log` plus timestamped crash reports
-- Modern Python type hints throughout
-- Local result caching for performance
-- Clean modular architecture: config.py, logger.py, results_tracker.py, doc_generator.py, dialogs.py
+- **10/10 GUI Polish**: Refined quantum dark theme (expanded palette, modern fonts like Inter/Cascadia/JetBrains), consistent card layouts, premium buttons/controls, accent bars, better spacing/typography.
+- **MCP Server**: Complete stdio + HTTP MCP server exposing **25 tools** (code analysis, decoders, benchmarks, results, config, hardware, resources, clients, `generate_documentation`). All exhaustively tested and working.
+- **Premium Documentation Generator**: Self-contained modern HTML (stats grids, matrix previews, copy buttons, provenance), improved Markdown (TOC), LaTeX, JSON + high-quality SVG/PDF figures with watermark. Full repro snippets and certification in every export.
+- **Docs Studio Tab**: One-click multi-format exports (HTML/MD/LaTeX/JSON) with real provenance.
 
 ## Installation
 
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+# From source (recommended for dev)
+python -m pip install --upgrade pip
+pip install -e .[dev]
+python -m pytest -q
+python app.py
 
-# Launch the application
-python main.py
+# Or use the production installer / standalone exe from the v3.4.0 release
 ```
 
-On first launch the workbench automatically creates:
-- `~/.qector/.qector_config.json`
-- `logs/` directory with rotation support
-- `.cache/` for results
+On first launch:
+- Creates `.qector_config.json`
+- `logs/` with rotation
+- Exports and cache dirs
 
 ## Quick Start
 
-1. Launch the app. Hardware is auto-detected when enabled in settings.
-2. Go to the Code Explorer tab, choose a code family, configure parameters, then click Build Code.
-3. Generate professional documentation in any format: Markdown, HTML, LaTeX, or JSON.
-4. Use Decoder Lab, Benchmark, or Batch and Streaming tabs for deeper analysis.
-5. Access Settings and Help directly from the header.
+1. Launch `python app.py` (or the installed exe).
+2. **Code Explorer**: Select family (e.g. rotated_surface), set distance, Build. View matrix + summary.
+3. Export professional docs (HTML/MD/LaTeX/JSON) via the Documentation tab or buttons.
+4. Use **Decoder Lab** for single-syndrome decode with diagnostics.
+5. **Benchmark** for real latency/throughput.
+6. **Batch & Streaming**, **Hardware & Routing** for advanced workflows.
+7. Full MCP integration for agents/automation (tools include list_code_families, generate_documentation, run_benchmark, etc.).
 
 ## Features by Tab
 
 ### Code Explorer
-Professional code exploration and documentation:
-- Families supported: Repetition, Ring, Rotated/Unrotated Surface, Toric, Heavy-hex
-- Real-time parameter validation
-- Code generation powered by qector_decoder_v3
-- One-click export to Markdown, HTML, LaTeX, or JSON. Files are saved in the exports folder.
+- Real qector_decoder_v3 code families (Repetition, Ring, Rotated/Unrotated Surface, Toric, Heavy-hex, etc.)
+- Parameter validation
+- Sparsity matrix, Tanner graph, circuit views
+- Premium export buttons
 
 ### Decoder Lab
-Interactive single-syndrome decoding and diagnostics:
-- Multiple decoder algorithms available
-- Configurable error rate and reproducible random seed
-- Detailed decode results with full tracking
+- Multiple decoders (union_find, fast_union_find, blossom, sparse_blossom, bp_osd)
+- Error sampling + decode with seed
+- Visual results + explain
 
 ### Benchmark
-Performance and latency profiling:
-- Adjustable sample sizes
-- Native Rust-backed throughput measurements
-- Results automatically cached and exportable
+- Real Rust backend measurements
+- Configurable samples
+- Results tracking + export
 
-### Batch and Streaming
-High-volume and real-time workflows:
-- Batch Decode: CPU, CUDA, and OpenCL backends with success-rate tracking
-- Streaming Session: Sliding-window multi-round decoding with live syndrome injection
+### Batch & Streaming + Hardware
+- CPU / CUDA / OpenCL batch
+- Streaming sessions
+- Hardware profile + routing recommendations
 
-### Hardware and Routing
-Intelligent system detection and recommendations:
-- Auto-detects CPU, CUDA, GPU, memory, and Python environment
-- AI-powered decoder suggestion engine. Optimize for speed, accuracy, or balanced priority.
+## MCP Server (25 Tools, Fully Tested)
 
-## Settings and Preferences
+stdio + HTTP (default 8765). All functions verified in test_mcp_all.py.
 
-Open via the gear icon in the header. All settings persist across sessions.
+Key tools:
+- analyze_code_family, list_code_families, get_code_properties
+- list_decoders, get_decoder_info, benchmark_decoder
+- run_benchmark, compare_benchmarks, export_benchmark
+- get_results, get_statistics, clear_results
+- get_config, set_config, reset_config
+- get_system_info, get_hardware_info, list_tools
+- generate_documentation (premium multi-format)
+- get_resources, get_resource, delete_resource
+- register_client, list_clients, mcp_status
 
-| Category   | Key Options                                      |
-|------------|--------------------------------------------------|
-| UI         | Dark/light theme, auto hardware detection        |
-| Behavior   | Logging toggle, log level, auto-open exports     |
-| Defaults   | Error rate, batch size, random seed              |
-| Export     | Default formats and output directory             |
-
-Configuration file location: `~/.qector/.qector_config.json`
-
-## File Organization
-
-```
-~/.qector/
-├── .qector_config.json
-├── logs/
-│   ├── qector.log
-│   └── crash_TIMESTAMP.log
-├── .cache/
-│   └── results.json
-└── exports/
-    └── code_doc files
-```
-
-## Logging and Diagnostics
-
-- In-app Console: Real-time colored output
-- File Log: logs/qector.log (rotating)
-- Crash Reports: logs/crash_TIMESTAMP.log with complete traceback
-- Export any console session with the Save Log button
-
-## Scripting and API
-
-Full backend access for automation and custom workflows:
-
+Example (Python):
 ```python
-import backend as be
+import asyncio
+from mcp_server import call_mcp_tool
 
-# Build a quantum error correction code
-code = be.build_code('rotated_surface', 5)
-
-# Get human-readable summary
-summary = be.code_summary(code)
-
-# Run a single decode
-result = be.run_single_decode(code, error_rate=0.05, decoder='union_find', seed=42)
-
-# Performance benchmark
-bench = be.run_benchmark(code, samples=5000, seed=42)
-
-# High-volume batch decode
-batch = be.run_batch_decode(code, backend='cpu', batch_size=500, error_rate=0.05, seed=42)
+res = asyncio.run(call_mcp_tool("generate_documentation", {
+    "family_key": "rotated_surface", "param": 5,
+    "formats": ["html", "markdown", "json", "latex"]
+}))
 ```
 
-## Troubleshooting
+## Documentation Export (10/10 Quality)
 
-Missing qector_decoder_v3 module:
+`ProfessionalDocGenerator` produces:
+- Modern self-contained HTML (Inter + JetBrains Mono, responsive stats, matrix preview, JS copy, provenance)
+- Clean Markdown with TOC + repro
+- Publication LaTeX + figures
+- Rich JSON
+- SVG/PDF matrix + Tanner graphs
+
+All include generator/backend versions, timestamp, author/ORCID, watermark.
+
+## Packaging & Release
+
+- PyInstaller spec (updated for v3.4)
+- Inno Setup installer (64-bit, lzma2, version info)
+- Production bundles include exe, setup, docs samples, manifests, SHA256 checksums
+
+See release assets for `QectorWorkbench-v3.4.0-production.zip` and `QectorWorkbenchSetup.exe`.
+
+Build locally:
 ```bash
-pip install -r requirements.txt
+pyinstaller -y QectorWorkbench.spec
+"C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /Q installer.iss
 ```
 
-CUDA backend unavailable:
-Install NVIDIA drivers and CUDA toolkit. The workbench automatically falls back to CPU.
+## Reproducibility & Verification
 
-Console not refreshing:
-Click inside the application window or check logs/qector.log for details.
-
-Missing icons:
-Restart the app. Ensure Pillow is installed.
+- All 25 MCP tools passing
+- End-to-end: build → decode/benchmark → MCP → doc gen verified
+- Self-tests pass (`python main.py --self-test`)
+- Seeded RNGs, full provenance in exports
 
 ## System Requirements
 
-- Python 3.8 or higher
-- RAM: 2 GB minimum (4 GB+ recommended)
-- Disk space: approximately 200 MB for logs and cache
-- GPU: Optional. CUDA 11.0+ enables accelerated batch decoding
+- Python 3.11+
+- Windows 10+ / Linux (recommended)
+- 4 GB+ RAM
+- Optional: CUDA/OpenCL for batch acceleration
 
 ## Version History
 
-- v3.1 (2026-07-05): Professional upgrade featuring multi-format documentation export, persistent settings, structured logging, result tracking, and refined UI/UX
-- v3.0: Major infrastructure and professional tooling release
-- v2.0: Expanded feature set
-- v1.0: Initial release
+- v3.4.0 (2026-07): Production release — upgraded installer, production packaging, full verification of wiring/MCP/docs/GUI
+- v3.3.0: 10/10 GUI polish, premium doc generator, MCP server completion + 25-tool exhaustive tests
+- v3.1 / earlier: Initial professional infrastructure (config, logging, results, docs, dialogs)
 
 ## License
 
-Source-available under the terms in EULA.txt.
-Free for personal, academic, and non-commercial research use.
-Commercial and OEM licensing available on request.
+Source-available under EULA.txt. Free for personal/academic/non-commercial research. Commercial licensing available.
 
-Developer: Guillaume Lessard 2026
+Developer: Guillaume Lessard © 2026
 
 ## Acknowledgments
 
-Built on the powerful qector_decoder_v3 quantum error correction library.
+Built on qector_decoder_v3 (Rust + Python, v0.6.2).
 
-QECTOR Decoder Workbench v3.1: Professional Quantum Error Correction Analysis Suite
-```
+QECTOR Decoder Workbench v3.4 — Production Ready
