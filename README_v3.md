@@ -1,101 +1,57 @@
-# QECTOR Decoder Workbench v3.4 — Scientific QEC Analysis Suite (Production Ready)
+# QECTOR Decoder Workbench v3.4.0 — Professional QEC Analysis Suite
 
-## What this is
+## Overview
 
-QECTOR Decoder Workbench is a scientific desktop application for constructing quantum error correction (QEC) codes, inspecting their parity-check structure, running decoders, benchmarking decode latency, batch-decoding syndrome ensembles, running streaming decoding sessions, and exporting analyzed results.
+Professional quantum error correction analysis platform built on `qector_decoder_v3`. Features 5 decoders, 6 code families, batch/streaming decode, hardware detection, MCP server, auto-updater, and multi-format documentation export.
 
-It is built on `qector-decoder-v3` and surfaces real backend APIs through a CustomTkinter desktop GUI and an optional MCP server bridge.
-
-## Current release surface
-
-- **Desktop GUI**: 7 tabs — Code Explorer, Decoder Lab, Benchmark, Batch & Streaming, Hardware & Routing, Console, Documentation Studio.
-- **Real backend wrappers**: `backend.py` is a thin wrapper over the installed `qector_decoder_v3` package. It does not simulate decoders.
-- **Documentation export**: Premium 10/10 outputs — modern self-contained HTML, clean MD with TOC, production LaTeX, rich JSON. Full provenance + repro code included.
-- **UI/UX**: Professional dark quantum theme, refined controls, high-quality embedded plots, consistent premium card layouts across all tabs.
-- **MCP server**: stdio/HTTP bridge exposing real tools for code building, decoding, hardware detection, and doc generation. **25 tools fully tested**.
-- **Reproducible packaging**: PyInstaller build spec, GitHub Actions CI, release artifact checksum generation.
-
-## Installation
+## Quick Start
 
 ```bash
-python -m pip install --upgrade pip
-pip install -e .[dev]
-python -m pytest -q
-python app.py
+pip install -r requirements.txt
+python main.py
 ```
+
+## Features
+
+### Code Explorer
+Build codes from 6 families (repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex) with configurable distance. Live properties display including qubits, checks, and code rate.
+
+### Decoder Lab
+Test any of 5 decoders (union_find, fast_union_find, blossom, sparse_blossom, bp_osd) with configurable error rate and seed. View error, syndrome, and correction arrays.
+
+### Benchmark Suite
+Run configurable benchmarks with throughput/latency metrics. Export results to JSON.
+
+### Batch & Streaming
+Batch decode multiple error samples with success rate. Streaming session controls (requires backend v0.6.x).
+
+### Hardware Dashboard
+Auto-detect CUDA, OpenCL, and CPU backends. System info with CPU/RAM utilization. Hardware-optimized decoder recommendations.
+
+### Documentation Studio
+Export professional documentation in Markdown, HTML, JSON, and LaTeX formats with full provenance metadata.
+
+### MCP Server
+25-tool Model Context Protocol server for programmatic access. All tools wired to real backend with bulletproof error handling.
+
+### Auto-Updater
+On each boot, checks PyPI for newer `qector_decoder_v3`. Install v0.6.2+ for streaming session support.
 
 ## Requirements
 
 - Python 3.11+
-- OS: Windows 10+, Linux
-- RAM: 4 GB+ recommended
-- GPU: optional; CUDA/OpenCL batch backends require matching drivers
+- qector-decoder-v3 >=0.5.8
+- customtkinter >=6.0.0
+- numpy, scipy, Pillow, matplotlib, psutil
 
-## MCP Server
-
-The Workbench includes a complete MCP (Model Context Protocol) server exposing **25 tools** across code analysis, decoders, benchmarks, results, config, hardware, resources, clients, and premium documentation generation.
-
-All 25 functions verified passing.
-
-## Supported code families
-
-- Repetition code
-- Ring code
-- Rotated surface code
-- Unrotated surface code
-- Toric code
-- Heavy-hex code
-
-## Supported decoders
-
-- union_find
-- fast_union_find
-- blossom
-- sparse_blossom
-- bp_osd
-
-## Reproducibility
-
-- Seeded RNGs
-- Document exports include timestamp, versions, author/ORCID
-
-## Packaging & Clean Builds
-
-The source repo is kept lean (build artifacts, venvs, large zips are gitignored).
+## Build Production Executable
 
 ```bash
-# Clean build standalone
-pyinstaller -y --clean QectorWorkbench.spec
-
-# Build installer (Inno Setup)
-& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" /Q installer.iss
+pyinstaller QectorWorkbench.spec
 ```
 
-Production release bundles (v3.4.0+) include:
-- Standalone exe + _internal
-- Full installer .exe
-- Sample docs, manifests, SHA256 checksums
-
-See release assets for `QectorWorkbench-v3.4.0-production.zip` and `QectorWorkbenchSetup.exe`.
-
-Never commit `dist/`, `build/`, `*.zip`, or `QectorWorkbench_v*_production/`.
-
-## .gitignore
-
-The repo uses a strict .gitignore to prevent committing:
-- PyInstaller outputs (build/, dist/)
-- Python caches, venvs (.venv/)
-- Release zips and old production folders
-- Logs, caches, temp files
-
-This keeps the source repo small and clean.
+Output: `dist/QectorWorkbench/QectorWorkbench.exe`
 
 ## License
 
-See `EULA.txt`.
-
-**Developer**: Guillaume Lessard © 2026
-
-## Acknowledgments
-
-Built on `qector_decoder_v3`.
+Proprietary — see EULA.txt

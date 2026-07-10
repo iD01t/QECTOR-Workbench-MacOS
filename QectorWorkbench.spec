@@ -1,13 +1,19 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_all
+from PyInstaller.utils.hooks import collect_submodules
 
-datas = [('icon.ico', '.'), ('icon.png', '.'), ('EULA.txt', '.'), ('README_v3.md', '.')]
+hiddenimports = [
+    # QECTOR app modules (all 22)
+    'app', 'backend', 'state', 'theme', 'utils', 'logger', 'console', 'version',
+    'doc_generator', 'auto_updater', 'threading_utils', 'results_tracker',
+    'hardware_routing', 'mcp_server', 'mcp_resources', 'dialogs',
+    'code_explorer_tab', 'decoder_lab_tab', 'benchmark_tab',
+    'batch_streaming_tab', 'hardware_tab', 'documentation_tab',
+]
+
+datas = [('icon.jpg', '.'), ('EULA.txt', '.'), ('README_v3.md', '.')]
 binaries = []
-hiddenimports = []
-tmp_ret = collect_all('customtkinter')
-datas += tmp_ret[0]; binaries += tmp_ret[1]; hiddenimports += tmp_ret[2]
 
-app_version = '3.4'  # canonical: matches version.py WORKBENCH_VERSION
+app_version = '3.4.0'
 
 a = Analysis(
     ['main.py'],
@@ -18,7 +24,15 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=['pythoncom', 'win32api', 'win32con', 'pywintypes'],
+    excludes=[
+        'pythoncom', 'win32api', 'win32con', 'pywintypes',
+        'tkinter.test', 'unittest', 'pdb', 'email',
+        'http.server', 'xmlrpc',
+        'torch', 'tensorflow', 'jax', 'pandas', 'notebook',
+        'matplotlib.tests', 'matplotlib.testing',
+        'scipy.tests', 'scipy.testing',
+        'PIL.ImageShow', 'PIL.ImageGrab',
+    ],
     noarchive=False,
     optimize=0,
 )
@@ -40,7 +54,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['icon.ico'],
+    icon=[],
 )
 coll = COLLECT(
     exe,
