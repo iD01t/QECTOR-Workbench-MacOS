@@ -939,8 +939,38 @@ async def serve_stdio() -> int:
             _write_message(stdout, response)
 
 
+def _reopen_frozen_streams() -> None:
+    """Windows-specific helper to restore stdin/stdout/stderr pipes in frozen GUI builds."""
+    if sys.platform != "win32" or not getattr(sys, "frozen", False):
+        return
+    import ctypes
+    import msvcrt
+    import io
+
+    STD_INPUT_HANDLE = -10
+    STD_OUTPUT_HANDLE = -11
+    STD_ERROR_HANDLE = -12
+
+    kernel32 = ctypes.windll.kernel32
+
+    for std_id, mode, attr in [
+        (STD_INPUT_HANDLE, "r", "stdin"),
+        (STD_OUTPUT_HANDLE, "w", "stdout"),
+        (STD_ERROR_HANDLE, "w", "stderr"),
+    ]:
+        h = kernel32.GetStdHandle(std_id)
+        if h and h != -1:
+            try:
+                fd = msvcrt.open_osfhandle(h, 0 if mode == "r" else 1)
+                stream = io.TextIOWrapper(open(fd, mode + "b", buffering=0), encoding="utf-8")
+                setattr(sys, attr, stream)
+            except Exception:
+                pass
+
+
 def main() -> int:
     """Entry point for `python mcp_server.py` — run the stdio MCP server."""
+    _reopen_frozen_streams()
     try:
         sys.stdout.reconfigure(encoding="utf-8", newline="\n")
         sys.stderr.reconfigure(encoding="utf-8")
