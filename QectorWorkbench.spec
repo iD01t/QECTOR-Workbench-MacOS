@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_submodules
+from PyInstaller.utils.hooks import collect_submodules, collect_dynamic_libs, collect_data_files
 
 hiddenimports = [
     # QECTOR app modules (all 22)
@@ -10,8 +10,8 @@ hiddenimports = [
     'batch_streaming_tab', 'hardware_tab', 'documentation_tab',
 ]
 
-datas = [('icon.jpg', '.'), ('icon.ico', '.'), ('EULA.txt', '.'), ('README_v3.md', '.')]
-binaries = []
+datas = [('icon.jpg', '.'), ('icon.ico', '.'), ('EULA.txt', '.'), ('README_v3.md', '.')] + collect_data_files('qector_decoder_v3')
+binaries = collect_dynamic_libs('qector_decoder_v3')
 
 app_version = '3.5.0'
 
@@ -25,13 +25,9 @@ a = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[
-        'pythoncom', 'win32api', 'win32con', 'pywintypes',
-        'tkinter.test', 'unittest', 'pdb',
-        'http.server', 'xmlrpc',
         'torch', 'tensorflow', 'jax', 'pandas', 'notebook',
         'matplotlib.tests', 'matplotlib.testing',
         'scipy.tests', 'scipy.testing',
-        'PIL.ImageShow', 'PIL.ImageGrab',
     ],
     noarchive=False,
     optimize=0,
