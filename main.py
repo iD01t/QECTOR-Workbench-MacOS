@@ -12,6 +12,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 if __name__ == "__main__":
     multiprocessing.freeze_support()
-    from app import main
-
-    main()
+    if "--mcp" in sys.argv:
+        from mcp_server import main as mcp_main
+        mcp_main()
+    else:
+        from app import main
+        main()
