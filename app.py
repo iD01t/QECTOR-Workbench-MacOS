@@ -51,6 +51,34 @@ class QectorApp:
         # ── Build UI ──────────────────────────────────────────────
         self._build_ui()
 
+        # ── Start background update check ─────────────────────────
+        threading.Thread(target=self._bg_update_check, daemon=True).start()
+
+    def _bg_update_check(self) -> None:
+        try:
+            from auto_updater import check_for_update
+            avail = check_for_update()
+            if avail:
+                self.console.log(f"New qector_decoder_v3 version available: {avail}", "INFO")
+                self.root.after(200, lambda: self._prompt_upgrade(avail))
+        except Exception:
+            pass
+
+    def _prompt_upgrade(self, version: str) -> None:
+        from dialogs import ask_yes_no, show_info, show_error
+        msg = f"A new version of qector_decoder_v3 ({version}) is available.\n\nWould you like to upgrade now?"
+        if ask_yes_no(self.root, "Upgrade Available", msg):
+            self.console.log(f"Upgrading to qector_decoder_v3 v{version} in background...", "INFO")
+            from auto_updater import try_upgrade
+            def callback(success: bool, detail: str):
+                if success:
+                    self.console.log(f"Upgrade succeeded: {detail}", "SUCCESS")
+                    self.root.after(0, lambda: show_info(self.root, "Upgrade Successful", "Upgrade successful! Please restart the application to use the new version."))
+                else:
+                    self.console.log(f"Upgrade failed: {detail}", "ERROR")
+                    self.root.after(0, lambda: show_error(self.root, "Upgrade Failed", f"Upgrade failed:\n{detail}"))
+            try_upgrade(version, callback)
+
     # ── helpers expected by test suite ────────────────────────────
     def title(self) -> str:
         return self.root.title()
@@ -262,18 +290,7 @@ def main() -> None:
         print("ERROR: customtkinter is required to run QECTOR Workbench")
         sys.exit(1)
 
-    # Fire-and-forget update check (non-blocking, not at import time)
-    def _bg_update_check():
-        try:
-            from auto_updater import check_for_update
-            from logger import get_logger
-            avail = check_for_update()
-            if avail:
-                get_logger().info(f"Update available: {avail}")
-        except Exception:
-            pass
 
-    threading.Thread(target=_bg_update_check, daemon=True).start()
 
     try:
         from logger import get_logger
