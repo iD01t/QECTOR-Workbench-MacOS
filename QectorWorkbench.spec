@@ -10,10 +10,10 @@ hiddenimports = [
     'batch_streaming_tab', 'hardware_tab', 'documentation_tab',
 ]
 
-datas = [('icon.jpg', '.'), ('EULA.txt', '.'), ('README_v3.md', '.')]
+datas = [('icon.jpg', '.'), ('icon.ico', '.'), ('EULA.txt', '.'), ('README_v3.md', '.')]
 binaries = []
 
-app_version = '3.4.0'
+app_version = '3.5.0'
 
 a = Analysis(
     ['main.py'],
@@ -54,7 +54,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=[],
+    icon='icon.ico',
 )
 coll = COLLECT(
     exe,

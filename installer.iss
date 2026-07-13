@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "QECTOR Decoder Workbench"
-#define MyAppVersion "3.4.0"
+#define MyAppVersion "3.5.0"
 #define MyAppPublisher "Guillaume Lessard"
 #define MyAppURL "https://www.qector.store"
 #define MyAppSupportURL "https://id01t.itch.io"
@@ -45,6 +45,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "dist\QectorWorkbench\*"; DestDir: "{app}"; Flags: recursesubdirs createallsubdirs
+Source: "icon.ico"; DestDir: "{app}"
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\icon.ico"

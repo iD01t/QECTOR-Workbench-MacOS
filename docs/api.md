@@ -1,8 +1,6 @@
-# QECTOR Workbench — API Reference (v3.4.0)
+# QECTOR Workbench — API Reference (v3.5.0)
 
-> The Workbench also exposes a powerful **MCP Server** (25 tools, all verified) — see `mcp_server.py` and `README_v3.md` for agent/LLM integration details.
-
-**Note**: Source repo is cleaned. Build with `pyinstaller --clean` for production. See .gitignore and UPGRADE_NOTES.md.
+> The Workbench also exposes a powerful **MCP Server** (29 tools, all verified) — see `mcp_server.py` and `README_v3.md` for agent/LLM integration details.
 
 ## backend.py
 
@@ -11,16 +9,15 @@
 ```python
 import backend as be
 
-be.CODE_FAMILIES  # dict[str, CodeFamily]
-be.CODE_FAMILIES["rotated_surface"].builder
-be.CODE_FAMILIES["rotated_surface"].param_name
-be.CODE_FAMILIES["rotated_surface"].default
+be.CODE_FAMILIES  # dict[str, callable]
+# Keys: "repetition", "ring", "rotated_surface", "unrotated_surface", "toric", "heavy_hex"
 ```
 
 ### Decoder kinds
 
 ```python
 be.DECODER_KINDS  # list[str]
+# Values: "union_find", "fast_union_find", "blossom", "sparse_blossom", "bp_osd"
 ```
 
 ### Build code
@@ -35,66 +32,72 @@ Returns a real `qector_decoder_v3.codes.Code`.
 
 ```python
 summary = be.code_summary(code)
-# keys: name, n_qubits, n_checks, distance, max_qubit_degree, description
+# Returns dict with keys: n_qubits, n_checks, and optional: name, distance, description, max_qubit_degree
 ```
 
 ### Validate parameter
 
 ```python
-ok, msg = be.validate_parameter("heavy_hex", 7)
+ok, msg = be.validate_parameter("heavy_hex", 5)
 ```
 
 ### Code family info
 
 ```python
 info = be.get_code_family_info("rotated_surface")
-# keys: key, label, param_name, default, note
+# Returns dict with keys: key, label
 ```
 
 ### Decode
 
 ```python
-result = be.run_single_decode(code, error_rate=0.05, kind="union_find", seed=42)
-# returns dict with keys: error, syndrome, result, explain
-# result is qector_decoder_v3.result.DecodeResult
+result = be.run_single_decode(code, error_rate=0.05, decoder_kind="union_find", seed=42)
+# returns dict with keys: error, syndrome, result
+# result is an instance of _DecodeResult with attributes: correction, syndrome_valid, logical_failure, hamming_weight
 result["result"].hamming_weight
 result["result"].syndrome_valid
+result["result"].logical_failure
 result["result"].to_dict()
 ```
 
 ### Benchmark
 
 ```python
-bench = be.run_benchmark(code, n_samples=5000, seed=42)
-# keys: latency_mean_us, latency_p50_us, latency_p99_us, latency_min_us, latency_max_us, throughput
+bench = be.run_benchmark(code, n_samples=1000, seed=42, decoder_kind="union_find", error_rate=0.05)
+# returns dict with keys: throughput_decodes_per_s, decode_seconds, n_trials, p, seed, method, backend,
+# latency_mean_us, latency_p50_us, latency_p99_us, latency_min_us, latency_max_us, syndrome_match_rate, logical_error_rate
 ```
 
 ### Batch decode
 
 ```python
-out = be.run_batch_decode(code, backend_key="cpu", n_samples=500, error_rate=0.05, seed=1)
-# keys: corrections, syndromes, batch_seconds, mean_hamming_weight, success_rate
+out = be.run_batch_decode(code, backend="cpu", n_samples=100, error_rate=0.05, seed=1)
+# returns dict with keys: corrections, syndromes, success_rate, logical_error_rate, mean_hamming_weight, batch_seconds, n_samples, backend_used
 ```
 
 ### Streaming decode
 
 ```python
-out = be.run_streaming_session(code, window_size=5, n_rounds=40, error_rate=0.03, seed=9)
-# keys: committed_corrections, committed_syndromes, committed_count, session_seconds
+out = be.run_streaming_session(code, window_size=5, n_rounds=10, error_rate=0.03, seed=1, decoder_kind="union_find")
+# returns dict with keys: committed_corrections, committed_count, rounds, window_size, session_seconds, logical_error_rate
 ```
 
-### Hardware profile
+## hardware_routing.py
+
+### Detect Hardware
 
 ```python
-profile = be.get_hardware_profile()
-# attributes: cuda_rust, gpu, cpu_count, ...
+import hardware_routing as hr
+
+profile = hr.detect_hardware()
+# Returns HardwareProfile instance with attributes: cuda_rust (bool), gpu (str|None), opencl (bool), opencl_device (str|None)
 ```
 
-### Recommendation
+### Recommend Decoder
 
 ```python
-rec = be.get_recommendation("rotated_surface", distance=5, n_qubits=25, priority="balanced")
-# attributes: decoder, reason, family, priority, batch_size, hardware, gpu_batched_bp
+rec = hr.recommend(code_family="rotated_surface", distance=5, n_qubits=25, priority="balanced")
+# Returns Recommendation instance with attributes: decoder (str), reason (str), family (str|None), priority (str), batch_size (int), hardware (str), gpu_batched_bp (bool)
 ```
 
 ## AppState
@@ -111,8 +114,9 @@ state.set_code(code, "rotated_surface", 5)
 
 ```python
 from doc_generator import ProfessionalDocGenerator
+from pathlib import Path
 
 gen = ProfessionalDocGenerator(output_dir=Path("./exports"))
-paths_map = gen.generate_all(code, formats=["markdown", "json", "html", "latex", "svg", "pdf"])
+paths_map = gen.generate_all(code, formats=["markdown", "json", "html", "latex", "pdf", "svg"])
 # returns dict[str, tuple[bool, Path]]
 ```

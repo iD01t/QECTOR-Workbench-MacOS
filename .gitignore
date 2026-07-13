@@ -1,19 +1,40 @@
-﻿# Ignore all Python source files
-*.py
-!main.py
-!QectorWorkbench.spec
-
-# Ignore build artifacts
-build/
-dist/QectorWorkbench/_internal/
+# --- Python bytecode & caches ---
 __pycache__/
-*.pyc
-*.pyo
+*.py[co]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Build & packaging output ---
+build/
+dist/
+*.exe
+*.zip
 *.egg-info/
 
-# Ignore temp / generated files
+# --- Virtual environments ---
+.venv/
+venv/
+
+# --- Logs ---
+logs/
+
+# --- Coverage reports ---
+coverage.xml
+.coverage
+htmlcov/
+
+# --- Generated benchmark / documentation artifacts ---
 benchmark_*.json
+benchmark_export.json
 code_doc_*.md
 code_doc_*.json
 code_doc_*.html
-logs/
+code_doc_*.tex
+code_doc_*.pdf
+code_doc_*.svg
+
+# --- Release staging & runtime state ---
+release_assets/
+release_ready/
+mcp_*.json
