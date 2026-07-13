@@ -8,10 +8,10 @@ hiddenimports = [
     'hardware_routing', 'mcp_server', 'mcp_resources', 'dialogs',
     'code_explorer_tab', 'decoder_lab_tab', 'benchmark_tab',
     'batch_streaming_tab', 'hardware_tab', 'documentation_tab',
-]
+] + collect_submodules('qector_decoder_v3')
 
 datas = [('icon.jpg', '.'), ('icon.ico', '.'), ('EULA.txt', '.'), ('README_v3.md', '.')] + collect_data_files('qector_decoder_v3')
-binaries = collect_dynamic_libs('qector_decoder_v3')
+binaries = []
 
 app_version = '3.5.0'
 
