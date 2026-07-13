@@ -268,7 +268,12 @@ All five highest-priority priority items, as well as the remaining defects liste
 ### Final Verification ✅ PASS
 - Run suite: `pytest tests/ -v` -> **82 / 82 tests passed** (including streaming & security depth).
 - Run registry: `python test_mcp_all.py` -> **29 / 29 tools passed**.
-- Rebuilt executable: `pyinstaller QectorWorkbench.spec --clean -y` -> **Successful compilation**.
+- Rebuilt executable: `python -m PyInstaller QectorWorkbench.spec --clean -y` -> **Successful compilation**.
+- Frozen Executable Checks:
+  - **MCP Server Stdio Check**: `QectorWorkbench.exe --mcp` successfully completes JSON-RPC 2.0 handshake initialization -> **PASS**.
+  - **GUI Launch Check**: `QectorWorkbench.exe` successfully spawns the customtkinter window loop with no standard error output -> **PASS**.
+  - **Auto-Updater Check**: Interactive background update thread runs correctly without blocking or crash -> **PASS**.
+
 
 
 
