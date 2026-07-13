@@ -26,7 +26,7 @@ a = Analysis(
     runtime_hooks=[],
     excludes=[
         'pythoncom', 'win32api', 'win32con', 'pywintypes',
-        'tkinter.test', 'unittest', 'pdb', 'email',
+        'tkinter.test', 'unittest', 'pdb',
         'http.server', 'xmlrpc',
         'torch', 'tensorflow', 'jax', 'pandas', 'notebook',
         'matplotlib.tests', 'matplotlib.testing',
