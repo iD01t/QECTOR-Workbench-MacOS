@@ -1,9 +1,11 @@
-# QECTOR Workbench release manifest
+# QECTOR Workbench v3.5.0 — release manifest
 version: 3.5.0
-generated_utc: 2026-07-14T07:28:28+00:00
-file: QectorWorkbench-v3.5.0.zip
-  sha256: cf2c576448e5ede64d21d2d52db7b478e39c2efa1b6b8742ee17ccf26f435f07
-  size_bytes: 26018660
-file: QectorWorkbenchSetup-v3.5.0.exe
-  sha256: 44f174c9b722828f9e5e931e2221d85bbc5d54488554a2a92ae3d075f4c8eb38
-  size_bytes: 19991680
+generated_utc: 2026-07-14T12:37:04Z
+
+[QectorWorkbenchSetup-v3.5.0.exe]
+  sha256: 41b51d685e0f5edd0a57a6d979e7bb40176d64024b56937e816c1053d95d865b
+  size_bytes: 94523769  (90.1 MB)
+
+[QectorWorkbench-v3.5.0.zip]
+  sha256: 0e468d8eefa106e392b72b5e6264168241565afbd07a36338a1c3d90aaaa5933
+  size_bytes: 129607072  (123.6 MB)
