@@ -1,6 +1,11 @@
 # QECTOR Workbench v3.5.0 — release manifest
 version: 3.5.0
-generated_utc: 2026-07-14T12:37:04Z
+generated_utc: 2026-07-14T13:16:33Z
+
+artifacts:
+  QectorWorkbenchSetup-v3.5.0.exe            — Windows installer (Inno Setup)
+  QectorWorkbench-v3.5.0.zip                 — portable app (unzip and run QectorWorkbench.exe)
+  QectorWorkbench-v3.5.0-installer-bundle.zip — installer + documentation bundle
 
 [QectorWorkbenchSetup-v3.5.0.exe]
   sha256: 41b51d685e0f5edd0a57a6d979e7bb40176d64024b56937e816c1053d95d865b
@@ -9,3 +14,7 @@ generated_utc: 2026-07-14T12:37:04Z
 [QectorWorkbench-v3.5.0.zip]
   sha256: 0e468d8eefa106e392b72b5e6264168241565afbd07a36338a1c3d90aaaa5933
   size_bytes: 129607072  (123.6 MB)
+
+[QectorWorkbench-v3.5.0-installer-bundle.zip]
+  sha256: dd171a6e6eee46fb36ed85ca1f1b68ef070abe870f3e1339c3fe5a11324882bf
+  size_bytes: 94043903  (89.7 MB)
