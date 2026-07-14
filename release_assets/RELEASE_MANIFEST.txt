@@ -1,30 +1,30 @@
-# QECTOR Workbench v3.5.0 — release manifest
+# QECTOR Workbench v3.5.0 - release manifest
 version: 3.5.0
 backend: qector-decoder-v3 0.6.6 (min 0.6.2)
-generated_utc: 2026-07-14T13:47:37Z
+generated_utc: 2026-07-14T13:58:38Z
 
 artifacts:
+  QectorWorkbench-v3.5.0-COMPLETE.zip
+    Everything: portable exe + installer + all docs + checksums (recommended download)
+    sha256: 7b4d7be23445d1357e663a1f0f5fbd3f3813f5543bbad8e56d23a99aed956e2e
+    size:   211.8 MB
+
   QectorWorkbench-v3.5.0-Portable.exe
-    Single-file portable app — copy anywhere and run; no install, no folder, immune to any system Python
+    Single-file portable app — copy anywhere and run; immune to any system Python
+    sha256: 8cc180ed47c9fd79f1971435f132eee6eb848fd21780ce7f115b378cd0d026ce
+    size:   123.2 MB
+
   QectorWorkbenchSetup-v3.5.0.exe
-    Windows installer (Inno Setup) — installs to Program Files with shortcuts
+    Windows installer (Inno Setup)
+    sha256: 41b51d685e0f5edd0a57a6d979e7bb40176d64024b56937e816c1053d95d865b
+    size:   90.1 MB
+
   QectorWorkbench-v3.5.0.zip
-    Portable folder — unzip the WHOLE folder, run QectorWorkbench.exe inside
+    Portable folder — unzip the WHOLE folder, run the exe inside
+    sha256: 0e468d8eefa106e392b72b5e6264168241565afbd07a36338a1c3d90aaaa5933
+    size:   123.6 MB
+
   QectorWorkbench-v3.5.0-installer-bundle.zip
     Installer + documentation bundle
-
-[QectorWorkbench-v3.5.0-Portable.exe]
-  sha256: 8cc180ed47c9fd79f1971435f132eee6eb848fd21780ce7f115b378cd0d026ce
-  size_bytes: 129185258  (123.2 MB)
-
-[QectorWorkbenchSetup-v3.5.0.exe]
-  sha256: 41b51d685e0f5edd0a57a6d979e7bb40176d64024b56937e816c1053d95d865b
-  size_bytes: 94523769  (90.1 MB)
-
-[QectorWorkbench-v3.5.0.zip]
-  sha256: 0e468d8eefa106e392b72b5e6264168241565afbd07a36338a1c3d90aaaa5933
-  size_bytes: 129607072  (123.6 MB)
-
-[QectorWorkbench-v3.5.0-installer-bundle.zip]
-  sha256: dd171a6e6eee46fb36ed85ca1f1b68ef070abe870f3e1339c3fe5a11324882bf
-  size_bytes: 94043903  (89.7 MB)
+    sha256: dd171a6e6eee46fb36ed85ca1f1b68ef070abe870f3e1339c3fe5a11324882bf
+    size:   89.7 MB
