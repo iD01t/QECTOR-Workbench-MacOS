@@ -20,12 +20,24 @@ _PACKAGE = "qector-decoder-v3"
 
 
 def _parse_version(v: str) -> tuple:
+    """Parse a version string into a tuple of ints for comparison.
+
+    The leading digits of each dot-separated segment are extracted, so PEP 440
+    style suffixes are tolerated: "0.6.2rc1" -> (0, 6, 2).  Parsing stops at
+    the first segment without leading digits ("1.2.dev3" -> (1, 2)); anything
+    completely unparseable yields (0, 0, 0).
+    """
     import re
+    nums: list = []
     try:
-        parts = v.split(".")
-        return tuple(int(re.match(r'(\d+)', p).group(1)) for p in parts if re.match(r'\d', p))
+        for segment in str(v).split("."):
+            m = re.match(r"\s*(\d+)", segment)
+            if not m:
+                break
+            nums.append(int(m.group(1)))
     except Exception:
         return (0, 0, 0)
+    return tuple(nums) if nums else (0, 0, 0)
 
 
 def _get_installed_version() -> Optional[str]:

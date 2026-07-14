@@ -34,6 +34,9 @@ code_doc_*.tex
 code_doc_*.pdf
 code_doc_*.svg
 
+# --- Temporary / smoke-test artifacts ---
+.smoke_tmp/
+
 # --- Release staging & runtime state ---
 release_assets/
 release_ready/

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import traceback
 from typing import Any, Callable, Optional
 
 import backend as be
@@ -23,11 +24,20 @@ class AppState:
         self.current_code = code
         self.current_family_key = family
         self.current_param = param
-        for cb in self._code_changed_callbacks:
+        for cb in list(self._code_changed_callbacks):
             try:
                 cb()
             except Exception:
-                pass
+                # A broken listener must not break the others, but the
+                # failure is logged rather than silently swallowed.
+                try:
+                    from logger import get_logger
+
+                    get_logger().error(
+                        "AppState code-changed listener raised:\n" + traceback.format_exc()
+                    )
+                except Exception:
+                    pass
 
     def to_dict(self) -> dict[str, Any]:
         return {"family": self.current_family_key, "param": self.current_param}
