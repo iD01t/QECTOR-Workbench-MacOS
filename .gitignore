@@ -12,6 +12,7 @@ dist/
 *.zip
 !release_assets/*.exe
 !release_assets/*.zip
+release_assets/QectorWorkbench-win64.zip
 *.egg-info/
 
 # --- Virtual environments ---
@@ -42,3 +43,6 @@ code_doc_*.svg
 # --- Release staging & runtime state ---
 release_ready/
 mcp_*.json
+
+# --- SSH deploy keys ---
+deploy_key.pub
