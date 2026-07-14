@@ -16,8 +16,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
-from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -295,7 +293,6 @@ def test_benchmark_has_expected_fields(default_code):
 
 def test_benchmark_seed_produces_same_code_path(default_code):
     """Benchmark with same seed uses the same decoder/code path; errors must match."""
-    import time
 
     rng = np.random.default_rng(42)
     e1 = default_code.random_error(0.05, rng=rng)

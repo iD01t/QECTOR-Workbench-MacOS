@@ -78,5 +78,5 @@
 
 ---
 
-**Release Approved.**
-**Status: PRODUCTION READY — FLAWLESS**
+**Status: Release-ready — all local quality gates green (pytest 84 passed, MCP
+conformance pass, ruff/mypy/bandit clean).**

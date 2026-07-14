@@ -104,7 +104,6 @@ def test_single_decode_different_seeds_differ(repetition_code):
 
 def test_benchmark_same_code_same_seed_same_errors(rotated_code):
     """Benchmark reuses the same seeded errors; verify sampling contract."""
-    import time
 
     rng = np.random.default_rng(7)
     e1 = [rotated_code.random_error(0.05, rng=rng) for _ in range(20)]
@@ -149,7 +148,8 @@ def test_batch_decode_same_seed_same_errors(default_code):
 
 def test_streaming_reproducible():
     """run_streaming_session twice with same seed → same committed_corrections digests."""
-    import hashlib, json
+    import hashlib
+    import json
     code = be.build_code("repetition", 5)
     kwargs = dict(window_size=5, n_rounds=10, error_rate=0.03, seed=1,
                   decoder_kind="union_find")

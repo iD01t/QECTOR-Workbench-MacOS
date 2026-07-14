@@ -61,9 +61,10 @@ Output: `dist/QectorWorkbench/QectorWorkbench.exe`
 
 ### License
 
-Source-available under EULA.txt. Royalty-free for personal, academic, and non-commercial research.
-
-Commercial licensing available.
+Source-available under EULA.txt. The EULA grants a royalty-free, worldwide license to
+use, execute, copy, and distribute the software for any purpose — including commercial,
+academic, and personal use — provided the embedded "QECTOR" notices and watermarks are
+retained (EULA §2).
 
 Developer: Guillaume Lessard © 2026
 

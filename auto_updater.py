@@ -12,7 +12,6 @@ import threading
 import subprocess
 import urllib.request
 import urllib.error
-from pathlib import Path
 from typing import Optional
 
 _PYPI_JSON = "https://pypi.org/pypi/qector-decoder-v3/json"
@@ -49,9 +48,15 @@ def _get_installed_version() -> Optional[str]:
 
 
 def _fetch_latest_pypi_version(timeout: int = 5) -> Optional[str]:
+    # Only ever contact the fixed https PyPI endpoint; reject any other scheme
+    # (file:/ftp:/custom) defensively before opening the connection.
+    if not _PYPI_JSON.lower().startswith("https://"):
+        return None
     try:
         req = urllib.request.Request(_PYPI_JSON, headers={"User-Agent": "QECTOR-Workbench/3.4"})
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
+        if req.type != "https":
+            return None
+        with urllib.request.urlopen(req, timeout=timeout) as resp:  # nosec B310 - scheme pinned to https above
             data = json.loads(resp.read().decode("utf-8"))
         return data.get("info", {}).get("version")
     except Exception:

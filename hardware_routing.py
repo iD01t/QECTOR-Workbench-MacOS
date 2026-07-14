@@ -21,7 +21,7 @@ accuracy MWPM family; UnionFind/FastUnionFind = highest throughput,
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
 
 import qector_decoder_v3 as qec
 
@@ -69,6 +69,7 @@ def _safe_device_name(kind: str) -> Optional[str]:
     """Best-effort device name probe; a tiny 1-qubit decoder is enough to
     read .device_name without doing any real decode work."""
     try:
+        dec: Any
         if kind == "cuda":
             dec = qec.CUDABatchDecoder([[0]], 1)
         else:

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import tkinter
 import traceback
-from typing import Any, Optional
+from typing import Any
 
 try:
     import customtkinter as ctk

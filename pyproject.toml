@@ -81,11 +81,22 @@ addopts = "-q --tb=short"
 [tool.ruff]
 line-length = 120
 target-version = "py311"
+extend-exclude = ["build", "dist", ".venv"]
+
+[tool.ruff.lint.per-file-ignores]
+# test_mcp_all.py inserts the repo root on sys.path before importing local
+# modules, so those imports intentionally follow executable code.
+"test_mcp_all.py" = ["E402"]
 
 [tool.mypy]
 python_version = "3.11"
 strict = false
 ignore_missing_imports = true
+exclude = ["build/", "dist/", "\\.venv/"]
+# Every GUI module defines its tab class twice — a real CustomTkinter subclass
+# under `if _HAS_GUI:` and a headless no-op stub under `else:`. That deliberate
+# idiom trips no-redef; disable just that code project-wide.
+disable_error_code = ["no-redef"]
 
 [tool.bandit]
 exclude_dirs = ["dist", "build", ".venv", "__pycache__"]

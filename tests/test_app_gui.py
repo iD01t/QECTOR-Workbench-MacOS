@@ -7,9 +7,6 @@ host; import-only and pure-python state checks still run regardless.
 
 from __future__ import annotations
 
-import os
-import sys
-from types import SimpleNamespace
 from typing import Any, Generator, List
 
 import pytest
@@ -88,7 +85,6 @@ def test_tab_modules_import_cleanly():
 
 def test_state_round_trip_via_backend_builder():
     """AppState serializes family/param and rebuilds the code from backend."""
-    import backend as be
     from state import AppState
 
     state = AppState()

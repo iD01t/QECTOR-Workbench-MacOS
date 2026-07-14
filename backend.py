@@ -346,6 +346,7 @@ def _make_batch_decoder(backend: str, checks) -> Any:
     corresponding availability probe reports False the request fails loudly
     with QectorError — there is no silent CPU fallback.
     """
+    factory: Any
     if backend == "cuda":
         if not _backend_available(qd.cuda_is_available):
             raise QectorError(

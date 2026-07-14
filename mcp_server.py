@@ -27,7 +27,7 @@ import traceback
 import uuid
 from collections import deque
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 import numpy as np
 
@@ -101,9 +101,9 @@ class _ToolRegistry:
 
     def __init__(self):
         self.tools: dict[str, dict] = {}
-        self._handlers: dict[str, callable] = {}
+        self._handlers: dict[str, Callable[..., Any]] = {}
 
-    def register(self, name: str, description: str, parameters: dict, handler: callable) -> None:
+    def register(self, name: str, description: str, parameters: dict, handler: Callable[..., Any]) -> None:
         self.tools[name] = {
             "name": name,
             "description": description,
@@ -132,6 +132,15 @@ class _ToolRegistry:
 _server_instance: Optional["MCPServer"] = None
 _server_lock = threading.Lock()
 _registry: Optional[_ToolRegistry] = None
+
+
+def _require_registry() -> "_ToolRegistry":
+    """Return the tool registry, building it on first use. Never None."""
+    global _registry
+    if _registry is None:
+        _build_registry()
+    assert _registry is not None  # nosec B101 - invariant established by _build_registry
+    return _registry
 
 
 def _get_default_config() -> dict[str, Any]:
@@ -465,13 +474,14 @@ def _handle_list_decoders() -> dict:
 
 
 def _handle_list_tools() -> dict:
-    return {"tools": list(_registry.tools.values()), "count": len(_registry.tools)}
+    reg = _require_registry()
+    return {"tools": list(reg.tools.values()), "count": len(reg.tools)}
 
 
 def _handle_mcp_status() -> dict:
     return {"status": "running", "uptime": time.monotonic(),
             "version": WORKBENCH_VERSION, "backend": be.PACKAGE_VERSION,
-            "protocol_version": PROTOCOL_VERSION, "tools": len(_registry.tools)}
+            "protocol_version": PROTOCOL_VERSION, "tools": len(_require_registry().tools)}
 
 
 def _handle_recommend_decoder(family: str = "rotated_surface", distance: int = 5,
@@ -573,7 +583,7 @@ class MCPServer:
         return {"name": SERVER_NAME, "version": WORKBENCH_VERSION,
                 "backend_version": be.PACKAGE_VERSION,
                 "protocol_version": PROTOCOL_VERSION,
-                "tools": len(_registry.tools)}
+                "tools": len(_require_registry().tools)}
 
 
 def get_mcp_server() -> MCPServer:
@@ -972,8 +982,8 @@ def main() -> int:
     """Entry point for `python mcp_server.py` — run the stdio MCP server."""
     _reopen_frozen_streams()
     try:
-        sys.stdout.reconfigure(encoding="utf-8", newline="\n")
-        sys.stderr.reconfigure(encoding="utf-8")
+        sys.stdout.reconfigure(encoding="utf-8", newline="\n")  # type: ignore[union-attr]
+        sys.stderr.reconfigure(encoding="utf-8")  # type: ignore[union-attr]
     except Exception:
         pass
     try:

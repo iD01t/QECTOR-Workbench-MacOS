@@ -12,7 +12,6 @@ import ast
 import re
 from pathlib import Path
 
-import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -69,7 +68,7 @@ def test_no_eval_in_source():
                 continue
             if re.search(r'\beval\s*\(', line):
                 bad.append((path, lineno, line.strip()))
-    assert not bad, "eval() found:\n" + "\n".join(f"{p}:{n}: {l}" for p, n, l in bad)
+    assert not bad, "eval() found:\n" + "\n".join(f"{p}:{n}: {ln}" for p, n, ln in bad)
 
 
 def test_no_exec_in_source():
@@ -83,7 +82,7 @@ def test_no_exec_in_source():
                 continue
             if re.search(r'\bexec\s*\(', line):
                 bad.append((path, lineno, line.strip()))
-    assert not bad, "exec() found:\n" + "\n".join(f"{p}:{n}: {l}" for p, n, l in bad)
+    assert not bad, "exec() found:\n" + "\n".join(f"{p}:{n}: {ln}" for p, n, ln in bad)
 
 
 def test_no_pickle_in_source():
@@ -97,7 +96,7 @@ def test_no_pickle_in_source():
                 continue
             if re.search(r'\bpickle\.(load|loads|Unpickler)\s*\(', line):
                 bad.append((path, lineno, line.strip()))
-    assert not bad, "pickle deserialization found:\n" + "\n".join(f"{p}:{n}: {l}" for p, n, l in bad)
+    assert not bad, "pickle deserialization found:\n" + "\n".join(f"{p}:{n}: {ln}" for p, n, ln in bad)
 
 
 def test_no_hardcoded_api_keys():
@@ -116,7 +115,7 @@ def test_no_hardcoded_api_keys():
                 continue
             if any(p.search(line) for p in patterns):
                 bad.append((path, lineno, line.strip()))
-    assert not bad, "Possible hardcoded secret found:\n" + "\n".join(f"{p}:{n}: {l}" for p, n, l in bad)
+    assert not bad, "Possible hardcoded secret found:\n" + "\n".join(f"{p}:{n}: {ln}" for p, n, ln in bad)
 
 
 def test_no_subprocess_with_shell_true_in_source():
@@ -130,7 +129,7 @@ def test_no_subprocess_with_shell_true_in_source():
                 continue
             if "shell=True" in line:
                 bad.append((path, lineno, line.strip()))
-    assert not bad, "subprocess shell=True found:\n" + "\n".join(f"{p}:{n}: {l}" for p, n, l in bad)
+    assert not bad, "subprocess shell=True found:\n" + "\n".join(f"{p}:{n}: {ln}" for p, n, ln in bad)
 
 
 def test_no_nested_ast_bodies():

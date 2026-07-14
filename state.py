@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import traceback
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 import backend as be
 
