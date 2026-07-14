@@ -186,7 +186,8 @@ class QectorApp:
         # otherwise fire against the destroyed interpreter (an intermittent
         # _tkinter.TclError when roots are created and torn down repeatedly).
         try:
-            for aid in self._app.tk.eval("after info").split():
+            pending = self._app.tk.splitlist(self._app.tk.call("after", "info"))
+            for aid in pending:
                 try:
                     self._app.after_cancel(aid)
                 except Exception:
