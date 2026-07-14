@@ -21,6 +21,7 @@ venv/
 
 # --- Logs ---
 logs/
+*.log
 
 # --- Coverage reports ---
 coverage.xml

@@ -28,6 +28,14 @@ a = Analysis(
         'torch', 'tensorflow', 'jax', 'pandas', 'notebook',
         'matplotlib.tests', 'matplotlib.testing',
         'scipy.tests', 'scipy.testing',
+        # GPU acceleration is optional. Excluding cupy and its bundled CUDA
+        # runtime (~1.5 GB of cublas/cusparse/cufft/etc. DLLs) keeps the
+        # installer lean: CPU decode works fully, and the GPU batch backend
+        # reports "unavailable" through the existing graceful error path.
+        # Users who want GPU decode run from source with cupy installed.
+        'cupy', 'cupy_backends', 'cupyx', 'fastrlock',
+        # Interactive/notebook tooling pulled in transitively; unused at runtime.
+        'IPython', 'jedi', 'notebook', 'nbconvert', 'nbformat', 'jupyter_client',
     ],
     noarchive=False,
     optimize=0,

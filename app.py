@@ -181,6 +181,22 @@ class QectorApp:
                     pass
         self._update_after_id = None
         self._toast_after_id = None
+        # Cancel every remaining Tk "after" timer — including CustomTkinter's
+        # internal DPI/scaling-tracker loop, which reschedules itself and would
+        # otherwise fire against the destroyed interpreter (an intermittent
+        # _tkinter.TclError when roots are created and torn down repeatedly).
+        try:
+            for aid in self._app.tk.eval("after info").split():
+                try:
+                    self._app.after_cancel(aid)
+                except Exception:
+                    pass
+        except Exception:
+            pass
+        try:
+            self._app.update_idletasks()
+        except Exception:
+            pass
         try:
             self._app.destroy()
         except Exception:
