@@ -12,10 +12,14 @@ opencl_is_available().
 
 No fabricated benchmark numbers are used here. The recommendation logic
 is a plain, documented heuristic derived from the decoder docstrings
-shipped in the installed package (Blossom/SparseBlossom = highest
-accuracy MWPM family; UnionFind/FastUnionFind = highest throughput,
-~3x higher LER than Blossom; batch decode should prefer CUDA > OpenCL
-> CPU when available).
+shipped in the installed package (v0.6.6): Blossom = weight-optimal exact
+MWPM (reaches PyMatching's LER but is not faster); SparseBlossom =
+region-growing near-optimal matching, NOT exact; UnionFind/FastUnionFind =
+fast approximate paths with higher LER than exact MWPM (regenerate LER on
+the target workload — no fixed ratio is quoted); batch decode should prefer
+CUDA > OpenCL > CPU when available. Note: the standard qector_decoder_v3
+wheel ships a CUDA path but no OpenCL kernels, so opencl_is_available() is
+False unless the package was built from source with the opencl feature.
 """
 
 from __future__ import annotations
@@ -80,8 +84,8 @@ def _safe_device_name(kind: str) -> Optional[str]:
 
 
 # Decoders in accuracy order (best LER first) per the installed package's
-# own docstrings (Blossom/SparseBlossom = exact MWPM; UnionFind family
-# trades accuracy for raw speed).
+# own docstrings (Blossom = exact MWPM; SparseBlossom = near-optimal, not
+# exact; UnionFind family trades accuracy for raw speed).
 _ACCURACY_ORDER = ["blossom", "sparse_blossom", "bp_osd", "fast_union_find", "union_find"]
 _SPEED_ORDER = ["fast_union_find", "union_find", "cpu_batch", "sparse_blossom", "blossom"]
 
@@ -110,10 +114,10 @@ def recommend(
         reason = "Exact MWPM (Blossom) minimizes logical error rate; sparse_blossom scales better for large codes."
         if large_n:
             decoder = "sparse_blossom"
-            reason = "Large qubit count: sparse_blossom keeps MWPM accuracy with better scaling than Blossom."
+            reason = "Large qubit count: sparse_blossom (near-optimal, not exact) scales better than Blossom; use Blossom if exact MWPM is required."
     elif priority == "speed":
         decoder = "fast_union_find"
-        reason = "FastUnionFind gives the lowest per-decode latency; accept higher LER (about 3x Blossom)."
+        reason = "FastUnionFind gives the lowest per-decode latency; accept a higher LER than exact MWPM (regenerate the ratio on your target)."
         if hw.cuda_rust and large_n:
             decoder = "cpu_batch"
             reason = "CUDA available with a large batch: use a batch backend (cuda/cpu_batch) for max throughput."

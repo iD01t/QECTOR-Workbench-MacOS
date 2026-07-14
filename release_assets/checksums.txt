@@ -1,3 +1,4 @@
+8cc180ed47c9fd79f1971435f132eee6eb848fd21780ce7f115b378cd0d026ce  QectorWorkbench-v3.5.0-Portable.exe
 41b51d685e0f5edd0a57a6d979e7bb40176d64024b56937e816c1053d95d865b  QectorWorkbenchSetup-v3.5.0.exe
 0e468d8eefa106e392b72b5e6264168241565afbd07a36338a1c3d90aaaa5933  QectorWorkbench-v3.5.0.zip
 dd171a6e6eee46fb36ed85ca1f1b68ef070abe870f3e1339c3fe5a11324882bf  QectorWorkbench-v3.5.0-installer-bundle.zip

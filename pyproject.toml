@@ -9,7 +9,7 @@ description = "Professional QEC analysis suite built on qector-decoder-v3"
 readme = "README_v3.md"
 license = {text = "Proprietary"}
 requires-python = ">=3.11"
-authors = [{name = "Guillaume Lessard", email = "dev@qector.app"}]
+authors = [{name = "Guillaume Lessard / iD01t Productions", email = "admin@qector.store"}]
 keywords = ["quantum", "error-correction", "decoder", "qec", "gui"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -40,6 +40,10 @@ dev = [
     "ruff>=0.1",
     "pyinstaller>=6.0",
 ]
+
+[project.urls]
+Homepage = "https://www.qector.store"
+"Commercial licensing" = "mailto:admin@qector.store"
 
 [project.scripts]
 qector = "app:main"

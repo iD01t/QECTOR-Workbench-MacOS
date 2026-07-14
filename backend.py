@@ -124,11 +124,16 @@ def _decoder_class(kind: str):
 def get_decoder_info(kind: str) -> dict[str, str]:
     """Return human-readable info about a decoder kind."""
     descriptions = {
-        "union_find": "Union-Find decoder — MWPM approximation, high throughput, moderate LER",
-        "fast_union_find": "Fast Union-Find decoder — highest throughput, ~3x higher LER than Blossom",
-        "blossom": "Blossom decoder — exact MWPM, lowest LER, best accuracy",
-        "sparse_blossom": "Sparse Blossom decoder — exact MWPM with better scaling for large codes",
-        "bp_osd": "BP-OSD decoder — belief propagation with ordered statistics post-processing",
+        "union_find": "Union-Find — fast approximate decode; higher LER than exact MWPM. "
+                      "Best as a throughput/triage lever, not a universal decoder.",
+        "fast_union_find": "Fast Union-Find — optimized Union-Find hot path; approximate, "
+                           "higher LER than exact MWPM. Regenerate LER on your target workload.",
+        "blossom": "Blossom — weight-optimal exact MWPM. Reaches PyMatching's logical error "
+                   "rate on tested surface-code workloads but is not faster than PyMatching.",
+        "sparse_blossom": "Sparse Blossom — region-growing, near-optimal matching (experimental); "
+                          "NOT exact. Use Blossom for exact minimum-weight matching.",
+        "bp_osd": "BP-OSD — belief propagation + ordered-statistics decoding for LDPC / "
+                  "quantum-LDPC codes that graphlike matching cannot decode (experimental).",
     }
     return {"name": kind, "description": descriptions.get(kind, "Unknown decoder")}
 

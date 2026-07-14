@@ -11,6 +11,8 @@ __pycache__/
 # and checksums under release_assets/ are tracked so downloads can be verified.
 build/
 dist/
+build_*/
+dist_*/
 *.exe
 *.zip
 *.egg-info/
