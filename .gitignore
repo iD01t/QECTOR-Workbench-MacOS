@@ -10,6 +10,8 @@ build/
 dist/
 *.exe
 *.zip
+!release_assets/*.exe
+!release_assets/*.zip
 *.egg-info/
 
 # --- Virtual environments ---
@@ -38,6 +40,5 @@ code_doc_*.svg
 .smoke_tmp/
 
 # --- Release staging & runtime state ---
-release_assets/
 release_ready/
 mcp_*.json

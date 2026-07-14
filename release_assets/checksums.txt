@@ -1,0 +1,2 @@
+cf2c576448e5ede64d21d2d52db7b478e39c2efa1b6b8742ee17ccf26f435f07  QectorWorkbench-v3.5.0.zip
+44f174c9b722828f9e5e931e2221d85bbc5d54488554a2a92ae3d075f4c8eb38  QectorWorkbenchSetup-v3.5.0.exe
