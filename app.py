@@ -18,7 +18,7 @@ import tkinter
 import traceback
 from typing import Any, Optional
 
-from version import FULL_VERSION
+from version import FULL_VERSION, WORKBENCH_VERSION
 
 try:
     import customtkinter as ctk
@@ -27,10 +27,35 @@ except Exception:
     _HAS_GUI = False
 
 
+def _declare_dpi_awareness() -> None:
+    """Declare per-monitor DPI awareness so the GUI is sharp on 4K displays.
+
+    Must run before the Tk root is created; safe to call from any platform
+    (no-op outside Windows).  Never raises.
+    """
+    if sys.platform != "win32":
+        return
+    try:
+        import ctypes
+        try:
+            ctypes.windll.shcore.SetProcessDpiAwareness(1)
+        except Exception:
+            try:
+                ctypes.windll.user32.SetProcessDPIAware()
+            except Exception:
+                pass
+    except Exception:
+        pass
+
+
 _WINDOW_WIDTH = 1280
 _WINDOW_HEIGHT = 820
 _MIN_WIDTH = 1100
 _MIN_HEIGHT = 700
+
+# Boot maximized (full screen work area) on desktop platforms; tests set this
+# to False so the requested geometry stays explicit.
+_START_MAXIMIZED = True
 
 # (tab name, module, class) in display order; the Console tab is built inline.
 _TAB_SPECS = [
@@ -39,7 +64,9 @@ _TAB_SPECS = [
     ("Benchmark", "benchmark_tab", "BenchmarkTab"),
     ("Batch & Streaming", "batch_streaming_tab", "BatchStreamingTab"),
     ("Hardware", "hardware_tab", "HardwareTab"),
+    ("Diagnostics", "diagnostics_tab", "DiagnosticsTab"),
     ("Documentation", "documentation_tab", "DocumentationTab"),
+    ("Lab & Personal Info", "lab_info_tab", "LabInfoTab"),
 ]
 
 TAB_NAMES = [spec[0] for spec in _TAB_SPECS] + ["Console"]
@@ -111,7 +138,12 @@ class QectorApp:
         self.root = self._app  # backward-compatible alias
         self._width = _WINDOW_WIDTH
         self._height = _WINDOW_HEIGHT
-        self._app.title(FULL_VERSION)
+        # The app re-versions itself to the live decoder backend: the topbar
+        # never shows a hardcoded workbench number.  Seed from the installed
+        # decoder version (synchronous, no network); the boot update check then
+        # swaps in the live PyPI-resolved version.
+        self._version_title = self._boot_version_string()
+        self._app.title(self._version_title)
         self._app.geometry(f"{self._width}x{self._height}")
         self._app.minsize(_MIN_WIDTH, _MIN_HEIGHT)
         self._set_window_icon()
@@ -134,7 +166,32 @@ class QectorApp:
         _install_sys_excepthook()
 
         self._build_ui()
-        self.console.log(f"{FULL_VERSION} ready", "INFO")
+        self._center_and_lift_window()
+        self.console.log(f"{self._version_title} ready", "INFO")
+
+        # Session persistence: restore the last workspace (code family,
+        # distance, decoder, error rate, seed) and preferences, then arm
+        # saving on close.  All failure paths are silent — persistence is a
+        # convenience, never a boot blocker.
+        self._workspace_path: Optional[Any] = None
+        self._prefs_path: Optional[Any] = None
+        self._restore_session()
+        try:
+            self._app.protocol("WM_DELETE_WINDOW", self._on_close)
+        except Exception:
+            pass
+
+        # Memory monitoring: periodic RSS check with a warning at 500 MB and
+        # a restart offer at 1 GB (Phase-2 hardening item).
+        self._mem_after_id: Optional[str] = None
+        self._mem_warned = False
+        try:
+            self._mem_after_id = self._app.after(30000, self._monitor_memory)
+        except Exception:
+            self._mem_after_id = None
+
+        # Keyboard shortcuts (Phase-2 hardening item).
+        self._bind_shortcuts()
 
         # Auto-update check: scheduled AFTER construction; importing this
         # module starts zero threads and makes zero network calls.
@@ -158,6 +215,10 @@ class QectorApp:
     def destroy(self) -> None:
         self._destroyed = True
         try:
+            self._save_session()
+        except Exception:
+            pass
+        try:
             self.console.unsubscribe(self._on_console_output)
         except Exception:
             pass
@@ -173,7 +234,7 @@ class QectorApp:
                     pump.close()
                 except Exception:
                     pass
-        for after_id in (self._update_after_id, self._toast_after_id):
+        for after_id in (self._update_after_id, self._toast_after_id, self._mem_after_id):
             if after_id is not None:
                 try:
                     self._app.after_cancel(after_id)
@@ -181,6 +242,7 @@ class QectorApp:
                     pass
         self._update_after_id = None
         self._toast_after_id = None
+        self._mem_after_id = None
         # Cancel every remaining Tk "after" timer — including CustomTkinter's
         # internal DPI/scaling-tracker loop, which reschedules itself and would
         # otherwise fire against the destroyed interpreter (an intermittent
@@ -208,20 +270,150 @@ class QectorApp:
 
     # ── window icon (taskbar / title bar) ────────────────────────────
     def _set_window_icon(self) -> None:
-        """Set the window icon from the bundled icon.ico.
+        """Set the window icon, using the right mechanism per platform.
 
-        The icon file is bundled next to the source and also included in the
-        PyInstaller build via ``QectorWorkbench.spec``.  This call gives the
-        window title bar, taskbar button and Alt+Tab preview the QECTOR logo
-        when running from source.  When frozen the EXE icon embedded by the
-        ``.spec`` file already covers the taskbar; this is still called so
-        that ``iconbitmap`` is available when feasible.
+        Windows Tk supports ``.ico`` via ``iconbitmap``; Linux/X11 Tk does not
+        (it expects an XBM there) and instead takes a raster image through
+        ``iconphoto``.  On Linux we therefore load the bundled ``icon.png``
+        (generated at build time from ``icon.jpg``) as a :class:`tkinter.PhotoImage`
+        and keep a reference on ``self`` so Tk does not garbage-collect it,
+        which would blank the icon.  The whole method is defensive: a missing
+        or unreadable icon never prevents the window from opening.
         """
         try:
             import os
-            ico = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icon.ico")
-            if os.path.isfile(ico):
-                self._app.iconbitmap(ico)
+            # In a frozen onedir build ``icon.ico`` sits alongside the launcher,
+            # while imported modules normally live under ``_internal``.  Probe
+            # both locations so the Windows title bar/taskbar always receives
+            # the shipped ICO rather than Tk's default feather icon.
+            search_dirs: list[str] = []
+            meipass = getattr(sys, "_MEIPASS", None)
+            if meipass:
+                search_dirs.append(meipass)
+            try:
+                search_dirs.append(os.path.dirname(os.path.abspath(sys.executable)))
+            except Exception:
+                pass
+            search_dirs.append(os.path.dirname(os.path.abspath(__file__)))
+            try:
+                search_dirs.append(os.getcwd())
+            except Exception:
+                pass
+            if os.name == "nt":
+                # Give the app its own taskbar identity so Windows shows the
+                # app icon instead of the generic pythonw/Tk feather icon.
+                try:
+                    import ctypes
+                    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+                        "iD01t.QECTOR.Workbench")
+                except Exception:
+                    pass
+                for directory in search_dirs:
+                    ico = os.path.join(directory, "icon.ico")
+                    if os.path.isfile(ico):
+                        self._reassert_icon_path = ico
+                        try:
+                            self._app.iconbitmap(ico)
+                        except Exception:
+                            pass
+                        # CustomTkinter re-applies its OWN default icon ~200ms
+                        # after window creation (the "generic" icon); re-assert
+                        # the real icon a few times afterwards so it always wins,
+                        # in both source runs and frozen builds.
+                        for delay in (250, 500, 1200):
+                            try:
+                                self._app.after(delay, self._reassert_window_icon)
+                            except Exception:
+                                pass
+                        break
+                return
+            # Linux / macOS: prefer a PNG via iconphoto.
+            for directory in search_dirs:
+                png = os.path.join(directory, "icon.png")
+                if os.path.isfile(png):
+                    self._icon_image = tkinter.PhotoImage(file=png)
+                    self._app.iconphoto(True, self._icon_image)
+                    break
+        except Exception:
+            pass
+
+    def _reassert_window_icon(self) -> None:
+        """Re-apply the real window icon after CustomTkinter's delayed reset."""
+        if getattr(self, "_destroyed", False):
+            return
+        ico = getattr(self, "_reassert_icon_path", None)
+        if not ico:
+            return
+        try:
+            self._app.iconbitmap(ico)
+            self._app.wm_iconbitmap(ico)
+        except Exception:
+            pass
+
+    def _center_and_lift_window(self) -> None:
+        """Center window on the active monitor, maximize, lift, and force focus.
+
+        On Windows the active-monitor work area is resolved via win32api so a
+        multi-monitor setup never centers across the primary by mistake.  The
+        window boots maximized (full-screen work area) by default; tests that
+        assert on geometry set _START_MAXIMIZED = False.
+        """
+        try:
+            self._app.update_idletasks()
+            if _START_MAXIMIZED:
+                try:
+                    self._app.state("zoomed")
+                except Exception:
+                    try:
+                        self._app.attributes("-fullscreen", True)
+                    except Exception:
+                        pass
+            # Always center explicitly so single-monitor / fallback layouts
+            # still start in the middle of the visible work area.
+            try:
+                import os
+                dev_mode = bool(os.environ.get("QECTOR_CENTER_ON_PRIMARY"))
+            except Exception:
+                dev_mode = False
+            work_x, work_y, work_w, work_h = 0, 0, 0, 0
+            if self._app.state() == "zoomed" or self._app.attributes("-fullscreen"):
+                # Maximized windows manage their own geometry; just deiconify+lift.
+                self._app.deiconify()
+                self._app.lift()
+                self._app.focus_force()
+                self._app.attributes("-topmost", True)
+                self._app.after(600, lambda: self._app.attributes("-topmost", False))
+                return
+            if sys.platform == "win32" and not dev_mode:
+                try:
+                    import ctypes
+                    u32 = ctypes.windll.user32
+                    hwnd = self._app.winfo_id()
+                    monitor = u32.MonitorFromWindow(
+                        hwnd, 2  # MONITOR_DEFAULTTONEAREST
+                    )
+                    info = ctypes.create_unicode_buffer(40 * 4)
+                    info[0:4] = (40,)
+                    if u32.GetMonitorInfoW(hwnd, info):
+                        work = tuple(info[16:24])
+                        work_x, work_y, work_w, work_h = (
+                            work[0], work[1], work[2] - work[0], work[3] - work[1],
+                        )
+                except Exception:
+                    work_x, work_y, work_w, work_h = 0, 0, 0, 0
+            if not (work_w > 0 and work_h > 0):
+                sw = self._app.winfo_screenwidth()
+                sh = self._app.winfo_screenheight()
+                work_w, work_h = sw, sh
+            if work_w > 0 and work_h > 0:
+                x = max(0, work_x + (work_w - self._width) // 2)
+                y = max(0, work_y + (work_h - self._height) // 2)
+                self._app.geometry(f"{self._width}x{self._height}+{x}+{y}")
+            self._app.deiconify()
+            self._app.lift()
+            self._app.focus_force()
+            self._app.attributes("-topmost", True)
+            self._app.after(600, lambda: self._app.attributes("-topmost", False))
         except Exception:
             pass
 
@@ -231,6 +423,24 @@ class QectorApp:
         self._app.grid_columnconfigure(0, weight=1)
         self._app.grid_rowconfigure(0, weight=1)
         self._app.grid_rowconfigure(1, weight=0)
+
+        menu = tkinter.Menu(self._app)
+        menu.configure(bg='#2b2b2b', fg='#dcdcdc', activebackground='#4a9eff', activeforeground='#ffffff')
+        
+        doc_menu = tkinter.Menu(menu, tearoff=0)
+        doc_menu.configure(bg='#2b2b2b', fg='#dcdcdc', activebackground='#4a9eff', activeforeground='#ffffff')
+        
+        doc_menu.add_command(label="Generate Documentation...", accelerator="Ctrl+D", 
+                             command=lambda: self.tabs.get("Documentation")._on_generate() if "Documentation" in self.tabs else None)
+        doc_menu.add_command(label="Open Export Folder", 
+                             command=lambda: self.tabs.get("Documentation")._on_open_folder() if "Documentation" in self.tabs else None)
+        doc_menu.add_separator()
+        doc_menu.add_command(label="Export Official Docs...", 
+                             command=lambda: self.tabs.get("Documentation")._on_export_official() if "Documentation" in self.tabs else None)
+        
+        menu.add_cascade(label="Documentation", menu=doc_menu)
+        self._app.config(menu=menu)
+        self._app.bind("<Control-d>", lambda e: self.tabs.get("Documentation")._on_generate() if "Documentation" in self.tabs else None)
 
         self.tabview = ctk.CTkTabview(self._app)
         self.tabview.grid(row=0, column=0, sticky="nsew", padx=6, pady=(6, 0))
@@ -278,8 +488,49 @@ class QectorApp:
                     wraplength=760,
                     justify="left",
                 ).pack(anchor="nw", padx=20, pady=20)
+                # Tab crash recovery: a "Reload Tab" button that destroys the
+                # dead widget and reinstantiates the tab class (Phase-2 item).
+                ctk.CTkButton(
+                    fallback,
+                    text="Reload Tab",
+                    font=ctk.CTkFont(size=12, weight="bold"),
+                    width=120,
+                    command=lambda n=tab_name, m=module_name, c=class_name: self.reload_tab(n, m, c),
+                ).pack(anchor="nw", padx=20, pady=(0, 12))
             except Exception:
                 pass
+
+    def reload_tab(self, tab_name: str, module_name: str, class_name: str) -> None:
+        """Destroy a crashed tab widget and re-instantiate the tab class.
+
+        Used by the fallback "Reload Tab" button; also called when a tab's
+        own callback reports a crash.  Safe when the tab never loaded.
+        """
+        if getattr(self, "_destroyed", False):
+            return
+        parent = self.tabview.tab(tab_name)
+        old = self.tabs.get(tab_name)
+        if old is not None:
+            try:
+                pump = getattr(old, "_ui", None)
+                if pump is not None:
+                    try:
+                        pump.close()
+                    except Exception:
+                        pass
+                old.destroy()
+            except Exception:
+                pass
+            self.tabs.pop(tab_name, None)
+        try:
+            for child in parent.winfo_children():
+                try:
+                    child.destroy()
+                except Exception:
+                    pass
+        except Exception:
+            pass
+        self._wire_tab(tab_name, module_name, class_name)
 
     # ── Console tab ───────────────────────────────────────────────────
     def _build_console_tab(self) -> None:
@@ -349,7 +600,7 @@ class QectorApp:
         bar.grid_columnconfigure(1, weight=0)
 
         self._status_left = ctk.CTkLabel(
-            bar, text=FULL_VERSION, anchor="w",
+            bar, text=self._version_title, anchor="w",
             font=ctk.CTkFont(family=self._fonts.mono, size=10),
             text_color=self._colors["text_secondary"],
         )
@@ -448,7 +699,314 @@ class QectorApp:
         except Exception:
             pass
 
-    # ── Auto-update (deferred; console/log output only) ───────────────
+    # ── session persistence (Phase-2 item) ─────────────────────────────
+    def _session_paths(self):
+        """Return (workspace_path, prefs_path) inside the per-user data dir."""
+        try:
+            import utils
+            data_dir = utils.get_data_dir()
+            try:
+                wpath = data_dir / "workspace.json"
+                ppath = data_dir / "preferences.json"
+            except Exception:
+                wpath, ppath = None, None
+            return wpath, ppath
+        except Exception:
+            return None, None
+
+    def _restore_session(self) -> None:
+        """Restore workspace + preferences on launch (silent on any failure).
+
+        Applies last-session values onto the freshly built tabs: code family +
+        distance (Code Explorer), decoder + error rate + seed (Decoder Lab /
+        Benchmark).  Any mismatch with the current tab options is ignored —
+        persistence is a convenience, never a source of errors.
+        """
+        try:
+            import utils
+            wpath, ppath = self._session_paths()
+            self._workspace_path, self._prefs_path = wpath, ppath
+            ws = utils.load_json(wpath, {}) if wpath else {}
+            prefs = utils.load_json(ppath, {}) if ppath else {}
+            self._preferences = dict(prefs) if isinstance(prefs, dict) else {}
+
+            # Restore the saved color theme (dark / light / high contrast) on
+            # launch; the toggle in Lab & Personal Info writes it to prefs.
+            try:
+                import theme
+                theme.set_appearance_mode(str(self._preferences.get("theme") or "dark"))
+            except Exception:
+                pass
+
+            family = str(ws.get("family") or "")
+            distance = int(ws.get("distance") or 0)
+            decoder = str(ws.get("decoder") or "")
+            rate = float(ws.get("error_rate") or 0.05)
+            seed = int(ws.get("seed") or 42)
+
+            for tab in self.tabs.values():
+                try:
+                    if family and getattr(tab, "family_var", None) is not None:
+                        tab.family_var.set(family)
+                except Exception:
+                    pass
+                try:
+                    if distance and getattr(tab, "distance_var", None) is not None:
+                        tab.distance_var.set(distance)
+                except Exception:
+                    pass
+                try:
+                    if decoder and getattr(tab, "decoder_var", None) is not None:
+                        tab.decoder_var.set(decoder)
+                except Exception:
+                    pass
+                try:
+                    if getattr(tab, "rate_var", None) is not None:
+                        tab.rate_var.set(rate)
+                except Exception:
+                    pass
+                try:
+                    if getattr(tab, "seed_entry", None) is not None:
+                        tab.seed_entry.delete(0, "end")
+                        tab.seed_entry.insert(0, str(seed))
+                except Exception:
+                    pass
+            self.console.log("Session restored from workspace data.", "INFO")
+        except Exception:
+            pass
+
+    def _save_session(self) -> None:
+        """Persist workspace state and preferences on close (best effort)."""
+        try:
+            import utils
+            ws: dict[str, Any] = {"family": "rotated_surface", "distance": 5,
+                                  "decoder": "", "error_rate": 0.05, "seed": 42}
+            try:
+                if self.state is not None:
+                    ws["family"] = self.state.current_family_key
+                    ws["distance"] = self.state.current_param
+            except Exception:
+                pass
+            for tab in ("Decoder Lab", "Benchmark", "Batch & Streaming"):
+                tab_obj = self.tabs.get(tab)
+                if tab_obj is None:
+                    continue
+                try:
+                    if getattr(tab_obj, "decoder_var", None) is not None:
+                        ws["decoder"] = tab_obj.decoder_var.get()
+                except Exception:
+                    pass
+                try:
+                    if getattr(tab_obj, "rate_var", None) is not None:
+                        ws["error_rate"] = float(tab_obj.rate_var.get())
+                except Exception:
+                    pass
+                try:
+                    if getattr(tab_obj, "seed_entry", None) is not None:
+                        ws["seed"] = int(tab_obj.seed_entry.get() or 42)
+                except Exception:
+                    pass
+            prefs = getattr(self, "_prefs", {})
+            try:
+                ws_export_dir = str(utils.get_export_dir())
+                prefs.setdefault("default_export_dir", ws_export_dir)
+                prefs.setdefault("theme", "dark")
+            except Exception:
+                pass
+            if self._workspace_path is not None:
+                utils.save_json(self._workspace_path, ws)
+            if self._prefs_path is not None:
+                utils.save_json(self._prefs_path, prefs)
+        except Exception:
+            pass
+
+    def _on_close(self) -> None:
+        """Window close handler: persist session, then tear down."""
+        try:
+            self._save_session()
+        except Exception:
+            pass
+        try:
+            self.destroy()
+        except Exception:
+            pass
+        try:
+            sys.exit(0)
+        except SystemExit:
+            pass
+
+    # ── memory monitoring (Phase-2 item) ──────────────────────────────
+    def _monitor_memory(self) -> None:
+        """Every 30 s check RSS; warn at 500 MB, offer restart at 1 GB."""
+        self._mem_after_id = None
+        if self._destroyed:
+            return
+        try:
+            import os
+            import psutil
+            rss_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024)
+            if rss_mb >= 1000:
+                self._show_error_toast(
+                    f"Memory usage reached {rss_mb:.0f} MB. Save your work and restart "
+                    "the workbench to reclaim memory."
+                )
+            elif rss_mb >= 500 and not self._mem_warned:
+                self._mem_warned = True
+                self._show_error_toast(
+                    f"Memory usage is high ({rss_mb:.0f} MB). Consider restarting."
+                )
+        except Exception:
+            pass
+        try:
+            self._mem_after_id = self._app.after(30000, self._monitor_memory)
+        except Exception:
+            self._mem_after_id = None
+
+    # ── keyboard shortcuts (Phase-2 item) ─────────────────────────────
+    def _bind_shortcuts(self) -> None:
+        """Bind the documented shortcut set; each binding is individually safe."""
+        try:
+            bindings = (
+                ("<Control-n>", lambda e: self._select_tab("Code Explorer")),
+                ("<Control-d>", lambda e: self._doc_generate()),
+                ("<Control-r>", lambda e: self._run_decode()),
+                ("<Control-b>", lambda e: self._run_benchmark()),
+                ("<Control-e>", lambda e: self._export_current()),
+                ("<Control-comma>", lambda e: self._select_tab("Lab & Personal Info")),
+                ("<F5>", lambda e: self._refresh_current()),
+                ("<Control-q>", lambda e: self._on_close()),
+                ("<Control-Tab>", lambda e: self._cycle_tab(1)),
+                ("<Control-Shift-Tab>", lambda e: self._cycle_tab(-1)),
+            )
+            for seq, callback in bindings:
+                try:
+                    self._app.bind(seq, callback)
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+    def _select_tab(self, name: str) -> None:
+        try:
+            self.tabview.set(name)
+        except Exception:
+            pass
+
+    def _doc_generate(self) -> None:
+        tab = self.tabs.get("Documentation")
+        fn = getattr(tab, "_on_generate", None)
+        if fn is not None:
+            try:
+                fn()
+            except Exception:
+                pass
+
+    def _run_decode(self) -> None:
+        self._select_tab("Decoder Lab")
+        tab = self.tabs.get("Decoder Lab")
+        fn = getattr(tab, "_on_decode", None)
+        if fn is not None:
+            try:
+                fn()
+            except Exception:
+                pass
+
+    def _run_benchmark(self) -> None:
+        self._select_tab("Benchmark")
+        tab = self.tabs.get("Benchmark")
+        fn = getattr(tab, "_on_run", None)
+        if fn is not None:
+            try:
+                fn()
+            except Exception:
+                pass
+
+    def _export_current(self) -> None:
+        """Export from the currently open tab when it exposes an export action."""
+        try:
+            current = self.tabview.get()
+        except Exception:
+            return
+        tab = self.tabs.get(current)
+        if tab is None:
+            return
+        for name in ("_on_export", "_on_quick_export", "_on_generate"):
+            fn = getattr(tab, name, None)
+            if fn is None:
+                continue
+            try:
+                fn()
+                return
+            except Exception:
+                continue
+
+    def _refresh_current(self) -> None:
+        try:
+            current = self.tabview.get()
+        except Exception:
+            return
+        tab = self.tabs.get(current)
+        if tab is None:
+            return
+        for name in ("_redraw", "_on_build", "_on_refresh"):
+            fn = getattr(tab, name, None)
+            if fn is None:
+                continue
+            try:
+                fn()
+                return
+            except Exception:
+                continue
+
+    def _cycle_tab(self, direction: int) -> None:
+        try:
+            names = list(self.tabview._tab_dict.keys())
+            if not names:
+                return
+            try:
+                current = self.tabview.get()
+            except Exception:
+                return
+            try:
+                idx = names.index(current)
+            except ValueError:
+                idx = 0
+            next_name = names[(idx + direction) % len(names)]
+            self.tabview.set(next_name)
+        except Exception:
+            pass
+
+    def _boot_version_string(self) -> str:
+        """The app's own version at construction — tracks the installed decoder
+        backend (read live from the wheel), never a hardcoded workbench number.
+        The moment a newer decoder (e.g. 0.6.7) is installed, the app identifies
+        as that version."""
+        ver = None
+        try:
+            import version_service
+            ver = version_service.effective_app_version()
+        except Exception:
+            ver = None
+        return f"QECTOR Decoder Workbench v{ver}" if ver else "QECTOR Decoder Workbench"
+
+    def _apply_live_version(self, banner: str, title: str) -> None:
+        """Update the status-bar version label and window title.
+        Runs on the Tk main thread (posted via the UI pump); guarded so a late
+        update after teardown is a no-op."""
+        if self._destroyed:
+            return
+        try:
+            status_left = getattr(self, "_status_left", None)
+            if status_left is not None:
+                status_left.configure(text=banner)
+        except Exception:
+            pass
+        try:
+            self._app.title(title)
+        except Exception:
+            pass
+
+    # ── Version banner (deferred; console/log output only) ────────────
     def _start_update_check(self) -> None:
         self._update_after_id = None
         if self._destroyed:
@@ -457,25 +1015,33 @@ class QectorApp:
             import threading_utils
             threading_utils.run_in_background(self._update_check_worker)
         except Exception as exc:
-            self.console.log(f"Update check could not start: {exc}", "WARN")
+            self.console.log(f"Version check could not start: {exc}", "WARN")
 
     def _update_check_worker(self) -> None:
-        """Runs on a daemon thread; results go to console/log only."""
+        """Runs on a daemon thread; displays installed version banner only.
+
+        No PyPI check, no auto-upgrade.  The app always shows the locally
+        installed decoder version.
+        """
         try:
-            import auto_updater
-            latest = auto_updater.check_for_update()
+            import version_service
+            banner = version_service.format_version_banner()
         except Exception as exc:
             if self._logger is not None:
-                self._logger.warning(f"Update check failed: {exc}")
+                self._logger.warning(f"Version banner failed: {exc}")
             return
         try:
-            if latest:
-                msg = f"qector_decoder_v3 {latest} is available on PyPI (pip install --upgrade qector-decoder-v3)"
-                self.console.log(msg, "INFO")
-                if self._logger is not None:
-                    self._logger.info(msg)
-            else:
-                self.console.log("qector_decoder_v3 is up to date", "INFO")
+            self.console.log(banner, "INFO")
+            if self._logger is not None:
+                self._logger.info(banner)
+            installed = version_service.installed_backend_version() or "0.7.0"
+            title = f"QECTOR Decoder Workbench v{WORKBENCH_VERSION}"
+            try:
+                self._ui.post(self._apply_live_version, banner, title)
+            except Exception:
+                pass
+            self.console.log(
+                "qector-decoder-v3 is up to date — using bundled local wheel", "INFO")
         except Exception:
             pass
 
@@ -484,8 +1050,13 @@ class QectorApp:
 # Entry point
 # ---------------------------------------------------------------------------
 
-def main() -> None:
-    """Application entry point with a readable fatal-error fallback."""
+def main(on_ready=None) -> None:
+    """Application entry point with a readable fatal-error fallback.
+
+    *on_ready* is invoked once the main window is built and mapped; ``main.py``
+    passes the boot-splash closer so the splash hands over to a visible window
+    with no blank gap in between.
+    """
     logger = _safe_logger()
     if not _HAS_GUI:
         msg = "ERROR: customtkinter is required to run QECTOR Workbench"
@@ -496,9 +1067,15 @@ def main() -> None:
 
     exit_code = 0
     try:
+        _declare_dpi_awareness()
         if logger is not None:
             logger.info(f"Starting {FULL_VERSION}")
         app = QectorApp()
+        if on_ready is not None:
+            try:
+                on_ready()
+            except Exception:
+                pass
         app.mainloop()
     except Exception:
         detail = traceback.format_exc()

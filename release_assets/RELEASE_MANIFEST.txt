@@ -1,30 +1,44 @@
-# QECTOR Workbench v3.5.0 - release manifest
-version: 3.5.0
-backend: qector-decoder-v3 0.6.6 (min 0.6.2)
-generated_utc: 2026-07-14T13:58:38Z
+# QECTOR Workbench release manifest
+version: 1.0.0
+generated_utc: 2026-08-06T23:30:35+00:00
+decoder_provisioning: live PyPI install (portable and cross-platform)
+backend: qector-decoder-v3 1.0.0
+mcp_tools: 79   decoders: 17   code_families: 10
 
 artifacts:
-  QectorWorkbench-v3.5.0-COMPLETE.zip
-    Everything: portable exe + installer + all docs + checksums (recommended download)
-    sha256: 7b4d7be23445d1357e663a1f0f5fbd3f3813f5543bbad8e56d23a99aed956e2e
-    size:   211.8 MB
-
-  QectorWorkbench-v3.5.0-Portable.exe
-    Single-file portable app — copy anywhere and run; immune to any system Python
-    sha256: 8cc180ed47c9fd79f1971435f132eee6eb848fd21780ce7f115b378cd0d026ce
-    size:   123.2 MB
-
-  QectorWorkbenchSetup-v3.5.0.exe
-    Windows installer (Inno Setup)
-    sha256: 41b51d685e0f5edd0a57a6d979e7bb40176d64024b56937e816c1053d95d865b
-    size:   90.1 MB
-
-  QectorWorkbench-v3.5.0.zip
-    Portable folder — unzip the WHOLE folder, run the exe inside
-    sha256: 0e468d8eefa106e392b72b5e6264168241565afbd07a36338a1c3d90aaaa5933
-    size:   123.6 MB
-
-  QectorWorkbench-v3.5.0-installer-bundle.zip
-    Installer + documentation bundle
-    sha256: dd171a6e6eee46fb36ed85ca1f1b68ef070abe870f3e1339c3fe5a11324882bf
-    size:   89.7 MB
+  - name: qector-workbench_0.5.3_amd64.deb
+    platform: linux
+    kind: Debian package
+    sha256: 414280f4b34721e03ac65f88c24894da6dba125f945e277a3cfc682722ee6ba0
+    size_bytes: 349908 (0.3 MB)
+    modified_utc: 2026-08-04T11:36:54+00:00
+  - name: QectorWorkbench-Portable.exe
+    platform: windows
+    kind: Windows single-file portable
+    sha256: 70e5804948de41b25e8e67532116b6f3389fe2da8c3126a11d2d90b5f3dc494a
+    size_bytes: 56391973 (53.8 MB)
+    modified_utc: 2026-08-04T11:35:09+00:00
+  - name: QectorWorkbench-v0.5.3-Linux-x64-Public.zip
+    platform: linux
+    kind: Linux x64 release bundle zip
+    sha256: d0b3f13f328529e5f0fe4f175f969f453a2c4a0d380361a1dbf0da7a3c498195
+    size_bytes: 3435396 (3.3 MB)
+    modified_utc: 2026-08-04T11:37:30+00:00
+  - name: QectorWorkbench-v0.5.3-Windows-x64-Public.zip
+    platform: windows
+    kind: Windows x64 release bundle zip
+    sha256: 94603350cb13fc9e18c037f9309140569a3f074de90b10d55e82c262ce88e2da
+    size_bytes: 58852660 (56.1 MB)
+    modified_utc: 2026-08-04T11:37:29+00:00
+  - name: QectorWorkbench-v1.0.0-Linux-x64-Public.zip
+    platform: linux
+    kind: Linux x64 release bundle zip
+    sha256: bfcf1ff7cf8b5d8c23e96a9bc519e5b46eb5ceb877129b24c3404519109f17ce
+    size_bytes: 21329510 (20.3 MB)
+    modified_utc: 2026-08-06T23:30:08+00:00
+  - name: QectorWorkbench-v1.0.0-Windows-x64-Public.zip
+    platform: windows
+    kind: Windows x64 release bundle zip
+    sha256: 0426e9e516beb47b9ff45005663a150858183f7cade2941badb44e1708c67497
+    size_bytes: 114070653 (108.8 MB)
+    modified_utc: 2026-08-06T23:14:15+00:00

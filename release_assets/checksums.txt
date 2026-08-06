@@ -1,5 +1,17 @@
-7b4d7be23445d1357e663a1f0f5fbd3f3813f5543bbad8e56d23a99aed956e2e  QectorWorkbench-v3.5.0-COMPLETE.zip
-8cc180ed47c9fd79f1971435f132eee6eb848fd21780ce7f115b378cd0d026ce  QectorWorkbench-v3.5.0-Portable.exe
-41b51d685e0f5edd0a57a6d979e7bb40176d64024b56937e816c1053d95d865b  QectorWorkbenchSetup-v3.5.0.exe
-0e468d8eefa106e392b72b5e6264168241565afbd07a36338a1c3d90aaaa5933  QectorWorkbench-v3.5.0.zip
-dd171a6e6eee46fb36ed85ca1f1b68ef070abe870f3e1339c3fe5a11324882bf  QectorWorkbench-v3.5.0-installer-bundle.zip
+# QECTOR Decoder Workbench v1.0.0 — SHA-256 checksums
+# Generated: 2026-08-06T23:30:36+00:00
+# Verify:    sha256sum -c checksums.txt   (or the per-platform file)
+
+## Windows x64
+70e5804948de41b25e8e67532116b6f3389fe2da8c3126a11d2d90b5f3dc494a  QectorWorkbench-Portable.exe
+94603350cb13fc9e18c037f9309140569a3f074de90b10d55e82c262ce88e2da  QectorWorkbench-v0.5.3-Windows-x64-Public.zip
+0426e9e516beb47b9ff45005663a150858183f7cade2941badb44e1708c67497  QectorWorkbench-v1.0.0-Windows-x64-Public.zip
+
+## Linux x64
+414280f4b34721e03ac65f88c24894da6dba125f945e277a3cfc682722ee6ba0  qector-workbench_0.5.3_amd64.deb
+d0b3f13f328529e5f0fe4f175f969f453a2c4a0d380361a1dbf0da7a3c498195  QectorWorkbench-v0.5.3-Linux-x64-Public.zip
+bfcf1ff7cf8b5d8c23e96a9bc519e5b46eb5ceb877129b24c3404519109f17ce  QectorWorkbench-v1.0.0-Linux-x64-Public.zip
+
+## macOS
+# (not built for this release)
+
