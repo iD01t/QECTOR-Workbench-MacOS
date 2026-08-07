@@ -1,6 +1,6 @@
 # QECTOR Workbench release manifest
 version: 1.0.0
-generated_utc: 2026-08-06T23:30:35+00:00
+generated_utc: 2026-08-07T01:52:34+00:00
 decoder_provisioning: live PyPI install (portable and cross-platform)
 backend: qector-decoder-v3 1.0.0
 mcp_tools: 79   decoders: 17   code_families: 10
@@ -33,12 +33,12 @@ artifacts:
   - name: QectorWorkbench-v1.0.0-Linux-x64-Public.zip
     platform: linux
     kind: Linux x64 release bundle zip
-    sha256: bfcf1ff7cf8b5d8c23e96a9bc519e5b46eb5ceb877129b24c3404519109f17ce
-    size_bytes: 21329510 (20.3 MB)
-    modified_utc: 2026-08-06T23:30:08+00:00
+    sha256: 1d3d644657bd1a0fdffefb2b6ef37da9b5631087c50172ce770d5c975bb7772d
+    size_bytes: 21329461 (20.3 MB)
+    modified_utc: 2026-08-07T01:45:29+00:00
   - name: QectorWorkbench-v1.0.0-Windows-x64-Public.zip
     platform: windows
     kind: Windows x64 release bundle zip
-    sha256: 0426e9e516beb47b9ff45005663a150858183f7cade2941badb44e1708c67497
-    size_bytes: 114070653 (108.8 MB)
-    modified_utc: 2026-08-06T23:14:15+00:00
+    sha256: 417124ddbfb1ba6366331b32d5ad4ad074f64960f91fc5f0f1ec834b92c13544
+    size_bytes: 105111936 (100.2 MB)
+    modified_utc: 2026-08-07T01:51:49+00:00
