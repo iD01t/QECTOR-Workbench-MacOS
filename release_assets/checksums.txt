@@ -1,5 +1,5 @@
 # QECTOR Decoder Workbench v1.0.0 — SHA-256 checksums
-# Generated: 2026-08-07T01:52:35+00:00
+# Generated: 2026-08-07T02:40:30+00:00
 # Verify:    sha256sum -c checksums.txt   (or the per-platform file)
 
 ## Windows x64
@@ -10,7 +10,7 @@
 ## Linux x64
 414280f4b34721e03ac65f88c24894da6dba125f945e277a3cfc682722ee6ba0  qector-workbench_0.5.3_amd64.deb
 d0b3f13f328529e5f0fe4f175f969f453a2c4a0d380361a1dbf0da7a3c498195  QectorWorkbench-v0.5.3-Linux-x64-Public.zip
-1d3d644657bd1a0fdffefb2b6ef37da9b5631087c50172ce770d5c975bb7772d  QectorWorkbench-v1.0.0-Linux-x64-Public.zip
+88c100b6187c981548246400023c5f02f44f68d9c1e8b78809c979b15dad02f5  QectorWorkbench-v1.0.0-Linux-x64-Public.zip
 
 ## macOS
 # (not built for this release)
