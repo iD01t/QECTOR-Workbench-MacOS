@@ -1,0 +1,11 @@
+# Linux build artifacts — never committed
+.venv/
+build/
+dist/
+.cache/
+__pycache__/
+*.pyc
+*.AppImage
+# Generated at build time from assets/icon.jpg
+/icon.png
+AppDir/

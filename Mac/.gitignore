@@ -1,0 +1,14 @@
+# macOS build artifacts — never committed
+.venv/
+build/
+dist/
+__pycache__/
+*.pyc
+*.dmg
+# Generated at build time
+/icon.png
+/icon.icns
+# Bundled wheels are large and user-supplied; keep the folder, drop the wheels
+wheels/*.whl
+# macOS cruft
+.DS_Store

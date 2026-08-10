@@ -2,7 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "QECTOR Decoder Workbench"
-#define MyAppVersion "3.5.0"
+; Version comes from version.py via scripts/build_installer.py, which writes
+; installer_version.iss before invoking ISCC. Never hardcode it here: a stale
+; literal shipped 0.5.2 in Add/Remove Programs for a later build.
+#include "installer_version.iss"
 #define MyAppPublisher "Guillaume Lessard"
 #define MyAppURL "https://www.qector.store"
 #define MyAppSupportURL "https://id01t.itch.io"
@@ -23,6 +26,8 @@ LicenseFile=EULA.txt
 OutputDir=dist
 OutputBaseFilename=QectorWorkbenchSetup
 SetupIconFile=icon.ico
+WizardStyle=modern
+UninstallDisplayIcon={app}\icon.ico
 Compression=lzma2
 SolidCompression=yes
 PrivilegesRequired=admin

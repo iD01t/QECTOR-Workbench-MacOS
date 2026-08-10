@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rm -f ../build_deb2.log)",
+      "Bash(MSYS_NO_PATHCONV=1 ./build_installers.sh --test)"
+    ]
+  }
+}

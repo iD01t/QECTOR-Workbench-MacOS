@@ -1,44 +1,9 @@
 # QECTOR Workbench release manifest
 version: 1.0.0
-generated_utc: 2026-08-07T02:40:30+00:00
-decoder_provisioning: live PyPI install (portable and cross-platform)
-backend: qector-decoder-v3 1.0.0
-mcp_tools: 79   decoders: 17   code_families: 10
-
-artifacts:
-  - name: qector-workbench_0.5.3_amd64.deb
-    platform: linux
-    kind: Debian package
-    sha256: 414280f4b34721e03ac65f88c24894da6dba125f945e277a3cfc682722ee6ba0
-    size_bytes: 349908 (0.3 MB)
-    modified_utc: 2026-08-04T11:36:54+00:00
-  - name: QectorWorkbench-Portable.exe
-    platform: windows
-    kind: Windows single-file portable
-    sha256: 70e5804948de41b25e8e67532116b6f3389fe2da8c3126a11d2d90b5f3dc494a
-    size_bytes: 56391973 (53.8 MB)
-    modified_utc: 2026-08-04T11:35:09+00:00
-  - name: QectorWorkbench-v0.5.3-Linux-x64-Public.zip
-    platform: linux
-    kind: Linux x64 release bundle zip
-    sha256: d0b3f13f328529e5f0fe4f175f969f453a2c4a0d380361a1dbf0da7a3c498195
-    size_bytes: 3435396 (3.3 MB)
-    modified_utc: 2026-08-04T11:37:30+00:00
-  - name: QectorWorkbench-v0.5.3-Windows-x64-Public.zip
-    platform: windows
-    kind: Windows x64 release bundle zip
-    sha256: 94603350cb13fc9e18c037f9309140569a3f074de90b10d55e82c262ce88e2da
-    size_bytes: 58852660 (56.1 MB)
-    modified_utc: 2026-08-04T11:37:29+00:00
-  - name: QectorWorkbench-v1.0.0-Linux-x64-Public.zip
-    platform: linux
-    kind: Linux x64 release bundle zip
-    sha256: 88c100b6187c981548246400023c5f02f44f68d9c1e8b78809c979b15dad02f5
-    size_bytes: 21329617 (20.3 MB)
-    modified_utc: 2026-08-07T02:40:22+00:00
-  - name: QectorWorkbench-v1.0.0-Windows-x64-Public.zip
-    platform: windows
-    kind: Windows x64 release bundle zip
-    sha256: 417124ddbfb1ba6366331b32d5ad4ad074f64960f91fc5f0f1ec834b92c13544
-    size_bytes: 105111936 (100.2 MB)
-    modified_utc: 2026-08-07T01:51:49+00:00
+generated_utc: 2026-08-10T07:26:42+00:00
+file: QectorWorkbench-v1.0.0.zip
+  sha256: ac4768c06788a4c787221023701db0a37cbbedcbbfe9c3a3f398ecc6a382dc18
+  size_bytes: 102684372
+file: QectorWorkbenchSetup.exe
+  sha256: 18a58c53c5cc76b539cc659647875168ceba4540dc273fd48fc079721bcaf78b
+  size_bytes: 73199890

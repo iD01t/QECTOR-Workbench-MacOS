@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QECTOR - rotated_surface_d5 Documentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0e14;
+            color: #e8ecf3;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: #11151d;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        header {
+            border-bottom: 2px solid #3ddc97;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #3ddc97;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #3ddc97;
+            font-size: 1.8em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        h3 {
+            color: #5cc8ff;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: #161b26;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        th {
+            background-color: #1f6b4d;
+            color: #3ddc97;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #2a3142;
+        }
+        tr:hover {
+            background-color: #1c2230;
+        }
+        .property-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .property-item {
+            background-color: #161b26;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 3px solid #3ddc97;
+        }
+        .property-item strong {
+            color: #3ddc97;
+        }
+        .metric {
+            background-color: #1c2230;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .metric-name {
+            color: #5cc8ff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .metric-value {
+            font-size: 1.3em;
+            color: #3ddc97;
+            font-weight: bold;
+        }
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #2a3142;
+            color: #8a93a6;
+            font-size: 0.9em;
+            text-align: center;
+        }
+        .code-block {
+            background-color: #0b0e14;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin-bottom: 15px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>QECTOR Decoder Workbench</h1>
+            <h2>rotated_surface_d5</h2>
+            <p>Generated: 2026-07-04 20:05:45</p>
+        </header>
+        
+        <section>
+            <h2>Overview</h2>
+            <p>Rotated surface code, single sector (matching graph).</p>
+        </section>
+        
+        <section>
+            <h2>Code Parameters</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>n_qubits</td><td>25</td></tr>
+                    <tr><td>n_checks</td><td>12</td></tr>
+                    <tr><td>distance</td><td>5</td></tr>
+                    <tr><td>Max qubit degree</td><td>2</td></tr>
+                </tbody>
+            </table>
+        </section>
+        
+        <section>
+            <h2>Parity Check Matrix</h2>
+            <div class="property-list">
+                <div class="metric">
+                    <div class="metric-name">Shape</div>
+                    <div class="metric-value">12 × 25</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-name">Non-zero Elements</div>
+                    <div class="metric-value">40</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-name">Density</div>
+                    <div class="metric-value">13.33%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-name">Sparsity</div>
+                    <div class="metric-value">86.67%</div>
+                </div>
+            </div>
+        </section>
+        
+        <section>
+            <h2>Code Properties</h2>
+            <div class="property-list">
+                <div class="property-item">
+                    <strong>is_matching_graph</strong><br>
+                    ✓ Yes
+                </div>
+                <div class="property-item">
+                    <strong>is_css</strong><br>
+                    ✗ No
+                </div>
+                <div class="property-item">
+                    <strong>is_stabilizer</strong><br>
+                    ✓ Yes
+                </div>
+            </div>
+        </section>
+        
+        <section>
+            <h2>Statistics</h2>
+            <div class="metric">
+                <div class="metric-name">average_row_weight</div>
+                <div class="metric-value">3.3333</div>
+            </div>
+                <div class="metric">
+                <div class="metric-name">average_col_weight</div>
+                <div class="metric-value">1.6000</div>
+            </div>
+            <div class="metric">
+                <div class="metric-name">min_row_weight</div>
+                <div class="metric-value">2</div>
+            </div>
+            <div class="metric">
+                <div class="metric-name">max_row_weight</div>
+                <div class="metric-value">4</div>
+            </div>
+        </section>
+        
+        <footer>
+            <p>Documentation generated by QECTOR Decoder Workbench v2.0</p>
+            <p>Backend: qector_decoder_v3 v0.5.8</p>
+        </footer>
+    </div>
+</body>
+</html>

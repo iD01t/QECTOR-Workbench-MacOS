@@ -1,0 +1,31 @@
+QECTOR Decoder Workbench v1.0.0 - Linux x64 - Public Release
+============================================================
+Generated: 2026-08-07T02:40:21+00:00
+Backend:   qector-decoder-v3 1.0.0
+MCP tools: 66
+
+SHA-256 checksums:
+
+0cb025ed429806ac444df5d2c29efd594c69ebd92b9072375903041e98573e66  EULA.txt
+910bcbd617a987c58ed93d19ae2143f96bb6066ce35549e6e503910483b93edb  manuals/figures/cascade_stats.png
+d8c8287caf3e2cc000c55b62e5fb1fcda395b3e299041903754d46c32b0c5d0c  manuals/figures/compatibility_matrix.png
+414b04409dbda1420a3b52fc59a2b63df730d4ea60c1295fff85f31c0aae6a0b  manuals/figures/decoder_latency.png
+91ab6e32e22a55c8db6f229c6a1650957074ef95fda3baffb6dd39c8b2a4bcaa  manuals/figures/decoder_throughput.png
+a53f0c8bc4cf0d0bedab224432fdb4ade95cc534bf836773a12ce27c617be441  manuals/figures/tanner_rotated_surface_d5.png
+d2507f674e7cb1ec67dc4c7614fa275249f0eff97415122973bfea195487bb6c  manuals/QECTOR Decoder v3 - Extended Reference (package only).md
+d2507f674e7cb1ec67dc4c7614fa275249f0eff97415122973bfea195487bb6c  manuals/QECTOR Decoder v3 - Reference (package only).md
+0e4133a65f7ca104e4eb6737d2a88df270a78a79b3b661c07e6787c0e37e81ec  manuals/QECTOR_API_Reference.html
+f51417b053fbfc4348d86c584fcf6323906712e6f18e94da6d267f180155b20f  manuals/QECTOR_API_Reference.md
+db8ba55b11cd74424062872423f97bf108447680ba30edba0f06382732763ab8  manuals/QECTOR_API_Reference.pdf
+d5dc26c1c84216f9b9681ba46a932c6d8336d73c5eccca64ce0690b06a0c2775  manuals/QECTOR_LLM_Manual.json
+4939e5512a316dad503065c74a0560bb9286217ea247898f27c8611d4d1b9e58  manuals/QECTOR_MCP_Integration_Guide.pdf
+ac8b683fcf5e63efcb0b91d89d0cfbb4164514a76c77235757b964b61e363fe2  manuals/QECTOR_Quick_Start_Guide.pdf
+32275a39fe6e95f2195653555a98de63f5586be885b26b43c9bcd44c8d7c020f  manuals/QECTOR_User_Manual_Linux.pdf
+9ec3507e656e6497e9c0a6359a648967ac93eb74ee1004f3fcb40e46c8d82827  manuals/README.txt
+1586fec55ab016449a1b69193f727022c3382876e178e87e86802ba124e92177  qector-workbench_1.0.0_amd64.deb
+6a7f1a23ea20c1adb56754750e02590e94e32cac506567781a278850b216e30c  qector_decoder_v3-1.0.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+9ee1da96e08e6e841e6d8768a830e253c229380e41454f26971d8bd4cc385575  qector_decoder_v3-1.0.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+dca105a1cdbbaf802cf8426e9f3a414ee1a3965380549531df88e3f06484276f  qector_decoder_v3-1.0.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+02812bc01a2dff105b144896b1216e164bc67939483b6036c3ebcbcf6324f94a  qector_decoder_v3-1.0.0-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+3c9e847855a5aabcc721fcc056394264d0b63dfa71ac72902e1bd9ac35e47653  qector_decoder_v3-1.0.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
+2aeb0f68600cde2ace9a673043290a4db0a86f0c1b0063c6f01a77e690d30102  README.md

@@ -145,6 +145,22 @@ if _HAS_GUI:
             )
             self.quick_export_btn.pack(side="left", padx=(8, 0))
 
+            self.import_dem_btn = ctk.CTkButton(
+                row, text="Import DEM", command=self._on_import_dem,
+                font=ctk.CTkFont(size=12), width=90,
+                fg_color=theme.COLORS.get("bg_widget", "gray20"),
+                hover_color=theme.COLORS.get("bg_panel", "gray30"),
+            )
+            self.import_dem_btn.pack(side="left", padx=(8, 0))
+
+            self.import_stim_btn = ctk.CTkButton(
+                row, text="Import Stim", command=self._on_import_stim,
+                font=ctk.CTkFont(size=12), width=90,
+                fg_color=theme.COLORS.get("bg_widget", "gray20"),
+                hover_color=theme.COLORS.get("bg_panel", "gray30"),
+            )
+            self.import_stim_btn.pack(side="left", padx=(8, 0))
+
             # ── Left column: properties + analysis ────────────────────
             left = ctk.CTkFrame(self, fg_color="transparent", width=340)
             left.grid(row=1, column=0, sticky="nsew", padx=(12, 6), pady=(4, 12))
@@ -348,6 +364,71 @@ if _HAS_GUI:
             except Exception as e:
                 self._log(f"Quick export failed: {e}", "ERROR")
 
+        def _on_import_dem(self) -> None:
+            self._import_model("DEM Files", "*.dem", is_stim=False)
+
+        def _on_import_stim(self) -> None:
+            self._import_model("Stim Circuits", "*.stim", is_stim=True)
+
+        def _import_model(self, file_desc: str, ext: str, is_stim: bool) -> None:
+            """Import a .dem or .stim file via DemModel."""
+            import tkinter.filedialog as fd
+            path = fd.askopenfilename(
+                title=f"Import {file_desc}",
+                filetypes=[(file_desc, ext), ("All Files", "*.*")],
+            )
+            if not path:
+                return
+            self._set_text(self.props_text, f"Importing from {path} ...")
+            self._log(f"Importing from {path}", "INFO")
+            
+            def _worker():
+                try:
+                    dem_mod = getattr(be.qd, "dem", None)
+                    if dem_mod is None:
+                        raise ValueError("DEM module not available")
+                    DemModel = getattr(dem_mod, "DemModel", None)
+                    if DemModel is None:
+                        raise ValueError("DemModel not available")
+                    
+                    if is_stim:
+                        stim_mod = getattr(be.qd, "stim_compat", None)
+                        if stim_mod is None:
+                            raise ValueError("stim_compat module not available")
+                        from_stim = getattr(stim_mod, "from_stim_detector_error_model", None)
+                        if from_stim is None:
+                            raise ValueError("from_stim_detector_error_model not available")
+                        model = DemModel.from_stim(path)
+                    else:
+                        model = DemModel.from_parities([], 0) # Mock fallback if no direct load 
+                        # Assuming DemModel has a load/from_file method, but usually it's from_stim
+                        # We will use from_stim for both if .dem is a Stim DEM file.
+                        model = DemModel.from_stim(path)
+                    
+                    props = (
+                        f"Imported {'Stim' if is_stim else 'DEM'}: {path}\n\n"
+                        f"Checks: {model.n_checks if hasattr(model, 'n_checks') else 'N/A'}\n"
+                        f"Edges: {model._m.n_edges if hasattr(model, '_m') else 'N/A'}\n"
+                    )
+                    
+                    self._ui.post(self._on_import_done, True, props, model)
+                except Exception as e:
+                    self._ui.post(self._on_import_done, False, f"Import failed: {e}", None)
+
+            import threading
+            threading.Thread(target=_worker, daemon=True).start()
+
+        def _on_import_done(self, success: bool, message: str, model: Any) -> None:
+            self._set_text(self.props_text, message)
+            if not success:
+                self._log(message, "ERROR")
+            elif self.state:
+                class _DemCodeMock:
+                    name = "Imported Model"
+                    n_checks = getattr(model, "n_checks", 0)
+                    n_qubits = getattr(model, "n_qubits", 0)
+                self.state.current_code = _DemCodeMock()
+
 
         # ── worker (background thread) ─────────────────────────────────
         def _build_worker(self, seq: int, family: str, d: int) -> None:
@@ -355,6 +436,11 @@ if _HAS_GUI:
                 code = be.build_code(family, d)
                 summary = be.code_summary(code)
                 H = _dense_parity_matrix(code)
+                if H is None:
+                    try:
+                        H = be.generate_parity_check_matrix(family, d)
+                    except Exception as e:
+                        self._log(f"Fallback generate_parity_check_matrix failed: {e}", "WARN")
                 q_coords, c_coords = be.get_tanner_graph_layout(code, family, d)
                 analysis = self._analysis_text(code, family, d)
                 payload = {

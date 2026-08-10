@@ -23,6 +23,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import hashlib
 import importlib.util
 import os
 import platform
@@ -62,10 +63,11 @@ APP_MODULES = [
 ]
 DATA_FILES = ["icon.jpg", "icon.ico", "icon.png", "EULA.txt", "README_v3.md", "requirements.txt"]
 
-#: Root-level modules that exist for building/testing only. The installed app
-#: must never import them, and the .deb never ships them.
+# Root-level modules that exist for building/testing only. The installed app
+# must never import them, and the .deb never ships them.
 BUILD_TOOLING = {"build_production", "verify_frozen_mcp", "test_mcp_all",
                  "qector_v069_benchmark"}
+
 # Platform-specific offline wheels
 WHEEL_FILES = {
     "windows": "wheels\\qector_decoder_v3-1.0.0-cp311-cp311-win_amd64.whl",
@@ -503,6 +505,91 @@ def verify():
 
 
 # ---------------------------------------------------------------------------
+# Checksum manifest
+# ---------------------------------------------------------------------------
+def generate_checksum_manifest():
+    """Generate SHA-256 checksums for all release artefacts in dist/."""
+    banner("Generating SHA-256 Checksum Manifest")
+    dist_path = Path(DIST)
+    if not dist_path.is_dir():
+        print("  [SKIP] dist/ directory does not exist")
+        return
+
+    artefacts = []
+    for p in sorted(dist_path.rglob("*")):
+        if p.is_file():
+            artefacts.append(p)
+
+    if not artefacts:
+        print("  [SKIP] No artefacts in dist/")
+        return
+
+    sha256_lines = []
+    for artefact in artefacts:
+        rel = artefact.relative_to(dist_path)
+        h = hashlib.sha256(artefact.read_bytes()).hexdigest()
+        sha256_lines.append(f"{h}  {rel}")
+        print(f"  {h[:16]}...  {rel}")
+
+    manifest = dist_path / "checksums-sha256.txt"
+    manifest.write_text("\n".join(sha256_lines) + "\n", encoding="utf-8")
+    print(f"\n  [OK] Manifest written: {manifest}")
+    print(f"       {len(artefacts)} artefacts, {manifest.stat().st_size} bytes")
+
+
+# ---------------------------------------------------------------------------
+# Artifact signing
+# ---------------------------------------------------------------------------
+def sign_artifacts():
+    """Sign release artefacts with GPG (detached signatures).
+
+    Requires GPG installed and a signing key available.  When GPG is
+    unavailable the step is skipped with a clear warning -- checksum
+    manifest is still useful for integrity verification.
+    """
+    banner("Artifact Signing (GPG)")
+    dist_path = Path(DIST)
+    if not dist_path.is_dir():
+        print("  [SKIP] dist/ directory does not exist")
+        return
+
+    gpg = shutil.which("gpg") or shutil.which("gpg2")
+    if gpg is None:
+        print("  [WARN] GPG not found on PATH -- signatures NOT generated")
+        print("         Install GPG and set QECTOR_SIGNING_KEY env var to sign artefacts")
+        print("         Integrity verified via SHA-256 checksums only")
+        return
+
+    signing_key = os.environ.get("QECTOR_SIGNING_KEY", "")
+    if not signing_key:
+        print("  [WARN] QECTOR_SIGNING_KEY env var not set -- skipping GPG signing")
+        print("         Set it to your GPG key ID or email to enable artifact signing")
+        return
+
+    target_exts = {".exe", ".deb", ".whl", ".zip", ".tar.gz"}
+    signed = 0
+    for artefact in sorted(dist_path.rglob("*")):
+        if not artefact.is_file():
+            continue
+        if artefact.suffix not in target_exts and not artefact.name.endswith("-Portable.exe"):
+            continue
+        cmd = [gpg, "--batch", "--yes", "--detach-sign", "--armor",
+               "--local-user", signing_key, str(artefact)]
+        r = subprocess.run(cmd, capture_output=True, text=True)
+        if r.returncode == 0:
+            sig_path = Path(str(artefact) + ".asc")
+            print(f"  [OK] Signed: {artefact.name} -> {sig_path.name}")
+            signed += 1
+        else:
+            print(f"  [WARN] Failed to sign {artefact.name}: {r.stderr.strip()}")
+
+    if signed:
+        print(f"\n  [OK] Signed {signed} artefacts")
+    else:
+        print("\n  [SKIP] No artefacts signed")
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 def main():
@@ -512,6 +599,10 @@ def main():
     parser.add_argument("--all", action="store_true")
     parser.add_argument("--dev", action="store_true",
                         help="faster iteration: skip UPX compression in PyInstaller builds")
+    parser.add_argument("--no-sign", action="store_true",
+                        help="skip GPG artifact signing")
+    parser.add_argument("--no-checksum", action="store_true",
+                        help="skip SHA-256 checksum manifest generation")
     args = parser.parse_args()
     do_all = args.all or (not args.exe and not args.deb)
 
@@ -530,6 +621,10 @@ def main():
         build_deb()
 
     verify()
+    if not args.no_checksum:
+        generate_checksum_manifest()
+    if not args.no_sign:
+        sign_artifacts()
     banner("BUILD COMPLETE")
 
 

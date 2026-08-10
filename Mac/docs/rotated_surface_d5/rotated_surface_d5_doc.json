@@ -1,0 +1,40 @@
+{
+  "metadata": {
+    "generator": "QECTOR Professional Doc Generator v2.0",
+    "timestamp": "2026-07-04T20:43:35.237638",
+    "format_version": "1.0"
+  },
+  "code": {
+    "name": "rotated_surface_d5",
+    "description": "Rotated surface code, single sector (matching graph).",
+    "n_qubits": 25,
+    "n_checks": 12,
+    "distance": 5,
+    "H_shape": [
+      12,
+      25
+    ],
+    "max_qubit_degree": 2,
+    "is_matching_graph": true,
+    "h_matrix": {
+      "shape": [
+        12,
+        25
+      ],
+      "nnz": 40,
+      "density": 0.13333333333333333,
+      "sparsity": 0.8666666666666667
+    }
+  },
+  "properties": {
+    "is_matching_graph": true,
+    "is_css": false,
+    "is_stabilizer": true
+  },
+  "statistics": {
+    "average_row_weight": 3.3333333333333335,
+    "average_col_weight": 1.6,
+    "min_row_weight": 2,
+    "max_row_weight": 4
+  }
+}
