@@ -22,7 +22,8 @@ ALL_FAMILIES = ["repetition", "ring", "rotated_surface",
 EXPECTED_DECODERS = ["union_find", "fast_union_find", "blossom", "sparse_blossom",
                      "bp_osd", "auto", "hybrid", "lookup_table", "predecoded",
                      "auto_router", "hybrid_cascade", "gnn_belief_matching",
-                     "belief_matching", "two_stage", "ambiguity_cluster", "colour_code"]
+                     "belief_matching", "two_stage", "ambiguity_cluster", "colour_code",
+                     "space_time"]
 
 
 # ---------------------------------------------------------------------------

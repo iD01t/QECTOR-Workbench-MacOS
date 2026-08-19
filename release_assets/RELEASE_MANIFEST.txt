@@ -1,9 +1,0 @@
-# QECTOR Workbench release manifest
-version: 1.0.0
-generated_utc: 2026-08-10T07:26:42+00:00
-file: QectorWorkbench-v1.0.0.zip
-  sha256: ac4768c06788a4c787221023701db0a37cbbedcbbfe9c3a3f398ecc6a382dc18
-  size_bytes: 102684372
-file: QectorWorkbenchSetup.exe
-  sha256: 18a58c53c5cc76b539cc659647875168ceba4540dc273fd48fc079721bcaf78b
-  size_bytes: 73199890

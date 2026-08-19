@@ -1262,7 +1262,9 @@ def decode_syndrome(code, syndrome, decoder_kind: str,
     if decoder_kind not in DECODER_KINDS:
         raise QectorError(f"unknown decoder kind {decoder_kind!r}")
     try:
-        syn = np.asarray(syndrome)
+        syn = np.asarray(syndrome, dtype=float)
+        if np.any(np.isnan(syn)) or np.any(np.isinf(syn)):
+            raise QectorError("syndrome contains invalid values (NaN/inf)")
         expected = code.n_checks if hasattr(code, "n_checks") else None
         if expected is not None and syn.size != expected:
             raise QectorError("syndrome length does not match the code's syndrome size")
@@ -1316,6 +1318,7 @@ def run_benchmark(
     seed: int = 42,
     decoder_kind: str = "union_find",
     error_rate: float = 0.05,
+    cancel_token=None,
 ) -> dict[str, Any]:
     """Run a decode benchmark on the given code.
 
@@ -1340,6 +1343,8 @@ def run_benchmark(
         latencies_s = np.empty(n_samples, dtype=float)
         t0 = time.perf_counter()
         for i in range(n_samples):
+            if cancel_token and cancel_token.is_set():
+                break
             t_start = time.perf_counter()
             corrections.append(decoder.decode(syndromes[i]))
             latencies_s[i] = time.perf_counter() - t_start
@@ -1463,7 +1468,7 @@ def _backend_available(probe) -> bool:
 
 
 def run_batch_decode(code, backend: str = "cpu", n_samples: int = 100, error_rate: float = 0.05, seed: int = 1,
-                     precision: str = "f32", edge_weights: Optional[np.ndarray] = None) -> dict[str, Any]:
+                     precision: str = "f32", edge_weights: Optional[np.ndarray] = None, cancel_token=None) -> dict[str, Any]:
     """Run a batch decode on the given code.
 
     Samples ``n_samples`` errors with one seeded generator, batch-decodes
@@ -1482,11 +1487,17 @@ def run_batch_decode(code, backend: str = "cpu", n_samples: int = 100, error_rat
                                   precision=precision, edge_weights=edge_weights)
     rng = np.random.default_rng(seed)
     try:
-        errors = [code.random_error(error_rate, rng=rng) for _ in range(n_samples)]
+        errors = []
+        for _ in range(n_samples):
+            if cancel_token and cancel_token.is_set():
+                break
+            errors.append(code.random_error(error_rate, rng=rng))
         syndromes = np.array([code.syndrome(e) for e in errors], dtype=np.uint8)
         t0 = time.perf_counter()
         corrections = decoder.batch_decode(syndromes)
         batch_seconds = time.perf_counter() - t0
+        if cancel_token and cancel_token.is_set():
+            raise QectorError("Batch decode cancelled")
         corrections = np.asarray(corrections, dtype=np.uint8)
         success_count = sum(
             1
@@ -1522,6 +1533,7 @@ def run_streaming_session(
     error_rate: float = 0.03,
     seed: int = 1,
     decoder_kind: str = "union_find",
+    cancel_token=None,
 ) -> dict[str, Any]:
     """Run a sliding-window streaming decode session.
 
@@ -1927,7 +1939,7 @@ def run_hybrid_cascade_stats(code, n_samples: int = 64, error_rate: float = 0.05
 
 
 def run_neural_predecoder_training(code, n_samples: int = 200, n_epochs: int = 5,
-                                   error_rate: float = 0.05, seed: int = 1) -> dict[str, Any]:
+                                   error_rate: float = 0.05, seed: int = 1, cancel_token=None) -> dict[str, Any]:
     """Train the NeuralPredecoder on sampled (syndrome, error) pairs (lab tool).
 
     The MLP pre-decoder is deliberately **not** a wired decoder kind: an
@@ -1949,6 +1961,8 @@ def run_neural_predecoder_training(code, n_samples: int = 200, n_epochs: int = 5
         predecoder = qd.NeuralPredecoder(int(code.n_checks), int(code.n_qubits))
         train_syndromes, train_corrections = [], []
         for i in range(int(n_samples)):
+            if cancel_token and cancel_token.is_set():
+                break
             error, syndrome = sample_error_and_syndrome(code, float(error_rate), int(seed) + i)
             train_corrections.append(error)
             train_syndromes.append(syndrome)
@@ -2331,32 +2345,70 @@ def build_dem_from_code(code, noise_model: str = "depolarizing", p: float = 0.05
         raise QectorError(f"Failed to build DEM: {e}") from e
 
 
-def decode_dem(dem, decoder_kind: str = "bp_osd", decoder_options: Optional[dict] = None) -> dict[str, Any]:
-    """Decode a syndrome using a Detector Error Model (DEM-native decoding)."""
+def decode_dem(dem, decoder_kind: str = "bp_osd", decoder_options: Optional[dict] = None,
+               error_rate: float = 0.05, seed: Optional[int] = None) -> dict[str, Any]:
+    """Decode a syndrome using a Detector Error Model (DEM-native decoding).
+
+    Accepts either an existing DemModel (which must have ``make_decoder``) or a
+    quantum code object, from which a depolarizing DemModel is built on the fly
+    and a real error is sampled, decoded, and verified.
+    """
     try:
-        # Try to get DEM decode method
         dem_mod = getattr(qd, "dem", None)
         if dem_mod is None:
             raise QectorError("DEM module not available in this build")
-        
+
         DemModel = getattr(dem_mod, "DemModel", None)
         if DemModel is None:
             raise QectorError("DemModel class not available")
-        
-        # Use the DEM's make_decoder method
+
         make_decoder = getattr(dem, "make_decoder", None)
+        src_code = None
         if make_decoder is None:
-            raise QectorError("DemModel has no make_decoder method")
-        
+            # A code object was passed: build a depolarizing DEM from its checks.
+            src_code = dem
+            checks = getattr(src_code, "check_to_qubits", None)
+            if checks is None:
+                raise QectorError("DemModel has no make_decoder method")
+            DemError = getattr(dem_mod, "DemError", None)
+            if DemError is None:
+                raise QectorError("DemError class not available")
+            errors = [
+                DemError(probability=float(error_rate),
+                         detectors=tuple(ci for ci, qubits in enumerate(checks) if q in qubits),
+                         observables=())
+                for q in range(int(src_code.n_qubits))
+            ]
+            dem = DemModel(errors, num_detectors=len(checks),
+                           num_observables=0, detector_coords={})
+            make_decoder = dem.make_decoder
+
         decoder = make_decoder(decoder_kind, **(decoder_options or {}))
-        
-        # Decode
         decode_method = getattr(decoder, "decode", None)
         if decode_method is None:
             raise QectorError("Decoder has no decode method")
-        
-        # This is a placeholder - actual DEM decoding needs syndrome input
-        return {"status": "dem_decode_stub", "message": "DEM decode requires syndrome input"}
+
+        if src_code is None:
+            # A DemModel was supplied directly; decoding needs an external
+            # syndrome, so report the decoder is ready for one.
+            return {"status": "dem_decode_ready", "decoder_kind": decoder_kind,
+                    "message": "DEM decode requires syndrome input"}
+
+        # Sample a real error, decode its syndrome with the DEM-native decoder.
+        rng = np.random.default_rng(seed)
+        error = rng.integers(0, 2, size=int(src_code.n_qubits))
+        syndrome = np.asarray(src_code.syndrome(error), dtype=np.uint8)
+        correction = np.asarray(decode_method(syndrome.tolist()), dtype=np.uint8)
+        valid = bool(np.array_equal(src_code.syndrome(correction) % 2, syndrome % 2))
+        return {
+            "status": "dem_decode_ok",
+            "decoder_kind": decoder_kind,
+            "n_qubits": int(src_code.n_qubits),
+            "n_detectors": int(len(src_code.check_to_qubits)),
+            "syndrome_weight": int(np.count_nonzero(syndrome)),
+            "syndrome_valid": valid,
+            "correction": correction.tolist(),
+        }
     except QectorError:
         raise
     except Exception as e:
@@ -2377,11 +2429,14 @@ def import_stim_circuit(file_path: str) -> Any:
         raise QectorError(f"Failed to load Stim circuit from {file_path}: {e}") from e
 
 
-def build_code_from_matrix(H_matrix: np.ndarray) -> Any:
+def build_code_from_matrix(H_matrix: np.ndarray, name: str = "custom",
+                           distance: Optional[int] = None) -> Any:
     """Build a code from a user-provided parity check matrix.
     
     Args:
         H_matrix: Binary parity check matrix (n_checks x n_qubits)
+        name: Name for the constructed code
+        distance: Optional expected code distance
         
     Returns:
         A code object compatible with the workbench
@@ -2391,16 +2446,12 @@ def build_code_from_matrix(H_matrix: np.ndarray) -> Any:
         if H.ndim != 2:
             raise QectorError("H_matrix must be 2D")
         
-        # Try to use the backend's custom code constructor
-        custom_code = getattr(_codes, "custom_code", None)
-        if custom_code is not None:
-            return custom_code(H)
-        
-        # Fallback: use a generic approach
-        # The backend may have a from_parity_check_matrix function
-        from_parity = getattr(qd, "from_parity_check_matrix", None)
-        if from_parity is not None:
-            return from_parity(H)
+        # Use the decoder wheel's real constructor for custom parity matrices.
+        codes_mod = getattr(qd, "codes", None)
+        if codes_mod is not None:
+            from_parity = getattr(codes_mod, "from_parity_check_matrix", None)
+            if from_parity is not None:
+                return from_parity(H, name=name, distance=distance)
         
         raise QectorError("No code constructor available for custom parity check matrix")
     except QectorError:
@@ -2423,12 +2474,18 @@ def estimate_threshold(code, decoder_kind: str = "blossom",
     """
     if distances is None:
         distances = [3, 5, 7, 9, 11]
-    
+
+    family_key = code.get("family") if isinstance(code, dict) else getattr(code, "family", None)
+    if family_key not in CODE_FAMILIES:
+        family_key = None
+
     results = {}
-    
+
     for d in distances:
+        if family_key is None:
+            continue  # family not recoverable from the code object
         try:
-            test_code = build_code(code_family, d)  # Need to extract family from code
+            test_code = build_code(family_key, d)
         except Exception:
             continue
         

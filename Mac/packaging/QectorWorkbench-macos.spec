@@ -41,9 +41,11 @@ except Exception:
 app_modules = [
     'app', 'backend', 'state', 'theme', 'utils', 'logger', 'console', 'version',
     'version_service', 'decoder_provisioner', 'doc_generator', 'auto_updater', 'threading_utils', 'results_tracker',
-    'hardware_routing', 'mcp_server', 'mcp_resources', 'dialogs', 'autodebug', 'cli',
+    'hardware_routing', 'mcp_server', 'mcp_resources', 'dialogs', 'autodebug', 'cli', 'errors',
     'code_explorer_tab', 'decoder_lab_tab', 'benchmark_tab',
     'batch_streaming_tab', 'hardware_tab', 'diagnostics_tab', 'documentation_tab',
+    'lab_info_tab', 'history_tab', 'compliance', 'entra_auth', 'i18n',
+    'generate_manuals', 'api_reference', 'docs_exporter',
     # Runtime dependency of the externally provisioned decoder: qector-decoder-v3
     # >= 0.6.8 imports `cryptography` (via cffi) at package import time.  The
     # decoder is installed --no-deps and never imported at build time, so it must
@@ -61,8 +63,8 @@ hiddenimports = (
 datas = [
     (os.path.join(ROOT, 'icon.png'), '.'),
     (os.path.join(ROOT, 'assets', 'icon.jpg'), '.'),
-    (os.path.join(ROOT, 'assets', 'EULA.txt'), '.'),
-    (os.path.join(ROOT, 'assets', 'README_v3.md'), '.'),
+    (os.path.join(ROOT, 'EULA.txt'), '.'),
+    (os.path.join(ROOT, 'README.md'), '.'),
 ]
 datas += collect_data_files('customtkinter') + _dec_datas
 

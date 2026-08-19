@@ -1,3 +1,0 @@
-414280f4b34721e03ac65f88c24894da6dba125f945e277a3cfc682722ee6ba0  qector-workbench_0.5.3_amd64.deb
-d0b3f13f328529e5f0fe4f175f969f453a2c4a0d380361a1dbf0da7a3c498195  QectorWorkbench-v0.5.3-Linux-x64-Public.zip
-88c100b6187c981548246400023c5f02f44f68d9c1e8b78809c979b15dad02f5  QectorWorkbench-v1.0.0-Linux-x64-Public.zip

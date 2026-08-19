@@ -6,7 +6,6 @@ These cover the two regressions fixed in this session:
   * QECTOR_DISABLE_OPENCL=1 must actually skip OpenCL probing (the docs
     advertised it but the code never checked it).
 """
-import os
 import sys
 from pathlib import Path
 

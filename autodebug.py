@@ -480,9 +480,9 @@ def run_self_diagnostics(probe_family: str = "repetition", probe_distance: int =
         except Exception as exc:
             add("auto-decoder diagnostics", "warn", f"AutoDecoder diagnostics unavailable: {exc}")
 
-    # 6b. Newly wired v0.6.6 feature surface (rich diagnostics, native streaming,
-    #     policy routing, ecosystem compat).  Never fatal: a hiccup here degrades
-    #     to a warning so a healthy install is never marked "fail" for an
+    # 6b. Newly wired v1.0.0 feature surface (rich diagnostics, native streaming,
+    #     policy routing, ecosystem compat, enterprise hooks). Never fatal: a hiccup
+    #     here degrades to a warning so a healthy install is never marked "fail" for an
     #     auxiliary feature.
     if be is not None:
         feature_errors: list[str] = []
@@ -506,12 +506,21 @@ def run_self_diagnostics(probe_family: str = "repetition", probe_distance: int =
             be.compat_report()
         except Exception as exc:
             feature_errors.append(f"compat_report: {exc}")
+        try:
+            be.clear_decoder_cache()
+        except Exception as exc:
+            feature_errors.append(f"clear_decoder_cache: {exc}")
+        try:
+            be.run_doctor_checks()
+        except Exception as exc:
+            feature_errors.append(f"run_doctor_checks: {exc}")
+            
         if feature_errors:
-            add("v0.6.6 feature wiring", "warn",
+            add("v1.0.0 feature wiring", "warn",
                 "some auxiliary features unavailable: " + "; ".join(feature_errors))
         else:
-            add("v0.6.6 feature wiring", "pass",
-                "diagnostic decode, native streaming, policy routing and compat report all OK")
+            add("v1.0.0 feature wiring", "pass",
+                "diagnostic decode, native streaming, policy routing, compat report and v1.0.0 hooks all OK")
 
     # 7. Writable data directory
     try:

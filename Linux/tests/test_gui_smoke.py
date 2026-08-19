@@ -23,6 +23,26 @@ import time
 import pytest
 
 
+@pytest.fixture(autouse=True)
+def _reset_default_root():
+    """Clear tkinter's cached default root when it points at a dead interpreter.
+
+    A destroyed Tk root keeps ``tkinter._default_root`` alive until the object is
+    garbage-collected; the next ``CTkFont``/widget then calls ``font create`` on
+    a dead interpreter ("application has been destroyed").  This fixture unlinks
+    only roots that no longer exist, so repeated QectorApp bootstraps in one
+    pytest process stay deterministic.
+    """
+    yield
+    import tkinter
+    root = tkinter._default_root
+    if root is not None:
+        try:
+            root.winfo_exists()
+        except Exception:
+            tkinter._default_root = None
+
+
 # ---------------------------------------------------------------------------
 # Guard: only run GUI tests when Tk works on this host.
 #

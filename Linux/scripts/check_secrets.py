@@ -36,7 +36,7 @@ SECRET_PATTERNS = [
 
 # Excluded directories (build artefacts, vendored wheels, docs, venvs).
 EXCLUDE_DIRS = {
-    ".git", ".venv", "__pycache__", "node_modules",
+    ".git", ".venv", "test_venv", "__pycache__", "node_modules",
     "dist", "build", "wheels", "release_assets", "docs", "manuals",
     # PyInstaller intermediate trees: build artefacts from build_production.py
     # and verify_frozen_mcp.py. They contain .toc files with .NET runtime

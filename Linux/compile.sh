@@ -28,6 +28,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$ROOT"
 
 VERSION="$(tr -d ' \t\r\n' < VERSION 2>/dev/null || echo 0.5.2)"
+BACKEND_VERSION="$(python3 -c 'from version import BACKEND_VERSION; print(BACKEND_VERSION)' 2>/dev/null || echo 1.0.0)"
 APP_NAME="QectorWorkbench"
 VENV="$ROOT/.venv"
 BUILD="$ROOT/build"
@@ -164,9 +165,13 @@ ok "icon.png ready."
 # --- 5. Optional test gate --------------------------------------------------
 if [ "$DO_TEST" = "1" ]; then
     log "Running pytest…"
-    # Tests run against the EXACT bundled manylinux wheel (0.7.0) — PyPI only
-    # carries older releases, which would trip the MIN_BACKEND_VERSION gate.
-    MPLBACKEND=Agg "$VPY" -m pip install pytest pytest-asyncio ./qector_decoder_v3-0.7.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl >/dev/null
+    # Tests run against the exact bundled manylinux wheel for this release.
+    # Derive the cpXY tag from the active interpreter so the gate works on
+    # Python 3.11, 3.12, and 3.13 alike (wheels are shipped for each).
+    CP_TAG="cp$("$VPY" -c 'import sys; print(f"{sys.version_info[0]}{sys.version_info[1]}")')"
+    WHEEL_NAME="qector_decoder_v3-${BACKEND_VERSION}-${CP_TAG}-${CP_TAG}-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+    [ -f "wheels/$WHEEL_NAME" ] || die "bundled Linux decoder wheel missing for $CP_TAG: wheels/$WHEEL_NAME"
+    MPLBACKEND=Agg "$VPY" -m pip install pytest pytest-asyncio "wheels/$WHEEL_NAME" >/dev/null
     MPLBACKEND=Agg "$VPY" -m pytest -q
     MPLBACKEND=Agg "$VPY" test_mcp_all.py
     ok "Tests passed."

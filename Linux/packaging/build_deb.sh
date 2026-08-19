@@ -26,7 +26,7 @@ PKG="qector-workbench"
 ONEDIR="$ROOT/dist/QectorWorkbench"
 ICON="$ROOT/icon.png"
 OUTDIR="$ROOT/dist"
-MAINTAINER="${QECTOR_DEB_MAINTAINER:-QECTOR Workbench <crimaud34@gmail.com>}"
+MAINTAINER="${QECTOR_DEB_MAINTAINER:-QECTOR Workbench <admin@qector.store>}"
 HOMEPAGE="https://www.qector.store"
 
 log()  { printf '\033[1;36m==>\033[0m %s\n' "$*"; }
@@ -63,7 +63,12 @@ build_one() {
              "$pkgdir/usr/share/applications" \
              "$pkgdir/usr/share/icons/hicolor/256x256/apps" \
              "$pkgdir/usr/share/man/man1" \
-             "$pkgdir/usr/share/doc/qector-workbench"
+             "$pkgdir/usr/share/doc/qector-workbench" \
+             "$pkgdir/etc/apparmor.d"
+
+    # AppArmor confinement: loopback-only networking for the whole bundle.
+    cp "$ROOT/packaging/qector-workbench.apparmor" "$pkgdir/etc/apparmor.d/qector-workbench"
+    chmod 0644 "$pkgdir/etc/apparmor.d/qector-workbench"
 
     # Payload: the self-contained PyInstaller onedir.  Installed under /usr/lib
     # (FHS-compliant for a package-managed app) rather than /opt.
@@ -96,11 +101,11 @@ build_one() {
             "" \
             "----------------------------------------------------------------------" \
             ""
-        [ -f assets/EULA.txt ] && cat assets/EULA.txt
+        [ -f EULA.txt ] && cat EULA.txt
     } > "$pkgdir/usr/share/doc/qector-workbench/copyright"
 
     # End-user README in the standard Debian doc location (NOT the dev/build docs).
-    [ -f assets/README_v3.md ] && cp assets/README_v3.md "$pkgdir/usr/share/doc/qector-workbench/README.md" || true
+    [ -f README.md ] && cp README.md "$pkgdir/usr/share/doc/qector-workbench/README.md" || true
 
     # Debian changelog (gzip -9n, no timestamp).  The version carries no Debian
     # revision, so dpkg treats this as a native package: the file must be
@@ -108,7 +113,7 @@ build_one() {
     {
         printf '%s\n\n' "qector-workbench (${VERSION}) stable; urgency=low"
         printf '  * QECTOR Decoder Workbench %s — self-contained %s build.\n' "$VERSION" "$variant"
-        printf '  * 16 decoders, 10 code families (incl. qLDPC), 56-tool MCP server.\n\n'
+         printf '  * 17 decoders, 10 code families (incl. qLDPC), 85-tool MCP server.\n\n'
         printf ' -- %s  %s\n' "$MAINTAINER" "$(date -R)"
     } | gzip -9n > "$pkgdir/usr/share/doc/qector-workbench/changelog.gz"
 
@@ -124,13 +129,13 @@ qector-workbench \- QECTOR Decoder Workbench, a quantum error-correction decoder
 .RB [ --mcp ]
 .SH DESCRIPTION
 QECTOR Decoder Workbench is a self-contained desktop GUI and stdio MCP server for
-constructing quantum error-correcting codes and benchmarking single-shot and batch
+constructing quantum error-correcting codes and measuring single-shot and batch
 decoders (union-find, blossom, sparse-blossom, BP-OSD and more) from the
 qector-decoder-v3 backend.
 .SH OPTIONS
 .TP
 .B --mcp
-Start the 56-tool stdio Model Context Protocol server instead of the GUI (headless).
+Start the 85-tool stdio Model Context Protocol server instead of the GUI (headless).
 .SH FILES
 .TP
 .I ~/.local/share/QectorWorkbench
@@ -153,6 +158,7 @@ MAN
     cat > "$pkgdir/usr/bin/qector-workbench" <<'SH'
 #!/bin/sh
 # QECTOR Decoder Workbench launcher. Pass --mcp for the stdio MCP server.
+export QECTOR_OFFLINE="${QECTOR_OFFLINE:-1}"
 exec /usr/lib/qector-workbench/QectorWorkbench "$@"
 SH
     chmod 0755 "$pkgdir/usr/bin/qector-workbench"
@@ -192,14 +198,14 @@ Priority: optional
 Homepage: ${HOMEPAGE}
 Description: QECTOR Decoder Workbench (${variant}) — quantum error-correction decoder suite
  Self-contained desktop GUI and stdio MCP server for constructing quantum
- error-correcting codes and benchmarking single-shot and batch decoders
+  error-correcting codes and measuring single-shot and batch decoders
  (union-find, blossom, sparse-blossom, BP-OSD and more) from the
  qector-decoder-v3 backend.
  .
  Bundles its own Python 3.11 runtime, Tcl/Tk and scientific stack (numpy,
  scipy, matplotlib), so no system Python is required.  Built on a glibc 2.31
  baseline for the ${variant} family.  Run "qector-workbench" for the GUI or
- "qector-workbench --mcp" for the 56-tool MCP server.
+  "qector-workbench --mcp" for the 85-tool MCP server.
 CTRL
 
     # postinst: refresh desktop + icon caches AND drop a launcher icon on the
@@ -248,6 +254,14 @@ for home in /home/*; do
 done
 place_shortcut /root root
 
+# Best-effort AppArmor confinement: load the shipped loopback-only profile.
+# The profile is written to be safe to enforce on every supported host
+# (Ubuntu 20.04+ / antiX 21+); if apparmor_parser is absent, nothing changes.
+if [ -x /sbin/apparmor_parser ] || [ -x /usr/sbin/apparmor_parser ]; then
+    AP="$(command -v apparmor_parser || echo /sbin/apparmor_parser)"
+    "$AP" -r /etc/apparmor.d/qector-workbench 2>/dev/null || true
+fi
+
 exit 0
 POST
     cat > "$pkgdir/DEBIAN/postrm" <<'POSTRM'
@@ -265,6 +279,13 @@ if [ "$1" = "remove" ] || [ "$1" = "purge" ]; then
     for home in /home/* /root; do
         rm -f "$home/Desktop/qector-workbench.desktop" 2>/dev/null || true
     done
+fi
+if [ "$1" = "purge" ]; then
+    # Unload + remove the AppArmor profile we installed.
+    if command -v apparmor_parser >/dev/null 2>&1; then
+        apparmor_parser -R /etc/apparmor.d/qector-workbench 2>/dev/null || true
+    fi
+    rm -f /etc/apparmor.d/qector-workbench 2>/dev/null || true
 fi
 exit 0
 POSTRM

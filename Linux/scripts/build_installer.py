@@ -54,7 +54,7 @@ def build_zip() -> Path:
     if zip_path.exists():
         zip_path.unlink()
 
-    extra_files = ["icon.ico", "icon.jpg", "EULA.txt", "README_v3.md"]
+    extra_files = ["icon.ico", "icon.jpg", "EULA.txt", "README.md"]
 
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
         # Add all files from the dist directory
@@ -90,18 +90,29 @@ def write_installer_version() -> Path:
 def build_inno_installer() -> Path | None:
     """Compile installer.iss with Inno Setup if ISCC is available."""
     write_installer_version()
-    iscc = shutil.which("ISCC")
-    if not iscc:
-        iscc = str(Path("C:/Program Files (x86)/Inno Setup 6/ISCC.exe"))
-        if not os.path.isfile(iscc):
-            iscc = str(Path("C:/Program Files/Inno Setup 6/ISCC.exe"))
-            if not os.path.isfile(iscc):
-                print("Inno Setup (ISCC.exe) not found. Skipping installer compilation.")
-                print("Install from: https://jrsoftware.org/isdl.php")
-                return None
+    candidates: list[Path] = []
+    explicit = os.environ.get("ISCC_PATH") or os.environ.get("INNO_SETUP_PATH")
+    if explicit:
+        configured = Path(explicit)
+        candidates.append(configured / "ISCC.exe" if configured.is_dir() else configured)
+    on_path = shutil.which("ISCC")
+    if on_path:
+        candidates.append(Path(on_path))
+    for variable in ("ProgramFiles(x86)", "ProgramFiles"):
+        program_files = os.environ.get(variable)
+        if program_files:
+            candidates.append(Path(program_files) / "Inno Setup 6" / "ISCC.exe")
+    iscc_path = next((path for path in candidates if path.is_file()), None)
+    if iscc_path is None:
+        print("Inno Setup (ISCC.exe) not found. Skipping installer compilation.")
+        print("Install from: https://jrsoftware.org/isdl.php")
+        return None
 
     iss_path = REPO / "installer.iss"
-    result = subprocess.run([iscc, str(iss_path)], capture_output=True, text=True)
+    result = subprocess.run(
+        [str(iscc_path), str(iss_path)], cwd=REPO,
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+    )
     if result.returncode != 0:
         print("Inno Setup compilation failed:")
         print(result.stdout)

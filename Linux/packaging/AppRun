@@ -10,4 +10,5 @@ set -e
 HERE="$(dirname "$(readlink -f "${0}")")"
 export PATH="${HERE}/usr/bin:${PATH}"
 export XDG_DATA_DIRS="${HERE}/usr/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+export QECTOR_OFFLINE="${QECTOR_OFFLINE:-1}"
 exec "${HERE}/usr/bin/QectorWorkbench" "$@"

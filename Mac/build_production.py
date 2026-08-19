@@ -58,20 +58,22 @@ APP_MODULES = [
     "threading_utils.py", "results_tracker.py",
     "code_explorer_tab.py", "decoder_lab_tab.py", "benchmark_tab.py",
     "batch_streaming_tab.py", "hardware_tab.py", "diagnostics_tab.py",
-    "documentation_tab.py", "lab_info_tab.py", "generate_manuals.py",
+    "documentation_tab.py", "lab_info_tab.py", "history_tab.py", "generate_manuals.py",
     "api_reference.py", "docs_exporter.py",
+    # v1.0.1: zero-egress enforcement + optional Entra ID SSO (enterprise)
+    "compliance.py", "entra_auth.py",
 ]
-DATA_FILES = ["icon.jpg", "icon.ico", "icon.png", "EULA.txt", "README_v3.md", "requirements.txt"]
+DATA_FILES = ["icon.jpg", "icon.ico", "icon.png", "EULA.txt", "README.md", "requirements.txt"]
 
 # Root-level modules that exist for building/testing only. The installed app
 # must never import them, and the .deb never ships them.
-BUILD_TOOLING = {"build_production", "verify_frozen_mcp", "test_mcp_all",
-                 "qector_v069_benchmark"}
+BUILD_TOOLING = {"build_production", "test_mcp_all"}
 
 # Platform-specific offline wheels
 WHEEL_FILES = {
-    "windows": "wheels\\qector_decoder_v3-1.0.0-cp311-cp311-win_amd64.whl",
-    "linux": "wheels-linux/qector_decoder_v3-1.0.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+    "windows": f"wheels\\qector_decoder_v3-{BACKEND_VER}-cp311-cp311-win_amd64.whl",
+    "linux": f"wheels-linux/qector_decoder_v3-{BACKEND_VER}-cp311-cp311-"
+             "manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
 }
 
 _IMPORT_RX = re.compile(r"^\s*(?:from|import)\s+([A-Za-z_]\w*)", re.M)
@@ -277,7 +279,7 @@ def build_deb():
                 )
                 with open(provisioner_path, "w", encoding="utf-8") as f:
                     f.write(new_content)
-                    print(f"    [OK] Updated decoder_provisioner.py to use local wheel")
+                    print("    [OK] Updated decoder_provisioner.py to use local wheel")
     else:
         print("    [WARN] No offline wheels found")
 
@@ -421,7 +423,7 @@ def build_deb():
 
     # Desktop entry
     with open(os.path.join(desktop, "qector-workbench.desktop"), "w", newline="\n") as f:
-        f.write(textwrap.dedent(f"""\
+        f.write(textwrap.dedent("""\
             [Desktop Entry]
             Name=QECTOR Decoder Workbench
             Comment=Quantum Error Correction decoder workbench
@@ -441,9 +443,9 @@ def build_deb():
         # dpkg-deb cannot record correct permissions when the tree lives on a
         # Windows mount (/mnt/... in WSL). Use build_deb_wsl.sh in that case.
         if sys.platform.startswith("linux") and deb_root.startswith("/mnt/"):
-            print(f"\n  [INFO] dpkg-deb is available but the package tree is on a Windows mount.")
-            print(f"         Skipping dpkg-deb here to avoid permission issues.")
-            print(f"         Run 'bash build_deb_wsl.sh' in WSL to build the final .deb.")
+            print("\n  [INFO] dpkg-deb is available but the package tree is on a Windows mount.")
+            print("         Skipping dpkg-deb here to avoid permission issues.")
+            print("         Run 'bash build_deb_wsl.sh' in WSL to build the final .deb.")
         else:
             run(["dpkg-deb", "--build", "--root-owner-group", deb_root, deb_file], check=False)
             if os.path.isfile(deb_file):
@@ -453,13 +455,13 @@ def build_deb():
     else:
         print(f"\n  [INFO] dpkg-deb not on this OS. Package tree at: {deb_root}")
         print(f"         On Linux run: dpkg-deb --build --root-owner-group {deb_name} {deb_name}.deb")
-        print(f"         From Windows run: wsl -d <distro> -- bash -lc \"cd '/mnt/d/QECTOR APP' && bash build_deb_wsl.sh\"")
+        print("         From Windows run: wsl -d <distro> -- bash -lc \"cd '/mnt/d/QECTOR APP' && bash build_deb_wsl.sh\"")
         # A leftover .deb from an earlier run is the dangerous case: the tree is
         # fresh, the .deb is not, and nothing says so.  Call it out explicitly.
         if os.path.isfile(deb_file) and os.path.getmtime(deb_file) < os.path.getmtime(deb_root):
             print(f"\n  [STALE] {os.path.basename(deb_file)} is OLDER than the package tree just built.")
-            print(f"          It does NOT contain these changes. Rebuild it with build_deb_wsl.sh")
-            print(f"          before shipping, or delete it so it cannot be mistaken for current.")
+            print("          It does NOT contain these changes. Rebuild it with build_deb_wsl.sh")
+            print("          before shipping, or delete it so it cannot be mistaken for current.")
 
     fc = sum(len(files) for _, _, files in os.walk(deb_root))
     print(f"\n  Package tree: {fc} files")
@@ -501,7 +503,7 @@ def verify():
     print(f"  Python:    {sys.version.split()[0]}")
     print(f"  App:       {APP_NAME} v{APP_VERSION}")
     print(f"  Backend:   qector-decoder-v3 v{BACKEND_VER}  (bundled wheel, offline-ready)")
-    print(f"  Strategy:  decoder wheel bundled; provisioned offline on first launch")
+    print("  Strategy:  decoder wheel bundled; provisioned offline on first launch")
 
 
 # ---------------------------------------------------------------------------
@@ -607,7 +609,7 @@ def main():
     do_all = args.all or (not args.exe and not args.deb)
 
     banner(f"QECTOR Decoder Workbench v{APP_VERSION} -- Production Build (bundled decoder wheel)")
-    print(f"  Strategy:  decoder wheel bundled; provisioned offline on first launch")
+    print("  Strategy:  decoder wheel bundled; provisioned offline on first launch")
     print(f"  Platform:  {platform.system()} {platform.machine()}")
     print(f"  Python:    {sys.version.split()[0]}")
 
@@ -630,4 +632,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

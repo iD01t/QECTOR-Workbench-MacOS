@@ -19,7 +19,6 @@ import tkinter
 import html as _html
 import traceback
 from pathlib import Path
-from typing import Any, Optional
 
 try:
     import customtkinter as ctk

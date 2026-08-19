@@ -12,7 +12,6 @@ import json
 import tkinter
 import html as _html
 import traceback
-from pathlib import Path
 from typing import Any
 
 try:
@@ -263,6 +262,16 @@ if _HAS_GUI:
             try:
                 self._show_result(result)
                 self._draw_charts(result)
+                try:
+                    from history_tab import record_event
+                    record_event("benchmark", {
+                        "family": result.get("code_family", "?"),
+                        "distance": result.get("distance", "?"),
+                        "decoder": result.get("method", "?"),
+                        "throughput": f"{result['throughput_decodes_per_s']:.0f}",
+                    })
+                except Exception:
+                    pass
                 self._log(
                     f"Benchmark {result['code_family']} d={result['distance']} {result['method']}: "
                     f"{result['throughput_decodes_per_s']:.0f} dec/s, "
@@ -406,7 +415,7 @@ if _HAS_GUI:
             xs = np.arange(len(self._results))
             throughputs = [r["throughput_decodes_per_s"] for r in self._results]
             colors = [
-                theme.c("bar") if i == len(self._results) - 1 else theme.c("bar_dim")
+                theme.mc("bar") if i == len(self._results) - 1 else theme.mc("bar_dim")
                 for i in range(len(self._results))
             ]
             ax2.bar(xs, throughputs, color=colors, width=0.62, linewidth=0, zorder=3)

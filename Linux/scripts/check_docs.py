@@ -34,7 +34,7 @@ sys.path.insert(0, str(REPO))
 
 #: Docs that make factual claims to the public.
 TRACKED = [
-    "README.md", "README_v3.md", "README_LINUX.md", "AGENT.md", "PACKAGING.md",
+    "README.md", "README_LINUX.md", "AGENT.md", "PACKAGING.md",
     "PROJECT_STATUS.md", "RELEASE_REPORT.md",
     "docs/architecture.md", "docs/README.txt", "manuals/README.txt",
 ]
@@ -174,6 +174,10 @@ def check_download_claims(facts: dict) -> list[str]:
 
 
 def main(argv=None) -> int:
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except AttributeError:
+        pass
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--quiet", action="store_true", help="only print the summary line")
     args = ap.parse_args(argv)

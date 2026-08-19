@@ -163,7 +163,7 @@ log "Building disk image…"
 STAGE="$BUILD/dmg"; rm -rf "$STAGE"; mkdir -p "$STAGE"
 cp -R "$DIST/$APP" "$STAGE/"
 ln -s /Applications "$STAGE/Applications" 2>/dev/null || true
-cp assets/EULA.txt "$STAGE/" 2>/dev/null || true
+cp EULA.txt "$STAGE/" 2>/dev/null || true
 hdiutil create -volname "QECTOR Workbench $VERSION" -srcfolder "$STAGE" \
     -ov -format UDZO "$DMG" >/dev/null
 [ -f "$DMG" ] || die "hdiutil did not produce $DMG"

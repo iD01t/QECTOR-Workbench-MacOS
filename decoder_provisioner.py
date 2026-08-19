@@ -36,6 +36,9 @@ _THREAD_LOCK = threading.Lock()
 _MIN_FREE_BYTES = 100 * 1024 * 1024  # 100 MB floor before any install (devv1 §2.2)
 _MAX_RETRIES = 3
 _BASE_RETRY_DELAY = 2.0
+# The distributed product is permanently offline.  The legacy environment flag
+# remains accepted by the diagnostics, but it cannot enable a network fallback.
+_OFFLINE = True
 
 
 def _provision_timeout() -> int:
@@ -62,7 +65,12 @@ def _sha256_file(path: Path) -> str:
 
 
 def _fetch_pypi_metadata(version: Optional[str] = None) -> Optional[dict]:
-    """Fetch wheel metadata from PyPI JSON API with retry logic."""
+    """Fetch wheel metadata from PyPI JSON API with retry logic.
+
+    Zero-egress guarantee: in offline mode or in a frozen release this never
+    contacts PyPI — the bundled wheel is the only accepted decoder source."""
+    if _OFFLINE or is_frozen():
+        return None
     import urllib.request
     import urllib.error
     
@@ -118,7 +126,13 @@ def _find_wheel_url_and_checksum(metadata: dict, version: str) -> tuple[Optional
 
 
 def _download_with_checksum(url: str, dest: Path, expected_sha256: Optional[str]) -> bool:
-    """Download a file and verify its SHA-256 checksum."""
+    """Download a file and verify its SHA-256 checksum.
+
+    Zero-egress guarantee: in offline mode or in a frozen release this never
+    contacts the network."""
+    if _OFFLINE or is_frozen():
+        _diag("download blocked: offline mode or frozen release")
+        return False
     import urllib.request
     
     try:
@@ -484,7 +498,9 @@ def _release_lock(handle: Optional[int], path: Optional[Path]) -> None:
 
 
 def _latest_pypi() -> Optional[str]:
-    """Fetch latest version from PyPI with retry logic."""
+    """Fetch latest version from PyPI with retry logic (offline-safe)."""
+    if _OFFLINE or is_frozen():
+        return None
     metadata = _fetch_pypi_metadata()
     if not metadata:
         return None
@@ -496,7 +512,12 @@ def _latest_pypi() -> Optional[str]:
 
 
 def _install_from_pypi_with_checksum(version: str, timeout: int, on_log: Optional[Callable[[str], None]]) -> tuple[bool, str, Optional[str]]:
-    """Install a specific version from PyPI with checksum verification."""
+    """Install a specific version from PyPI with checksum verification.
+
+    Zero-egress guarantee: in offline mode or in a frozen release this never
+    contacts PyPI."""
+    if _OFFLINE or is_frozen():
+        return False, "offline mode is active; bundled wheel only", None
     metadata = _fetch_pypi_metadata(version)
     if not metadata:
         return False, f"PyPI metadata not found for version {version}", None
@@ -785,7 +806,7 @@ def ensure(prefer_latest: bool = True, timeout: Optional[int] = None,
         activate_site()
         installed = scan_version()
         minimum = _minimum_version()
-        latest = target_version or (_latest_pypi() if prefer_latest else None)
+        latest = target_version or (_latest_pypi() if prefer_latest and not _OFFLINE else None)
         result = {
             "module": MODULE, "installed_before": installed, "installed": installed,
             "minimum": minimum, "latest": latest, "managed_dir": str(managed_root()),
@@ -829,7 +850,20 @@ def ensure(prefer_latest: bool = True, timeout: Optional[int] = None,
             )
             return result
 
-    # Live install from PyPI with checksum verification and retry
+    # A frozen release is deliberately offline: the bundled wheel is the only
+    # accepted decoder source. A missing or incompatible wheel is a hard error,
+    # not a reason to contact PyPI.
+    if _OFFLINE or is_frozen():
+        result.update(
+            ok=False,
+            action="failed",
+            installed=installed,
+            message=f"local bundled wheel required ({minimum}); offline mode is active",
+        )
+        return result
+
+    # Live install from PyPI with checksum verification and retry for source
+    # installs only.
     if latest:
         if on_log:
             try:
@@ -1079,7 +1113,18 @@ def bootstrap(on_log: Optional[Callable[[str], None]] = None) -> dict:
                         "message": f"{MODULE} {ver} is ready (from {whl.name})"}
         _diag(f"step2.5 local wheel extract failed: {msg}")
 
-    # 3. Live install from PyPI
+    if _OFFLINE or is_frozen():
+        result = {
+            "ok": False,
+            "action": "failed",
+            "installed": _imported_version(),
+            "minimum": minimum,
+            "message": f"bundled {PACKAGE} {minimum} wheel is missing or incompatible; offline mode is active",
+        }
+        _diag(f"offline bootstrap failed: {result['message']}")
+        return result
+
+    # 3. Live install from PyPI for explicitly non-frozen source installs.
     if on_log:
         try:
             on_log(f"Downloading {PACKAGE} from PyPI...")

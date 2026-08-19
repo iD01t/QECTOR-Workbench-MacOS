@@ -36,11 +36,11 @@ those modules, the code is the source of truth — re-derive, do not improvise.
 | Property | Value (from code) |
 |---|---|
 | Server name (`serverInfo.name`) | `qector-workbench` |
-| Server version | `WORKBENCH_VERSION` = **1.0.0** |
+| Server version | `WORKBENCH_VERSION` = **1.0.1** |
 | Backend | `qector_decoder_v3` **1.0.0** (min supported 1.0.0) |
 | MCP protocol version | **2024-11-05** |
 | Transport | newline-delimited **JSON-RPC 2.0** over **stdio** |
-| Tool count | **82** (call `list_tools` for the live set) |
+| Tool count | **83** (call `list_tools` for the live set) |
 | Methods | `initialize`, `notifications/initialized`, `ping`, `tools/list`, `tools/call` |
 
 ### Launch
@@ -70,7 +70,7 @@ python main.py --mcp
 
 ---
 
-## 2. The tools (authoritative list; 82 in backend 1.0.0)
+## 2. The tools (authoritative list; 83 in backend 1.0.0)
 
 Grouped by purpose. Parameter defaults are the server's; **always set `seed`
 explicitly** for anything stochastic. Tools marked ⚠ mutate server state.
@@ -149,7 +149,7 @@ The 1.0.0 backend adds tools covering the new decoders (`gnn_belief_match_decode
 `belief_match_decode`, `hybrid_cascade_stats`), explicit-syndrome and option-aware
 decoding (`decode_syndrome`, `decode_with_options`), neural pre-decoder training
 (`neural_predecoder_train`, research/lab), honest GPU batch (`batch_decode_gpu`),
-and the live compatibility probe (`compatible_decoders`) — **82 tools** total;
+and the live compatibility probe (`compatible_decoders`) — **85 tools** total;
 `list_tools` remains the live authority.
 
 > If you need a tool not in this list, it does not exist. Call `list_tools` to

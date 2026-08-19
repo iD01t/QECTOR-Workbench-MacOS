@@ -269,7 +269,6 @@ if _HAS_GUI:
 
         def _draw_caps(self, hw_text: Optional[str], sys_text: Optional[str],
                        rec_text: Optional[str]) -> None:
-            import numpy as np
             labels = []
             values = []
             colors = []

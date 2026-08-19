@@ -12,7 +12,6 @@ from __future__ import annotations
 import tkinter
 import html as _html
 import traceback
-from pathlib import Path
 from typing import Any, Optional
 
 try:
@@ -459,6 +458,15 @@ if _HAS_GUI:
                 )
                 self._set_result_text(text)
                 self._draw_batch_histogram(p)
+                try:
+                    from history_tab import record_event
+                    record_event("batch", {
+                        "n": p["n_samples"],
+                        "backend": p["backend_used"],
+                        "success_rate": f"{p['success_rate'] * 100:.1f}%",
+                    })
+                except Exception:
+                    pass
                 self._log(
                     f"Batch {n} samples on {p['backend_used']}: "
                     f"{p['success_rate'] * 100:.0f}% syndrome match, LER={ler_str}",
@@ -595,6 +603,16 @@ if _HAS_GUI:
                 )
                 self._set_result_text(text)
                 self._draw_stream_chart(p)
+                try:
+                    from history_tab import record_event
+                    record_event("streaming", {
+                        "rounds": p["rounds"],
+                        "decoder": p["decoder"],
+                        "window": p["window_size"],
+                        "committed": p["committed_count"],
+                    })
+                except Exception:
+                    pass
                 self._log(
                     f"Streaming done ({p['decoder']}): {p['committed_count']} committed, LER={ler_str}",
                     "SUCCESS",

@@ -11,6 +11,13 @@ from PyInstaller.utils.hooks import (
     collect_submodules, collect_data_files, collect_dynamic_libs,
 )
 
+import sys
+import os
+SPEC = os.path.abspath(SPECPATH)
+def P(rel: str) -> str:
+    return os.path.join(SPEC, rel)
+if SPEC not in sys.path:
+    sys.path.insert(0, SPEC)
 import version as _qector_version  # noqa: E402
 
 app_version = _qector_version.WORKBENCH_VERSION
@@ -35,9 +42,8 @@ hiddenimports = [
 ] + collect_submodules('customtkinter') + collect_submodules('cryptography')
 
 datas = [
-    ('icon.jpg', '.'), ('icon.ico', '.'), ('EULA.txt', '.'), ('README_v3.md', '.'),
-    ('wheels/*', 'wheels'), 
-    (f'wheels/qector_decoder_v3-{backend_version}-cp311-cp311-win_amd64.whl', '.'),
+    (P('icon.jpg'), '.'), (P('icon.ico'), '.'), (P('EULA.txt'), '.'),
+    (P('README.md'), '.'), ('wheels/*', 'wheels'),
 ] + collect_data_files('customtkinter')
 
 binaries = collect_dynamic_libs('cryptography') + collect_dynamic_libs('cffi')
@@ -111,5 +117,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='icon.ico',
+    icon=P('icon.ico'),
 )

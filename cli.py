@@ -468,10 +468,10 @@ def cmd_version(args: argparse.Namespace) -> int:
             be_ver = be_info.get("installed") or be_info.get("local", "N/A")
             any_update = bool(app_info.get("update_available") or be_info.get("update_available"))
             lines = [
-                f"{C.BOLD}Workbench App:{C.RESET}    {app_ver} (PyPI: {app_info.get('latest', 'offline/N/A')})",
-                f"{C.BOLD}Decoder Backend:{C.RESET}  {be_ver} (PyPI: {be_info.get('latest', 'offline/N/A')})",
+                f"{C.BOLD}Workbench App:{C.RESET}    {app_ver} (local bundle)",
+                f"{C.BOLD}Decoder Backend:{C.RESET}  {be_ver} (local bundle)",
                 f"{C.BOLD}MCP Toolset:{C.RESET}      {MCP_TOOLS} tools (protocol 2024-11-05)",
-                f"{C.BOLD}Update Status:{C.RESET}    " + (f"{C.YELLOW}Update Available{C.RESET}" if any_update else f"{C.GREEN}Up to date{C.RESET}"),
+                f"{C.BOLD}Update Status:{C.RESET}    {C.GREEN}Offline bundle{C.RESET}",
             ]
             draw_box("QECTOR SYSTEM VERSION STATUS", lines, color=C.CYAN)
         return 0
@@ -530,6 +530,106 @@ def cmd_selftest(args: argparse.Namespace) -> int:
     except Exception as e:
         print(f"{C.RED}Error during self-test: {e}{C.RESET}", file=sys.stderr)
         return 1
+
+
+def cmd_compliance(args: argparse.Namespace) -> int:
+    import compliance
+
+    try:
+        # Enforce before attesting: an offline/frozen run must show an ACTIVE
+        # guard, not an advisory.  Source runs without QECTOR_AIRGAP/QECTOR_OFFLINE
+        # report the honest inactive state (dev mode can reach the network).
+        if compliance.airgap_mode():
+            compliance.install_egress_guard()
+        report = compliance.compliance_report()
+        if args.json:
+            print_json(report)
+        else:
+            if not args.no_banner:
+                print(banner())
+            print(compliance.format_compliance_report(report))
+        return 0 if report.get("compliant") else 1
+    except Exception as e:
+        print(f"{C.RED}Error running compliance check: {e}{C.RESET}", file=sys.stderr)
+        return 1
+
+
+def cmd_entra(args: argparse.Namespace) -> int:
+    try:
+        import entra_auth
+        action = getattr(args, "action", "status")
+        
+        if action == "configure":
+            cid = getattr(args, "client_id", None)
+            ten = getattr(args, "tenant", None)
+            grp = getattr(args, "group_id", None)
+            scp = getattr(args, "scopes", None)
+            cloud = getattr(args, "cloud", "public")
+            res = entra_auth.configure(cid, ten, grp, scp, cloud)
+            if args.json:
+                import json
+                print(json.dumps(res, indent=2))
+            else:
+                if res.get("ok"):
+                    print(f"Entra ID configured. Config saved to: {res.get('path')}")
+                else:
+                    print(f"Configuration failed: {res.get('reason')}", file=sys.stderr)
+                    return 1
+                    
+        elif action == "login":
+            flow = getattr(args, "flow", "browser")
+            print(f"Starting Entra ID sign-in ({flow} flow)...")
+            res = entra_auth.login(flow=flow)
+            if args.json:
+                import json
+                print(json.dumps(res, indent=2))
+            else:
+                if res.get("ok"):
+                    print(f"\\nSigned in successfully as: {res.get('account')}")
+                    if res.get("overage"):
+                        print("Note: Group overage detected (>200 groups)")
+                else:
+                    print(f"\\nSign-in failed: {res.get('reason')}", file=sys.stderr)
+                    return 1
+                    
+        elif action == "logout":
+            res = entra_auth.logout()
+            print("Session cleared.")
+            
+        elif action == "status":
+            if args.json:
+                import json
+                print(json.dumps(entra_auth.posture(), indent=2))
+            else:
+                print(entra_auth._format_status())
+                
+        elif action == "export-voucher":
+            path = getattr(args, "file", "voucher.bin")
+            res = entra_auth.export_voucher(path)
+            if res.get("ok"):
+                print(f"Voucher exported to {path}")
+            else:
+                print(f"Export failed: {res.get('reason')}", file=sys.stderr)
+                return 1
+                
+        elif action == "import-voucher":
+            path = getattr(args, "file", "voucher.bin")
+            res = entra_auth.import_voucher(path)
+            if res.get("ok"):
+                print("Voucher imported successfully")
+            else:
+                print(f"Import failed: {res.get('reason')}", file=sys.stderr)
+                return 1
+                
+        else:
+            print(f"Unknown action: {action}", file=sys.stderr)
+            return 1
+            
+        return 0
+    except Exception as e:
+        print(f"Error executing Entra ID command: {e}", file=sys.stderr)
+        return 1
+
 
 
 def cmd_compare(args: argparse.Namespace) -> int:
@@ -793,7 +893,7 @@ def cmd_matrix(args: argparse.Namespace) -> int:
                 row = f"{fam:22s} | "
                 row_parts = []
                 for d in all_decs:
-                    icon = f" ✔  " if d in decs else f" ✘  "
+                    icon = " ✔  " if d in decs else " ✘  "
                     row_parts.append(icon)
                 lines.append(row + "".join(row_parts))
             
@@ -811,14 +911,23 @@ def cmd_matrix(args: argparse.Namespace) -> int:
 
 def cmd_serve(args: argparse.Namespace) -> int:
     try:
+        host = getattr(args, "host", "127.0.0.1")
+        port = getattr(args, "port", 8000)
+
+        from compliance import airgap_mode
+        if airgap_mode():
+            if host not in ("127.0.0.1", "::1", "localhost"):
+                print(f"Error: Air-gap mode enforces loopback-only binding. Host {host!r} is refused.", file=sys.stderr)
+                return 1
+
         import qector_decoder_v3.rest_api as api
         if hasattr(api, "run"):
-            api.run()
+            api.run(host=host, port=port)
         elif hasattr(api, "main"):
             api.main()
         else:
             import uvicorn
-            uvicorn.run(api.app, host="127.0.0.1", port=8000)
+            uvicorn.run(api.app, host=host, port=port)
         return 0
     except Exception as e:
         print(f"Error starting REST API server: {e}", file=sys.stderr)
@@ -882,7 +991,7 @@ _qector() {
     elif shell == "powershell":
         print("""Register-ArgumentCompleter -CommandName qector -ScriptBlock {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
-    $choices = @('decode', 'benchmark', 'probe', 'diagnostics', 'hardware', 'list-codes', 'list-decoders', 'docgen', 'version', 'update', 'selftest', 'compare', 'batch', 'stream', 'train', 'export', 'import', 'matrix', 'serve', 'doctor', 'decode_mmap', 'completions')
+    $choices = @('decode', 'benchmark', 'probe', 'diagnostics', 'hardware', 'list-codes', 'list-decoders', 'docgen', 'version', 'update', 'selftest', 'compare', 'batch', 'stream', 'train', 'export', 'import', 'matrix', 'serve', 'doctor', 'compliance', 'decode_mmap', 'completions')
     $choices | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object { [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_) }
 }""")
     else:
@@ -921,6 +1030,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
     parser.add_argument("--quiet", "-q", action="store_true", help="Enable quiet mode (only errors)")
     parser.add_argument("--config", "-c", help="Path to config file loading JSON parameters")
+    parser.add_argument("--version", "-V", action="store_true", help="Show version information and exit")
 
     subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
 
@@ -980,6 +1090,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_doc.add_argument("--param", "-p", type=int, default=5, help="Distance or size parameter (default: 5)")
     p_doc.add_argument("--formats", default="md,html,pdf,json", help="Comma-separated formats (md,html,pdf,json,latex,svg)")
     p_doc.set_defaults(func=cmd_docgen)
+
+    # version
+    p_version = subparsers.add_parser("version", help="Show workbench and backend versions and update status")
+    p_version.set_defaults(func=cmd_version)
 
     # New subcommands from finaldev.md tasks 5.1-5.7
     # compare
@@ -1048,11 +1162,31 @@ def build_parser() -> argparse.ArgumentParser:
 
     # serve
     p_serve = subparsers.add_parser("serve", help="Launch local REST API service")
+    p_serve.add_argument("--host", default="127.0.0.1", help="Host interface to bind to (default: 127.0.0.1)")
+    p_serve.add_argument("--port", type=int, default=8000, help="Port to bind to (default: 8000)")
     p_serve.set_defaults(func=cmd_serve)
 
     # doctor
     p_doctor = subparsers.add_parser("doctor", help="Run 15-check environment diagnostic")
     p_doctor.set_defaults(func=cmd_doctor)
+
+    # compliance
+    p_compliance = subparsers.add_parser("compliance", help="Run zero-egress / offline compliance attestation")
+    p_compliance.set_defaults(func=cmd_compliance)
+
+    # entra
+    p_entra = subparsers.add_parser("entra", help="Optional Microsoft Entra ID SSO readiness (off by default)")
+    p_entra.add_argument("action", nargs="?", default="status",
+                         choices=["status", "configure", "login", "logout", "export-voucher", "import-voucher"],
+                         help="Action (default: status)")
+    p_entra.add_argument("--client-id", help="Entra ID application (client) ID")
+    p_entra.add_argument("--tenant", help="Entra ID tenant ID or verified domain")
+    p_entra.add_argument("--group-id", help="Entra ID group that gates Enterprise entitlement")
+    p_entra.add_argument("--scopes", nargs="*", default=None, help="OAuth scopes (default: User.Read)")
+    p_entra.add_argument("--cloud", default="public", help="Target cloud environment")
+    p_entra.add_argument("--flow", default="browser", choices=["browser", "broker", "device"], help="Auth flow to use (default: browser)")
+    p_entra.add_argument("--file", default="voucher.bin", help="Path for voucher import/export")
+    p_entra.set_defaults(func=cmd_entra)
 
     # decode_mmap
     p_mmap = subparsers.add_parser("decode_mmap", help="Out-of-core memmap decoding")
@@ -1108,6 +1242,8 @@ def main(args_list: Optional[list[str]] = None) -> int:
             return 1
             
     try:
+        if getattr(args, "version", False):
+            return cmd_version(args)
         if not hasattr(args, "func"):
             if not getattr(args, "quiet", False):
                 print(banner())

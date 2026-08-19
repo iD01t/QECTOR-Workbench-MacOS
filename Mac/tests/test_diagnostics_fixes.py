@@ -6,7 +6,6 @@ These cover the two regressions fixed in this session:
   * QECTOR_DISABLE_OPENCL=1 must actually skip OpenCL probing (the docs
     advertised it but the code never checked it).
 """
-import os
 import sys
 from pathlib import Path
 
@@ -69,6 +68,7 @@ def test_diagnostics_done_reenables_buttons():
         probe_btn = _FakeButton()
         resilient_btn = _FakeButton()
         doctor_btn = _FakeButton()
+        reset_btn = _FakeButton()
         status_label = _FakeLabel()
         result_text = _FakeText()
         _seq = 0
@@ -81,8 +81,8 @@ def test_diagnostics_done_reenables_buttons():
     # Simulate a run: busy(True) disables, then _done must re-enable.
     tab._busy(True, "Running…")
     assert all(b.state == "disabled" for b in
-               (tab.diag_btn, tab.probe_btn, tab.resilient_btn, tab.doctor_btn))
+               (tab.diag_btn, tab.probe_btn, tab.resilient_btn, tab.doctor_btn, tab.reset_btn))
     tab._seq = 1
     tab._done(1, "result text", "ok")
     assert all(b.state == "normal" for b in
-               (tab.diag_btn, tab.probe_btn, tab.resilient_btn, tab.doctor_btn))
+               (tab.diag_btn, tab.probe_btn, tab.resilient_btn, tab.doctor_btn, tab.reset_btn))

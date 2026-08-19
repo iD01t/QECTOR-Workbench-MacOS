@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "qector-workbench"
-version = "1.0.0"
+version = "1.0.1"
 description = "Professional QEC analysis suite built on qector-decoder-v3"
-readme = "README_v3.md"
+readme = "README.md"
 license = {text = "Proprietary"}
 requires-python = ">=3.11"
 authors = [{name = "Guillaume Lessard / iD01t Productions", email = "admin@qector.store"}]
@@ -86,6 +86,8 @@ py-modules = [
     "diagnostics_tab",
     "documentation_tab",
     "lab_info_tab",
+    "compliance",
+    "entra_auth",
 ]
 
 [tool.pytest.ini_options]

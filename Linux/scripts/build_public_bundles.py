@@ -54,7 +54,7 @@ PLATFORMS = {
         # page and is full of Windows .exe instructions. Pointing the Linux
         # bundle at it shipped a Linux zip whose README named
         # QectorWorkbench-Portable.exe thirteen times and never mentioned dpkg.
-        "readme": "README_v3.md",
+        "readme": "README.md",
         # Manuals that make no sense on this platform are left out, matching the
         # published bundles: a Linux download should not carry the Windows and
         # macOS user manuals.
@@ -147,8 +147,8 @@ def sha256_of(path: Path) -> str:
 #: this set: they ship with the app (APP_MODULES) and DO belong to the
 #: staleness comparison.
 _TOOLING = frozenset({
-    "build_production.py", "verify_frozen_mcp.py", "test_mcp_all.py",
-    "qector_v069_benchmark.py", "docgen_repro.py", "check_exe_pyz.py",
+    "build_production.py", "test_mcp_all.py",
+    "docgen_repro.py", "check_exe_pyz.py",
     "e2e_export_check.py", "exe_toc_sizes.py",
 })
 
@@ -237,7 +237,7 @@ def refresh_staging(name: str, spec: dict, allow_stale: bool) -> tuple[Path, lis
                 if leftover.exists():
                     try:
                         leftover.unlink()
-                        warnings.append(f"  and removed the stale copy already in staging")
+                        warnings.append("  and removed the stale copy already in staging")
                     except Exception as exc:
                         warnings.append(f"  could not remove stale {leftover}: {exc}")
                 return

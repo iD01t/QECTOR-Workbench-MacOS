@@ -22,7 +22,7 @@ AppSupportURL={#MyAppSupportURL}
 DefaultDirName={commonpf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 AllowNoIcons=yes
-LicenseFile=EULA.txt
+LicenseFile=EULA.rtf
 OutputDir=dist
 OutputBaseFilename=QectorWorkbenchSetup
 SetupIconFile=icon.ico
@@ -31,9 +31,17 @@ UninstallDisplayIcon={app}\icon.ico
 Compression=lzma2
 SolidCompression=yes
 PrivilegesRequired=admin
+; Allow Intune / SCCM to force per-user installs without an escalated prompt.
+PrivilegesRequiredOverridesAllowed=commandline
 ArchitecturesInstallIn64BitMode=x64compatible
 ArchitecturesAllowed=x64compatible
 MinVersion=10.0.17763
+; Write a %TEMP%\Setup Log*.txt on every run: required for silent/Intune
+; deployment triage ("silent install did nothing" is almost always a log read).
+SetupLogging=yes
+; Never leave a running Workbench holding a file lock on the exe mid-update.
+CloseApplications=yes
+RestartApplications=no
 VersionInfoVersion={#MyAppVersion}
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription={#MyAppName} Installer
@@ -41,6 +49,8 @@ VersionInfoProductName={#MyAppName}
 VersionInfoProductVersion={#MyAppVersion}
 DisableDirPage=no
 DisableProgramGroupPage=no
+DisableReadyPage=yes
+DisableFinishedPage=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

@@ -13,7 +13,10 @@ from PyInstaller.utils.hooks import (
 
 import sys
 import os
-sys.path.insert(0, os.path.abspath('.'))
+SPEC = os.path.abspath(SPECPATH)
+def P(rel: str) -> str:
+    return os.path.join(SPEC, rel)
+sys.path.insert(0, SPEC)
 import version as _qector_version  # noqa: E402
 
 app_version = _qector_version.WORKBENCH_VERSION
@@ -27,7 +30,7 @@ hiddenimports = [
     'mcp_server', 'mcp_resources', 'dialogs', 'autodebug', 'cli',
     'code_explorer_tab', 'decoder_lab_tab', 'benchmark_tab',
     'batch_streaming_tab', 'hardware_tab', 'diagnostics_tab', 'documentation_tab',
-    'lab_info_tab', 'history_tab',
+    'lab_info_tab', 'history_tab', 'compliance', 'entra_auth',
     'generate_manuals', 'api_reference', 'docs_exporter',
     # ---------- Runtime deps of the decoder ----------
     'cffi', '_cffi_backend',
@@ -35,12 +38,13 @@ hiddenimports = [
     'reportlab', 'reportlab.platypus', 'reportlab.lib', 'reportlab.lib.pagesizes',
     'reportlab.lib.units', 'reportlab.lib.colors', 'reportlab.lib.styles',
     'reportlab.lib.enums', 'reportlab.platypus.tableofcontents',
+    'matplotlib.backends.backend_svg', 'matplotlib.backends.backend_pdf',
 ] + collect_submodules('customtkinter') + collect_submodules('cryptography')
 
 datas = [
-    ('icon.jpg', '.'), ('icon.ico', '.'), ('EULA.txt', '.'), ('README_v3.md', '.'),
-    ('wheels/*', 'wheels'), 
-    (f'wheels/qector_decoder_v3-{backend_version}-cp311-cp311-win_amd64.whl', '.'),
+    (P('icon.jpg'), '.'), (P('icon.ico'), '.'), (P('EULA.txt'), '.'),
+(P('README.md'), '.'),
+    ('wheels/*', 'wheels'),
 ] + collect_data_files('customtkinter')
 
 binaries = collect_dynamic_libs('cryptography') + collect_dynamic_libs('cffi')
@@ -76,6 +80,12 @@ a = Analysis(
     noarchive=False,
     optimize=0,
 )
+
+# Scrub any accidentally collected qector_decoder_v3 files (except the .whl)
+a.pure = [p for p in a.pure if not p[0].startswith('qector_decoder_v3')]
+a.binaries = [b for b in a.binaries if not b[0].startswith('qector_decoder_v3\\') and not b[0].startswith('qector_decoder_v3/')]
+a.datas = [d for d in a.datas if not d[0].startswith('qector_decoder_v3\\') and not d[0].startswith('qector_decoder_v3/') and not (d[0].startswith('qector_decoder_v3') and not d[0].endswith('.whl'))]
+
 pyz = PYZ(a.pure)
 
 # Boot splash: the bootloader paints this before Python even starts, so the
@@ -83,7 +93,7 @@ pyz = PYZ(a.pure)
 # main.py writes progress into it via pyi_splash and closes it once the real
 # window is mapped.
 splash = Splash(
-    'assets/splash.png',
+    P('assets/splash.png'),
     binaries=a.binaries,
     datas=a.datas,
     text_pos=(40, 205),
@@ -114,5 +124,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='icon.ico',
+    icon=P('icon.ico'),
 )

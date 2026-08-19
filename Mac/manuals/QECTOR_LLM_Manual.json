@@ -1,15 +1,15 @@
 {
   "manual_type": "operational manual for LLM and agent use",
   "schema_version": "2.0",
-  "generated_utc": "2026-07-26T11:58:30+00:00",
+  "generated_utc": "2026-08-19T14:03:48+00:00",
   "product": "QECTOR Decoder Workbench",
-  "application_version": "3.5.1",
+  "application_version": "1.0.1",
   "decoder_backend": {
     "package": "qector-decoder-v3",
-    "version": "0.6.9",
-    "minimum_version": "0.6.2",
-    "bundled": false,
-    "provisioning": "Downloaded and installed automatically from PyPI on first launch. After installation the app works offline. Linux requires python3 and python3-pip; Windows and macOS need no separate Python setup."
+    "version": "1.0.0",
+    "minimum_version": "1.0.0",
+    "bundled": true,
+    "provisioning": "Activated automatically from the wheel bundled inside the application on first launch; fully offline on every platform. Outdated managed decoders from older releases are purged automatically before activation."
   },
   "purpose": "Use this file to operate the QECTOR MCP server correctly. It lists every tool, its parameters, and an example call, and defines strict rules that prevent hallucination. Treat the tools, decoders and code families here as the complete and only valid set.",
   "hard_rules_no_hallucination": [
@@ -20,7 +20,8 @@
     "Treat logical error rate, throughput and latency as simulation outputs that depend on the seed, the hardware, the driver and the workload. Never present them as fixed or universal benchmarks. State that they must be regenerated for the target setting.",
     "The qLDPC families bicycle and bivariate_bicycle are not graphlike. Decode them with bp_osd, blossom, sparse_blossom, hybrid, predecoded, auto or auto_router. The union_find, fast_union_find and lookup_table decoders do not apply to them.",
     "Version numbers are resolved live at runtime. Do not state a version without first reading it from the version_info or get_system_info tool.",
-    "The decoder is bundled inside the application; no network or system Python is needed to run it. Do not tell a user to install Python or wait for a download.",
+    "The decoder wheel is bundled inside the application. On first launch the app extracts and activates the bundled qector-decoder-v3 wheel into an ABI-scoped managed site, entirely offline. Any outdated managed decoder from an older release is purged automatically before activation. Do not claim the app downloads anything at runtime.",
+    "OpenCL is reported unavailable by the published qector-decoder-v3 wheel because that wheel is built without its OpenCL feature, not because the machine lacks a GPU. No environment variable can turn it on. Do not tell a user to fix drivers or set a flag to enable it; CUDA and CPU are unaffected.",
     "When a large array in a result is summarised or truncated, do not extrapolate or invent the omitted values. Work only from what the result actually contains.",
     "The destructive tools (for example those that clear results, delete a resource or reset configuration) require confirm set to true. Do not call them unless the user explicitly asked for that action.",
     "If a tool call fails or times out, say so plainly. Do not present a placeholder or an assumed value as though it came from the server."
@@ -82,8 +83,86 @@
       "protocol_error": "A JSON-RPC error object with a numeric code, for example method not found or invalid params. Report it verbatim.",
       "array_summaries": "Large arrays in a result may be summarised as an object with shape, dtype, a short preview, and summary set to true. Do not infer the omitted values."
     },
-    "tool_count": 47,
+    "tool_count": 85,
     "tools": [
+      {
+        "name": "ambiguity_cluster_decode",
+        "description": "Decode using AmbiguityClusterDecoder for high noise or non-graphlike codes",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "error_rate",
+            "type": "number",
+            "required": false,
+            "description": "",
+            "default": 0.05
+          },
+          {
+            "name": "ambig_threshold",
+            "type": "number",
+            "required": false,
+            "description": "",
+            "default": 0.5
+          },
+          {
+            "name": "max_cluster_size",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 12
+          },
+          {
+            "name": "syndrome",
+            "type": [
+              "array",
+              "null"
+            ],
+            "required": false,
+            "description": "",
+            "default": null,
+            "items": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "seed",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 42
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "ambiguity_cluster_decode",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "error_rate": 0.05,
+              "ambig_threshold": 0.5,
+              "max_cluster_size": 12,
+              "syndrome": null,
+              "seed": 42
+            }
+          }
+        }
+      },
       {
         "name": "analyze_code_family",
         "description": "Analyze a code family with an example code instance",
@@ -92,7 +171,7 @@
             "name": "family_name",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -117,6 +196,94 @@
         }
       },
       {
+        "name": "analyze_error_patterns",
+        "description": "Analyze error patterns: weight distribution, cluster size, correlated errors",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "error_rate",
+            "type": "number",
+            "required": false,
+            "description": "",
+            "default": 0.05
+          },
+          {
+            "name": "n_samples",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 100
+          },
+          {
+            "name": "seed",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 42
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "analyze_error_patterns",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "error_rate": 0.05,
+              "n_samples": 100,
+              "seed": 42
+            }
+          }
+        }
+      },
+      {
+        "name": "analyze_logicals",
+        "description": "Expose logical operator matrix, logical weight distribution, and code distance estimation",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "analyze_logicals",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5
+            }
+          }
+        }
+      },
+      {
         "name": "batch_decode",
         "description": "Batch-decode sampled syndromes on cpu/cuda/opencl via backend.run_batch_decode",
         "parameters": [
@@ -124,7 +291,7 @@
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -182,13 +349,13 @@
       },
       {
         "name": "batch_decode_gpu",
-        "description": "Batch-decode on an explicit compute backend (cpu/cuda/opencl) with honest availability reporting ,  unavailable GPU backends return status='unavailable' with a reason, never fake results",
+        "description": "Batch-decode on an explicit compute backend (cpu/cuda/opencl) with honest availability reporting, unavailable GPU backends return status='unavailable' with a reason, never fake results",
         "parameters": [
           {
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -246,13 +413,13 @@
       },
       {
         "name": "belief_match_decode",
-        "description": "Convenience seeded decode pinned to the 0.6.9 belief_matching kind (BP posteriors + exact MWPM with faithfulness fallback)",
+        "description": "Convenience seeded decode pinned to the belief_matching kind (BP posteriors + exact MWPM with faithfulness fallback)",
         "parameters": [
           {
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -300,14 +467,14 @@
             "name": "decoder_name",
             "type": "string",
             "required": false,
-            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching",
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
             "default": "union_find"
           },
           {
             "name": "code_family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -357,14 +524,115 @@
         }
       },
       {
+        "name": "build_code_from_matrix",
+        "description": "Build a code from a user-provided parity check matrix",
+        "parameters": [
+          {
+            "name": "H_matrix",
+            "type": "array",
+            "required": true,
+            "description": "Binary parity check matrix (n_checks x n_qubits)",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "Family name for the custom code",
+            "default": "custom"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 3
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "build_code_from_matrix",
+            "arguments": {
+              "H_matrix": [],
+              "family": "custom",
+              "distance": 3
+            }
+          }
+        }
+      },
+      {
+        "name": "build_dem",
+        "description": "Build a Detector Error Model (DEM) from a code and noise model",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "noise_model",
+            "type": "string",
+            "required": false,
+            "description": "One of: depolarizing, biased, correlated, circuit",
+            "default": "depolarizing"
+          },
+          {
+            "name": "p",
+            "type": "number",
+            "required": false,
+            "description": "",
+            "default": 0.05
+          },
+          {
+            "name": "bias",
+            "type": "number",
+            "required": false,
+            "description": "",
+            "default": 0.5
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "build_dem",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "noise_model": "depolarizing",
+              "p": 0.05,
+              "bias": 0.5
+            }
+          }
+        }
+      },
+      {
         "name": "check_updates",
-        "description": "Check PyPI for newer app / decoder-backend releases and return install-aware upgrade instructions",
+        "description": "Report whether the installed decoder backend matches the bundled release baseline (offline, no update service)",
         "parameters": [
           {
             "name": "refresh",
             "type": "boolean",
             "required": false,
-            "description": "Bypass the version cache and re-query PyPI",
+            "description": "Accepted for compatibility; resolution is always local",
             "default": false
           }
         ],
@@ -377,6 +645,20 @@
             "arguments": {
               "refresh": false
             }
+          }
+        }
+      },
+      {
+        "name": "clear_decoder_cache",
+        "description": "Clear the backend's native decoder cache",
+        "parameters": [],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "clear_decoder_cache",
+            "arguments": {}
           }
         }
       },
@@ -400,6 +682,124 @@
             "name": "clear_results",
             "arguments": {
               "confirm": false
+            }
+          }
+        }
+      },
+      {
+        "name": "colour_code_decode",
+        "description": "Decode color code using BP-OSD over undecomposed detector error model",
+        "parameters": [
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 3
+          },
+          {
+            "name": "max_iter",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 30
+          },
+          {
+            "name": "osd_order",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 0
+          },
+          {
+            "name": "syndrome",
+            "type": [
+              "array",
+              "null"
+            ],
+            "required": false,
+            "description": "",
+            "default": null,
+            "items": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "seed",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 42
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "colour_code_decode",
+            "arguments": {
+              "distance": 3,
+              "max_iter": 30,
+              "osd_order": 0,
+              "syndrome": null,
+              "seed": 42
+            }
+          }
+        }
+      },
+      {
+        "name": "compare_all_decoders",
+        "description": "Run all compatible decoders on the same code and return comparison table",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "error_rate",
+            "type": "number",
+            "required": false,
+            "description": "",
+            "default": 0.05
+          },
+          {
+            "name": "n_samples",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 50
+          },
+          {
+            "name": "seed",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 42
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "compare_all_decoders",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "error_rate": 0.05,
+              "n_samples": 50,
+              "seed": 42
             }
           }
         }
@@ -445,6 +845,20 @@
         }
       },
       {
+        "name": "compatibility_matrix",
+        "description": "Return the full 16x10 decoder/code compatibility matrix",
+        "parameters": [],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "compatibility_matrix",
+            "arguments": {}
+          }
+        }
+      },
+      {
         "name": "compatible_decoders",
         "description": "Live probe: which decoder kinds construct and produce a syndrome-verified correction on this code",
         "parameters": [
@@ -452,7 +866,7 @@
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -477,6 +891,196 @@
         }
       },
       {
+        "name": "compliance_attestation",
+        "description": "Zero-egress / offline compliance attestation for infosec review: AST scan for network and telemetry imports, runtime EgressGuard state, offline license tier, local-only data residency, and optional Entra ID readiness. No network calls.",
+        "parameters": [],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "compliance_attestation",
+            "arguments": {}
+          }
+        }
+      },
+      {
+        "name": "decode_dem",
+        "description": "Decode using a Detector Error Model (DEM-native decoding)",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "decoder_kind",
+            "type": "string",
+            "required": false,
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
+            "default": "bp_osd"
+          },
+          {
+            "name": "decoder_options",
+            "type": [
+              "object",
+              "null"
+            ],
+            "required": false,
+            "description": "Optional per-decoder construction options: bp_method (exact|min_sum|relay), osd_order (0|1|2), osd_lambda, damping, error_rate, escalation (blossom|bposd), max_accept_weight, gnn_hidden_size, gnn_n_layers",
+            "default": null
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "decode_dem",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "decoder_kind": "bp_osd",
+              "decoder_options": null
+            }
+          }
+        }
+      },
+      {
+        "name": "decode_hyperedge",
+        "description": "Hyperedge / qLDPC decoding via bp_osd or other LDPC-capable decoders",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "bicycle"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 3
+          },
+          {
+            "name": "decoder_name",
+            "type": "string",
+            "required": false,
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
+            "default": "bp_osd"
+          },
+          {
+            "name": "error_rate",
+            "type": "number",
+            "required": false,
+            "description": "",
+            "default": 0.05
+          },
+          {
+            "name": "seed",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 42
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "decode_hyperedge",
+            "arguments": {
+              "family": "bicycle",
+              "distance": 3,
+              "decoder_name": "bp_osd",
+              "error_rate": 0.05,
+              "seed": 42
+            }
+          }
+        }
+      },
+      {
+        "name": "decode_mmap",
+        "description": "Out-of-core batch decoding via memory-mapped arrays",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "syndrome_path",
+            "type": "string",
+            "required": true,
+            "description": ""
+          },
+          {
+            "name": "output_path",
+            "type": "string",
+            "required": true,
+            "description": ""
+          },
+          {
+            "name": "decoder_name",
+            "type": "string",
+            "required": false,
+            "description": "",
+            "default": "cpu_batch"
+          },
+          {
+            "name": "batch_size",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 65536
+          },
+          {
+            "name": "n_shots",
+            "type": "integer",
+            "required": true,
+            "description": ""
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "decode_mmap",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "syndrome_path": "REPLACE_ME",
+              "output_path": "REPLACE_ME",
+              "decoder_name": "cpu_batch",
+              "batch_size": 65536,
+              "n_shots": 0
+            }
+          }
+        }
+      },
+      {
         "name": "decode_single",
         "description": "Run one seeded decode and report correction weight, syndrome validity and logical failure",
         "parameters": [
@@ -484,7 +1088,7 @@
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -498,7 +1102,7 @@
             "name": "decoder_name",
             "type": "string",
             "required": false,
-            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching",
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
             "default": "union_find"
           },
           {
@@ -540,7 +1144,7 @@
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -554,7 +1158,7 @@
             "name": "decoder_name",
             "type": "string",
             "required": false,
-            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching",
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
             "default": "union_find"
           },
           {
@@ -573,7 +1177,7 @@
               "null"
             ],
             "required": false,
-            "description": "Optional per-decoder construction options: bp_method (exact|min_sum), osd_order (0|1|2), error_rate, escalation (blossom|bposd), max_accept_weight, gnn_hidden_size, gnn_n_layers",
+            "description": "Optional per-decoder construction options: bp_method (exact|min_sum|relay), osd_order (0|1|2), osd_lambda, damping, error_rate, escalation (blossom|bposd), max_accept_weight, gnn_hidden_size, gnn_n_layers",
             "default": null
           }
         ],
@@ -594,6 +1198,90 @@
         }
       },
       {
+        "name": "decode_syndrome_blossom",
+        "description": "Convenience tool: exact Blossom (MWPM) syndrome decode",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "syndrome",
+            "type": "array",
+            "required": true,
+            "description": "Binary syndrome vector",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "decode_syndrome_blossom",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "syndrome": []
+            }
+          }
+        }
+      },
+      {
+        "name": "decode_syndrome_cascade",
+        "description": "Convenience tool: Hybrid cascading syndrome decode (UF pre-filter escalating to Blossom)",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "syndrome",
+            "type": "array",
+            "required": true,
+            "description": "Binary syndrome vector",
+            "items": {
+              "type": "integer"
+            }
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "decode_syndrome_cascade",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "syndrome": []
+            }
+          }
+        }
+      },
+      {
         "name": "decode_with_options",
         "description": "Seeded decode with validated per-decoder construction options (bp_osd bp_method/osd_order, hybrid_cascade escalation, GNN architecture); reports options_applied honestly",
         "parameters": [
@@ -601,7 +1289,7 @@
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "repetition"
           },
           {
@@ -615,7 +1303,7 @@
             "name": "decoder_name",
             "type": "string",
             "required": false,
-            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching",
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
             "default": "bp_osd"
           },
           {
@@ -639,7 +1327,7 @@
               "null"
             ],
             "required": false,
-            "description": "Optional per-decoder construction options: bp_method (exact|min_sum), osd_order (0|1|2), error_rate, escalation (blossom|bposd), max_accept_weight, gnn_hidden_size, gnn_n_layers",
+            "description": "Optional per-decoder construction options: bp_method (exact|min_sum|relay), osd_order (0|1|2), osd_lambda, damping, error_rate, escalation (blossom|bposd), max_accept_weight, gnn_hidden_size, gnn_n_layers",
             "default": null
           }
         ],
@@ -656,6 +1344,38 @@
               "error_rate": 0.05,
               "seed": 42,
               "decoder_options": null
+            }
+          }
+        }
+      },
+      {
+        "name": "decoder_benchmark_suite",
+        "description": "Run standard benchmark (rotated_surface d=5, p=0.05) across all decoders",
+        "parameters": [
+          {
+            "name": "n_samples",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 100
+          },
+          {
+            "name": "seed",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 42
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "decoder_benchmark_suite",
+            "arguments": {
+              "n_samples": 100,
+              "seed": 42
             }
           }
         }
@@ -699,7 +1419,7 @@
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -713,7 +1433,7 @@
             "name": "decoder_name",
             "type": "string",
             "required": false,
-            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching",
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
             "default": "blossom"
           },
           {
@@ -743,6 +1463,84 @@
               "decoder_name": "blossom",
               "error_rate": 0.05,
               "seed": 42
+            }
+          }
+        }
+      },
+      {
+        "name": "doctor_diagnostics",
+        "description": "Run system health and environment diagnostic checks via qd.doctor",
+        "parameters": [],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "doctor_diagnostics",
+            "arguments": {}
+          }
+        }
+      },
+      {
+        "name": "estimate_threshold",
+        "description": "Estimate the error threshold using binary search on error rate",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "decoder_kind",
+            "type": "string",
+            "required": false,
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
+            "default": "blossom"
+          },
+          {
+            "name": "p_min",
+            "type": "number",
+            "required": false,
+            "description": "",
+            "default": 0.01
+          },
+          {
+            "name": "p_max",
+            "type": "number",
+            "required": false,
+            "description": "",
+            "default": 0.2
+          },
+          {
+            "name": "n_samples",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 100
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "estimate_threshold",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "decoder_kind": "blossom",
+              "p_min": 0.01,
+              "p_max": 0.2,
+              "n_samples": 100
             }
           }
         }
@@ -779,6 +1577,253 @@
         }
       },
       {
+        "name": "export_figure",
+        "description": "Export a publication-ready figure of the Tanner graph",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "output_path",
+            "type": "string",
+            "required": false,
+            "description": "",
+            "default": "tanner_graph.png"
+          },
+          {
+            "name": "format",
+            "type": "string",
+            "required": false,
+            "description": "One of: png, pdf, svg, pgf",
+            "default": "png"
+          },
+          {
+            "name": "dpi",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 300
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "export_figure",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "output_path": "tanner_graph.png",
+              "format": "png",
+              "dpi": 300
+            }
+          }
+        }
+      },
+      {
+        "name": "export_session",
+        "description": "Export the current session (code + decode + benchmark + diagnostics) as a ZIP archive",
+        "parameters": [
+          {
+            "name": "output_path",
+            "type": [
+              "string",
+              "null"
+            ],
+            "required": false,
+            "description": "Optional file path for the ZIP; auto-named if omitted",
+            "default": null
+          },
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "decoder_name",
+            "type": "string",
+            "required": false,
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
+            "default": "blossom"
+          },
+          {
+            "name": "error_rate",
+            "type": "number",
+            "required": false,
+            "description": "",
+            "default": 0.05
+          },
+          {
+            "name": "seed",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 42
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "export_session",
+            "arguments": {
+              "output_path": null,
+              "family": "rotated_surface",
+              "distance": 5,
+              "decoder_name": "blossom",
+              "error_rate": 0.05,
+              "seed": 42
+            }
+          }
+        }
+      },
+      {
+        "name": "finite_size_scaling",
+        "description": "Perform finite-size scaling analysis (LER vs distance at fixed p)",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "decoder_kind",
+            "type": "string",
+            "required": false,
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
+            "default": "blossom"
+          },
+          {
+            "name": "distances",
+            "type": "array",
+            "required": false,
+            "description": "Code distances to test",
+            "default": [
+              3,
+              5,
+              7,
+              9,
+              11
+            ],
+            "items": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "p_vals",
+            "type": "array",
+            "required": false,
+            "description": "Error rates to test",
+            "default": [
+              0.01,
+              0.03,
+              0.05,
+              0.07,
+              0.1
+            ],
+            "items": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "n_samples",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 100
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "finite_size_scaling",
+            "arguments": {
+              "family": "rotated_surface",
+              "decoder_kind": "blossom",
+              "distances": [
+                3,
+                5,
+                7,
+                9,
+                11
+              ],
+              "p_vals": [
+                0.01,
+                0.03,
+                0.05,
+                0.07,
+                0.1
+              ],
+              "n_samples": 100
+            }
+          }
+        }
+      },
+      {
+        "name": "flush_usage",
+        "description": "Flush usage metrics to Stripe metered billing API",
+        "parameters": [
+          {
+            "name": "customer_id",
+            "type": [
+              "string",
+              "null"
+            ],
+            "required": false,
+            "description": "",
+            "default": null
+          },
+          {
+            "name": "api_key",
+            "type": [
+              "string",
+              "null"
+            ],
+            "required": false,
+            "description": "",
+            "default": null
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "flush_usage",
+            "arguments": {
+              "customer_id": null,
+              "api_key": null
+            }
+          }
+        }
+      },
+      {
         "name": "generate_documentation",
         "description": "Generate code documentation files",
         "parameters": [
@@ -786,7 +1831,7 @@
             "name": "family_key",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "ring"
           },
           {
@@ -823,6 +1868,116 @@
         }
       },
       {
+        "name": "generate_parity_check",
+        "description": "Generate a parity check matrix for a code family",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "generate_parity_check",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5
+            }
+          }
+        }
+      },
+      {
+        "name": "generate_reproducibility_package",
+        "description": "Generate a complete reproducibility package (ZIP)",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "decoder_name",
+            "type": "string",
+            "required": false,
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
+            "default": "blossom"
+          },
+          {
+            "name": "error_rate",
+            "type": "number",
+            "required": false,
+            "description": "",
+            "default": 0.05
+          },
+          {
+            "name": "seed",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 42
+          },
+          {
+            "name": "output_path",
+            "type": "string",
+            "required": false,
+            "description": "",
+            "default": "reproducibility_package.zip"
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "generate_reproducibility_package",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "decoder_name": "blossom",
+              "error_rate": 0.05,
+              "seed": 42,
+              "output_path": "reproducibility_package.zip"
+            }
+          }
+        }
+      },
+      {
+        "name": "get_backend_health",
+        "description": "7-tier backend health status from AutoDecoder diagnostics",
+        "parameters": [],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "get_backend_health",
+            "arguments": {}
+          }
+        }
+      },
+      {
         "name": "get_code_properties",
         "description": "Get properties of a code family",
         "parameters": [
@@ -830,7 +1985,7 @@
             "name": "family_name",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "ring"
           },
           {
@@ -876,7 +2031,7 @@
             "name": "decoder_name",
             "type": "string",
             "required": false,
-            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching",
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
             "default": "bp_osd"
           }
         ],
@@ -893,6 +2048,20 @@
         }
       },
       {
+        "name": "get_entra_posture",
+        "description": "Return the Microsoft Entra ID posture (enabled, unconfigured, or authenticated).",
+        "parameters": [],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "get_entra_posture",
+            "arguments": {}
+          }
+        }
+      },
+      {
         "name": "get_hardware_info",
         "description": "Get hardware/backend availability",
         "parameters": [],
@@ -902,6 +2071,34 @@
           "method": "tools/call",
           "params": {
             "name": "get_hardware_info",
+            "arguments": {}
+          }
+        }
+      },
+      {
+        "name": "get_identity_info",
+        "description": "Return identity info if signed into Entra ID, else None.",
+        "parameters": [],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "get_identity_info",
+            "arguments": {}
+          }
+        }
+      },
+      {
+        "name": "get_license_info",
+        "description": "Get license info from the decoder (tier, key_status, expiry)",
+        "parameters": [],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "get_license_info",
             "arguments": {}
           }
         }
@@ -968,6 +2165,20 @@
         }
       },
       {
+        "name": "get_server_env",
+        "description": "Get effective QECTOR environment variables (tuning vars)",
+        "parameters": [],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "get_server_env",
+            "arguments": {}
+          }
+        }
+      },
+      {
         "name": "get_statistics",
         "description": "Get server statistics",
         "parameters": [],
@@ -997,13 +2208,13 @@
       },
       {
         "name": "gnn_belief_match_decode",
-        "description": "Convenience seeded decode pinned to the 0.6.9 gnn_belief_matching kind with optional GNN architecture overrides (gnn_hidden_size, gnn_n_layers)",
+        "description": "Convenience seeded decode pinned to the gnn_belief_matching kind with optional GNN architecture overrides (gnn_hidden_size, gnn_n_layers)",
         "parameters": [
           {
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -1073,7 +2284,7 @@
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -1128,6 +2339,100 @@
               "error_rate": 0.05,
               "seed": 1,
               "escalation": null
+            }
+          }
+        }
+      },
+      {
+        "name": "import_stim",
+        "description": "Import a Stim circuit from file and convert to DEM",
+        "parameters": [
+          {
+            "name": "file_path",
+            "type": "string",
+            "required": true,
+            "description": "Path to Stim circuit file"
+          },
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "decoder_name",
+            "type": "string",
+            "required": false,
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
+            "default": "blossom"
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "import_stim",
+            "arguments": {
+              "file_path": "REPLACE_ME",
+              "family": "rotated_surface",
+              "distance": 5,
+              "decoder_name": "blossom"
+            }
+          }
+        }
+      },
+      {
+        "name": "import_syndrome",
+        "description": "Load external syndrome data (CSV, JSON, or .npy) and decode it",
+        "parameters": [
+          {
+            "name": "file_path",
+            "type": "string",
+            "required": true,
+            "description": "Path to syndrome file"
+          },
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "decoder_name",
+            "type": "string",
+            "required": false,
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
+            "default": "blossom"
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "import_syndrome",
+            "arguments": {
+              "file_path": "REPLACE_ME",
+              "family": "rotated_surface",
+              "distance": 5,
+              "decoder_name": "blossom"
             }
           }
         }
@@ -1203,6 +2508,20 @@
         }
       },
       {
+        "name": "mcp_health",
+        "description": "Server health check: uptime, memory, decoder status, tool count",
+        "parameters": [],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "mcp_health",
+            "arguments": {}
+          }
+        }
+      },
+      {
         "name": "mcp_status",
         "description": "Get MCP server status",
         "parameters": [],
@@ -1224,7 +2543,7 @@
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -1283,7 +2602,7 @@
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -1347,7 +2666,7 @@
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "repetition"
           },
           {
@@ -1404,14 +2723,86 @@
         }
       },
       {
-        "name": "probe_decoders",
-        "description": "Probe which decoders produce a valid (syndrome-verified) correction for a code ,  a self-test across every wired decoder",
+        "name": "parallel_batch_decode",
+        "description": "Parallel batch decode using multiple processes via backend.run_parallel_batch_decode",
         "parameters": [
           {
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "decoder_name",
+            "type": "string",
+            "required": false,
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
+            "default": "blossom"
+          },
+          {
+            "name": "n_samples",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 100
+          },
+          {
+            "name": "error_rate",
+            "type": "number",
+            "required": false,
+            "description": "",
+            "default": 0.05
+          },
+          {
+            "name": "seed",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 42
+          },
+          {
+            "name": "n_workers",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 4
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "parallel_batch_decode",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "decoder_name": "blossom",
+              "n_samples": 100,
+              "error_rate": 0.05,
+              "seed": 42,
+              "n_workers": 4
+            }
+          }
+        }
+      },
+      {
+        "name": "probe_decoders",
+        "description": "Probe which decoders produce a valid (syndrome-verified) correction for a code, a self-test across every wired decoder",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -1459,7 +2850,7 @@
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -1565,7 +2956,7 @@
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -1579,7 +2970,7 @@
             "name": "decoder_name",
             "type": "string",
             "required": false,
-            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching",
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
             "default": "union_find"
           },
           {
@@ -1621,7 +3012,7 @@
             "name": "code_family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -1635,7 +3026,7 @@
             "name": "decoder_name",
             "type": "string",
             "required": false,
-            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching",
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
             "default": "union_find"
           },
           {
@@ -1678,6 +3069,70 @@
         }
       },
       {
+        "name": "run_ler_benchmark",
+        "description": "Run LER benchmark with Wilson confidence intervals",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "decoder_name",
+            "type": "string",
+            "required": false,
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
+            "default": "blossom"
+          },
+          {
+            "name": "n_samples",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 1000
+          },
+          {
+            "name": "error_rate",
+            "type": "number",
+            "required": false,
+            "description": "",
+            "default": 0.05
+          },
+          {
+            "name": "seed",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 42
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "run_ler_benchmark",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "decoder_name": "blossom",
+              "n_samples": 1000,
+              "error_rate": 0.05,
+              "seed": 42
+            }
+          }
+        }
+      },
+      {
         "name": "self_diagnostics",
         "description": "Run a full environment/decoder/hardware self-diagnostics report (autodebug.run_self_diagnostics)",
         "parameters": [],
@@ -1715,6 +3170,83 @@
         }
       },
       {
+        "name": "set_license_key_file",
+        "description": "Set license key file path for offline verification",
+        "parameters": [
+          {
+            "name": "path",
+            "type": "string",
+            "required": true,
+            "description": ""
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "set_license_key_file",
+            "arguments": {
+              "path": "REPLACE_ME"
+            }
+          }
+        }
+      },
+      {
+        "name": "sparse_blossom_radix_neighbors",
+        "description": "Discover k-nearest candidate edges via SparseBlossom RadixHeap",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "defects",
+            "type": [
+              "array",
+              "null"
+            ],
+            "required": false,
+            "description": "",
+            "default": null,
+            "items": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "k",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 8
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "sparse_blossom_radix_neighbors",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "defects": null,
+              "k": 8
+            }
+          }
+        }
+      },
+      {
         "name": "stream_decode",
         "description": "Run a sliding-window streaming decode session via backend.run_streaming_session",
         "parameters": [
@@ -1722,7 +3254,7 @@
             "name": "family",
             "type": "string",
             "required": false,
-            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product",
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
             "default": "rotated_surface"
           },
           {
@@ -1764,7 +3296,7 @@
             "name": "decoder_name",
             "type": "string",
             "required": false,
-            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching",
+            "description": "One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time",
             "default": "union_find"
           }
         ],
@@ -1787,14 +3319,107 @@
         }
       },
       {
+        "name": "two_stage_decode",
+        "description": "Decode using TwoStageDecoder (decoupled X/Z sector decoders)",
+        "parameters": [
+          {
+            "name": "family",
+            "type": "string",
+            "required": false,
+            "description": "One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code",
+            "default": "rotated_surface"
+          },
+          {
+            "name": "distance",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 5
+          },
+          {
+            "name": "x_decoder",
+            "type": "string",
+            "required": false,
+            "description": "",
+            "default": "blossom"
+          },
+          {
+            "name": "z_decoder",
+            "type": "string",
+            "required": false,
+            "description": "",
+            "default": "blossom"
+          },
+          {
+            "name": "syndrome",
+            "type": [
+              "array",
+              "null"
+            ],
+            "required": false,
+            "description": "",
+            "default": null,
+            "items": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "seed",
+            "type": "integer",
+            "required": false,
+            "description": "",
+            "default": 42
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "two_stage_decode",
+            "arguments": {
+              "family": "rotated_surface",
+              "distance": 5,
+              "x_decoder": "blossom",
+              "z_decoder": "blossom",
+              "syndrome": null,
+              "seed": 42
+            }
+          }
+        }
+      },
+      {
+        "name": "verify_license_token",
+        "description": "Verify an Ed25519 signed license token string",
+        "parameters": [
+          {
+            "name": "token",
+            "type": "string",
+            "required": true,
+            "description": ""
+          }
+        ],
+        "example_call": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "tools/call",
+          "params": {
+            "name": "verify_license_token",
+            "arguments": {
+              "token": "REPLACE_ME"
+            }
+          }
+        }
+      },
+      {
         "name": "version_info",
-        "description": "Live app + decoder-backend version report resolved from PyPI at call time (installed/local vs. latest, cached)",
+        "description": "App + decoder-backend version report (workbench baseline + installed backend, resolved locally, no network)",
         "parameters": [
           {
             "name": "refresh",
             "type": "boolean",
             "required": false,
-            "description": "Bypass the version cache and re-query PyPI",
+            "description": "Accepted for compatibility; resolution is always local",
             "default": false
           }
         ],
@@ -1815,55 +3440,71 @@
   "decoders": [
     {
       "kind": "union_find",
-      "description": "Union-Find ,  fast approximate decode; higher LER than exact MWPM. Best as a throughput/triage lever, not a universal decoder."
+      "description": "Union-Find, fast approximate decode; higher LER than exact MWPM. Best as a throughput/triage lever, not a universal decoder."
     },
     {
       "kind": "fast_union_find",
-      "description": "Fast Union-Find ,  optimized Union-Find hot path; approximate, higher LER than exact MWPM. Regenerate LER on your target workload."
+      "description": "Fast Union-Find, optimized Union-Find hot path; approximate, higher LER than exact MWPM. Regenerate LER on your target workload."
     },
     {
       "kind": "blossom",
-      "description": "Blossom ,  weight-optimal exact MWPM. Reaches PyMatching's logical error rate on tested surface-code workloads but is not faster than PyMatching."
+      "description": "Blossom, weight-optimal exact MWPM. Reaches PyMatching's logical error rate on tested surface-code workloads but is not faster than PyMatching."
     },
     {
       "kind": "sparse_blossom",
-      "description": "Sparse Blossom ,  region-growing, near-optimal matching (experimental); NOT exact. Use Blossom for exact minimum-weight matching."
+      "description": "Sparse Blossom, region-growing, near-optimal matching (experimental); NOT exact. Use Blossom for exact minimum-weight matching."
     },
     {
       "kind": "bp_osd",
-      "description": "BP-OSD ,  belief propagation + ordered-statistics decoding for LDPC / quantum-LDPC codes that graphlike matching cannot decode (experimental)."
+      "description": "BP-OSD, belief propagation + ordered-statistics decoding for LDPC / quantum-LDPC codes that graphlike matching cannot decode (experimental)."
     },
     {
       "kind": "auto",
-      "description": "Auto ,  self-selecting decoder (v0.6.6 AutoDecoder): picks the best available backend (cpu_single / cpu_rayon / GPU) per problem size and exposes live diagnostics and available_backends. Robust general-purpose default."
+      "description": "Auto, self-selecting decoder (AutoDecoder): picks the best available backend (cpu_single / cpu_rayon / GPU) per problem size and exposes live diagnostics and available_backends. Robust general-purpose default."
     },
     {
       "kind": "hybrid",
-      "description": "Hybrid ,  combines a fast heuristic pass with exact matching (decode_hybrid); supports trainable weights. Trades a little accuracy for throughput."
+      "description": "Hybrid, combines a fast heuristic pass with exact matching (decode_hybrid); supports trainable weights. Trades a little accuracy for throughput."
     },
     {
       "kind": "lookup_table",
-      "description": "Lookup Table ,  precomputed syndrome\u2192correction table giving O(1) lookup after a one-time build. Exact for small codes; the table grows as 2**n_checks, so it is refused above 20 checks."
+      "description": "Lookup Table, precomputed syndrome\u2192correction table giving O(1) lookup after a one-time build. Exact for small codes; the table grows as 2**n_checks, so it is refused above 20 checks."
     },
     {
       "kind": "predecoded",
-      "description": "Predecoded ,  resolves easy/low-weight syndromes in a fast pre-decoding pass before matching. A throughput lever, not a standalone universal decoder."
+      "description": "Predecoded, resolves easy/low-weight syndromes in a fast pre-decoding pass before matching. A throughput lever, not a standalone universal decoder."
     },
     {
       "kind": "auto_router",
-      "description": "Auto-Router ,  policy decoder (v0.6.6 AutoRouter): inspects the code and dispatches the best concrete decoder (matching for graphlike codes, BP-OSD for qLDPC). Universally applicable; call explain() for the routing rationale."
+      "description": "Auto-Router, policy decoder: inspects the code and dispatches the best concrete decoder (matching for graphlike codes, BP-OSD for qLDPC). Universally applicable; call explain() for the routing rationale."
     },
     {
       "kind": "hybrid_cascade",
-      "description": "Hybrid Cascade ,  Union-Find pre-filter + Blossom/BP-OSD escalation (v0.6.9): trivial syndromes resolve at UF speed, hard ones escalate to the accurate decoder. Exposes prefilter_hits / escalations / prefilter_hit_rate stats. Graphlike codes only (UF pre-filter)."
+      "description": "Hybrid Cascade, Union-Find pre-filter + Blossom/BP-OSD escalation : trivial syndromes resolve at UF speed, hard ones escalate to the accurate decoder. Exposes prefilter_hits / escalations / prefilter_hit_rate stats. Graphlike codes only (UF pre-filter)."
     },
     {
       "kind": "gnn_belief_matching",
-      "description": "GNN Belief Matching ,  GNN-predicted per-qubit weights guide a weighted matching decode (v0.6.9 GNNBeliefMatcher); a built-in faithfulness check falls back to plain MWPM so corrections stay syndrome-valid. Requires qector_decoder_v3 >= 0.6.9; graphlike codes."
+      "description": "GNN Belief Matching, GNN-predicted per-qubit weights guide a weighted matching decode (GNNBeliefMatcher); a built-in faithfulness check falls back to plain MWPM so corrections stay syndrome-valid. Graphlike codes."
     },
     {
       "kind": "belief_matching",
-      "description": "Belief Matching ,  sum-product BP posteriors reweight an exact Blossom matching step (Higgott et al. 2023), recovering error-correlation information plain MWPM discards. Faithfulness-checked; falls back to plain MWPM so corrections stay syndrome-valid."
+      "description": "Belief Matching, sum-product BP posteriors reweight an exact Blossom matching step (Higgott et al. 2023), recovering error-correlation information plain MWPM discards. Faithfulness-checked; falls back to plain MWPM so corrections stay syndrome-valid."
+    },
+    {
+      "kind": "two_stage",
+      "description": "Two-Stage, decoupled X and Z sector decoders for CSS / color codes; decodes X and Z check sub-graphs separately with configurable base decoders."
+    },
+    {
+      "kind": "ambiguity_cluster",
+      "description": "Ambiguity Cluster, cluster-growth decoder for high noise or non-graphlike syndromes; partitions ambiguous checks into local clusters before solving."
+    },
+    {
+      "kind": "colour_code",
+      "description": "Colour Code, BP-OSD hypergraph decoder over undecomposed detector error models (v0.7.0); preserves multi-detector 3-body error mechanisms that standard MWPM discards."
+    },
+    {
+      "kind": "space_time",
+      "description": "Space-Time, multi-round space-time decoder for phenomenological and circuit-level decoding (v1.0.0, experimental). Handles measurement errors across syndrome rounds."
     }
   ],
   "decoder_names": [
@@ -1879,7 +3520,11 @@
     "auto_router",
     "hybrid_cascade",
     "gnn_belief_matching",
-    "belief_matching"
+    "belief_matching",
+    "two_stage",
+    "ambiguity_cluster",
+    "colour_code",
+    "space_time"
   ],
   "code_families": [
     {
@@ -1926,6 +3571,11 @@
       "key": "hypergraph_product",
       "label": "Hypergraph-Product Code (CSS)",
       "class": "graphlike"
+    },
+    {
+      "key": "color_code",
+      "label": "Color Code (Triangular 4.8.8)",
+      "class": "graphlike"
     }
   ],
   "code_family_keys": [
@@ -1937,7 +3587,8 @@
     "heavy_hex",
     "bicycle",
     "bivariate_bicycle",
-    "hypergraph_product"
+    "hypergraph_product",
+    "color_code"
   ],
   "result_interpretation": {
     "syndrome_valid": "Boolean. True only when the correction reproduces the observed syndrome under H times c equals s modulo 2. Do not claim success when it is false.",
@@ -1969,7 +3620,28 @@
   },
   "environment_variables": {
     "QECTOR_DATA_DIR": "Relocate all per user data.",
-    "QECTOR_DISABLE_OPENCL": "Set to 1 to skip OpenCL probing on unstable GPU drivers.",
+    "QECTOR_PYTHON": "Legacy source-run override: path to a compatible CPython. The shipped app never uses it (decoder comes from the bundled wheel, offline).",
+    "QECTOR_DISABLE_OPENCL": "Set to 1 to skip OpenCL probing on unstable GPU drivers. It cannot enable OpenCL.",
     "QECTOR_SILENT": "Set to 1 to suppress the backend startup notice."
+  },
+  "hardware_backends": {
+    "cpu": "Always available.",
+    "cuda": "Available when an NVIDIA GPU and a healthy driver are present.",
+    "opencl": "Reported unavailable by the published wheel: it is built without the OpenCL feature, so the backend does not exist in that build. This is independent of the host, which may well expose OpenCL devices, and no environment variable enables it. Do not attribute it to drivers or configuration."
+  },
+  "licensing": {
+    "model": "Source-available. Free for academic, personal and non-commercial research. Commercial use requires a paid licence.",
+    "evaluation": "60-day commercial evaluation available, creditable against a licence.",
+    "pricing_url": "https://qector.store/pricing",
+    "contact_email": "admin@qector.store",
+    "company": "iD01t Productions",
+    "maintainer": "Guillaume Lessard",
+    "in_app": "Documentation tab, Developer and Licensing section, with local licensing information and no external-link buttons."
+  },
+  "boot_behaviour": {
+    "splash": "A splash screen appears within about a second and closes when the main window is mapped.",
+    "first_launch": "Extracts and activates the bundled decoder wheel, then loads a compiled extension; this is the slow launch.",
+    "later_launches": "Activates the already-installed managed site and works offline.",
+    "diagnostics": "logs/boot.log in the per-user data directory records every provisioning step and the exact import error; logs/boot_stdio.log captures output that a windowed build has nowhere else to send."
   }
 }

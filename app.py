@@ -265,9 +265,29 @@ class QectorApp:
             self._app.destroy()
         except Exception:
             pass
+        # Failure-proof window teardown.  Cancelling every pending "after"
+        # timer above deletes Tcl commands that CustomTkinter widgets still
+        # hold, so tkinter.Tk.destroy() can abort mid-recursion with
+        # "can't delete Tcl command" BEFORE the root window itself is
+        # destroyed — leaving mainloop() spinning forever and the app unable
+        # to close.  Fall back to the raw Tcl destroy so the window always
+        # dies and mainloop() always returns.
+        try:
+            if self._app.tk.getboolean(self._app.tk.call("winfo", "exists", self._app._w)):
+                self._app.tk.call("destroy", self._app._w)
+        except Exception:
+            pass
 
     def mainloop(self) -> None:
-        self._app.mainloop()
+        try:
+            self._app.mainloop()
+        except tkinter.TclError:
+            # CustomTkinter's mainloop wrapper re-applies the Windows
+            # titlebar colour once the event loop unwinds; when the window
+            # was already destroyed by _on_close this raises "application
+            # has been destroyed".  The app is closing anyway — swallow it so
+            # teardown returns cleanly instead of surfacing as a fatal error.
+            pass
 
     # ── window icon (taskbar / title bar) ────────────────────────────
     def _set_window_icon(self) -> None:
@@ -352,21 +372,21 @@ class QectorApp:
             pass
 
     def _center_and_lift_window(self) -> None:
-        """Center window on the active monitor, maximize, lift, and force focus.
+        """Open full screen on the active monitor, lift, and force focus.
 
         On Windows the active-monitor work area is resolved via win32api so a
         multi-monitor setup never centers across the primary by mistake.  The
-        window boots maximized (full-screen work area) by default; tests that
-        assert on geometry set _START_MAXIMIZED = False.
+        window boots full screen by default; tests that assert on geometry set
+        _START_MAXIMIZED = False.
         """
         try:
             self._app.update_idletasks()
             if _START_MAXIMIZED:
                 try:
-                    self._app.state("zoomed")
+                    self._app.attributes("-fullscreen", True)
                 except Exception:
                     try:
-                        self._app.attributes("-fullscreen", True)
+                        self._app.state("zoomed")
                     except Exception:
                         pass
             # Always center explicitly so single-monitor / fallback layouts
@@ -599,6 +619,7 @@ class QectorApp:
         bar.grid(row=1, column=0, sticky="ew")
         bar.grid_columnconfigure(0, weight=1)
         bar.grid_columnconfigure(1, weight=0)
+        bar.grid_columnconfigure(2, weight=0)
 
         self._status_left = ctk.CTkLabel(
             bar, text=self._version_title, anchor="w",
@@ -607,12 +628,19 @@ class QectorApp:
         )
         self._status_left.grid(row=0, column=0, sticky="w", padx=(10, 4), pady=2)
 
+        offline_badge = ctk.CTkLabel(
+            bar, text="AIR-GAPPED · NO NETWORK", width=150,
+            font=ctk.CTkFont(size=10, weight="bold"),
+            text_color=self._colors["text_secondary"],
+        )
+        offline_badge.grid(row=0, column=1, sticky="e", padx=(4, 4), pady=2)
+
         self._status_right = ctk.CTkLabel(
             bar, text="no code built", anchor="e",
             font=ctk.CTkFont(family=self._fonts.mono, size=10),
             text_color=self._colors["text_secondary"],
         )
-        self._status_right.grid(row=0, column=1, sticky="e", padx=(4, 10), pady=2)
+        self._status_right.grid(row=0, column=2, sticky="e", padx=(4, 10), pady=2)
 
         self.state.on_code_changed(self._on_state_code_changed)
 
@@ -876,6 +904,7 @@ class QectorApp:
                 ("<Control-comma>", lambda e: self._select_tab("Lab & Personal Info")),
                 ("<F5>", lambda e: self._refresh_current()),
                 ("<Control-q>", lambda e: self._on_close()),
+                ("<Escape>", lambda e: self._exit_fullscreen()),
                 ("<Control-Tab>", lambda e: self._cycle_tab(1)),
                 ("<Control-Shift-Tab>", lambda e: self._cycle_tab(-1)),
             )
@@ -890,6 +919,17 @@ class QectorApp:
     def _select_tab(self, name: str) -> None:
         try:
             self.tabview.set(name)
+        except Exception:
+            pass
+
+    def _exit_fullscreen(self) -> None:
+        """Leave full-screen mode and return to a maximized window."""
+        if getattr(self, "_destroyed", False):
+            return
+        try:
+            if self._app.attributes("-fullscreen"):
+                self._app.attributes("-fullscreen", False)
+                self._app.state("zoomed")
         except Exception:
             pass
 
@@ -1054,10 +1094,8 @@ class QectorApp:
 def show_eula_dialog() -> bool:
     """Prompt the user to accept the EULA. Returns True if accepted, False otherwise."""
     import customtkinter as ctk
-    import os
     import sys
     from pathlib import Path
-    import utils
 
     # Read EULA text
     base_path = Path(getattr(sys, "_MEIPASS", Path(__file__).resolve().parent))
@@ -1074,7 +1112,7 @@ def show_eula_dialog() -> bool:
 
     # Create root for EULA dialog
     root = ctk.CTk()
-    root.title("QECTOR Decoder Workbench — Licence Agreement")
+    root.title("QECTOR Decoder Workbench - Licence Agreement")
     
     # Configure colors and styles
     root.configure(fg_color="#12141a")

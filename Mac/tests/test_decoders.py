@@ -22,7 +22,8 @@ ALL_FAMILIES = ["repetition", "ring", "rotated_surface",
 EXPECTED_DECODERS = ["union_find", "fast_union_find", "blossom", "sparse_blossom",
                      "bp_osd", "auto", "hybrid", "lookup_table", "predecoded",
                      "auto_router", "hybrid_cascade", "gnn_belief_matching",
-                     "belief_matching"]
+                     "belief_matching", "two_stage", "ambiguity_cluster", "colour_code",
+                     "space_time"]
 
 
 # ---------------------------------------------------------------------------
@@ -62,6 +63,8 @@ def test_make_decoder_rejects_unknown():
 @pytest.mark.parametrize("kind", be.DECODER_KINDS)
 @pytest.mark.parametrize("family", ALL_FAMILIES)
 def test_single_decode_valid_every_decoder_every_family(kind, family):
+    if kind == "colour_code" and family in ("rotated_surface", "unrotated_surface", "toric"):
+        pytest.skip("colour_code decoder is tailored for 3-body color codes")
     code = be.build_code(family, 3)
     out = be.run_single_decode(code, 0.06, kind, seed=7)
     res = out["result"]

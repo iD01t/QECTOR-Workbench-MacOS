@@ -1,16 +1,15 @@
 QECTOR Decoder Workbench - Public Documentation Set
 ====================================================
 
-Application version : 1.0.0
+Application version : 1.0.1
 Decoder backend : qector-decoder-v3 1.0.0 (bundled wheel, offline activation on first launch)
-MCP tools : 82
+MCP tools : 85
 Decoders : 17
 Code families : 10
-Generated : 2026-08-04 08:45 UTC
+Generated : 2026-08-19 14:03 UTC
 
 Archival Zenodo DOIs:
  User Manual & Licensing : https://doi.org/10.5281/zenodo.21363016
- Performance Benchmarks : https://doi.org/10.5281/zenodo.21339300
  Architecture Whitepaper : https://doi.org/10.5281/zenodo.21320543
 
 Contents of this documentation set:
@@ -44,7 +43,7 @@ Licensing:
  60-day commercial evaluation available, creditable against a licence.
  Buy a licence : https://qector.store/pricing
  Sales contact : admin@qector.store
- In the app : Documentation tab > Developer and Licensing > Buy Licence
+ In the app : Documentation tab > Developer and Licensing > offline local licensing
 
 Project: https://www.qector.store
 Attribution: Guillaume Lessard / iD01t Productions

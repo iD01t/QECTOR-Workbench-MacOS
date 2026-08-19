@@ -18,7 +18,6 @@ import os
 import re
 import threading
 import time
-import urllib.request
 from typing import Any, Callable, Optional
 
 BACKEND_PACKAGE = "qector-decoder-v3"
@@ -41,8 +40,6 @@ def _fallback_backend_version() -> str:
     except Exception:
         return "0.0.0"
 
-_PYPI_JSON = "https://pypi.org/pypi/{package}/json"
-_HTTP_TIMEOUT = 5
 _CACHE_TTL_SECONDS = 6 * 3600  # 6h: version churn is slow; don't spam PyPI.
 _CACHE_FILE = "version_cache.json"
 
@@ -149,7 +146,7 @@ def _save_disk_cache(data: dict[str, Any]) -> None:
 # PyPI fetch (https-pinned, cached, bulletproof)
 # ---------------------------------------------------------------------------
 
-def _fetch_pypi_latest(package: str, timeout: int = _HTTP_TIMEOUT) -> Optional[str]:
+def _fetch_pypi_latest(package: str, timeout: int = 5) -> Optional[str]:
     """Local wheel only: return local installed backend version."""
     return installed_backend_version() or _fallback_backend_version()
 
@@ -239,7 +236,7 @@ def resolve_versions_async(callback: Optional[Callable[[dict], None]] = None,
 def format_version_banner(report: Optional[dict] = None) -> str:
     """One-line human banner: workbench version + installed backend version.
 
-    e.g. 'QECTOR Decoder Workbench v1.0.0  |  qector-decoder-v3 1.0.0 (latest)'
+    e.g. 'QECTOR Decoder Workbench v1.0.1  |  qector-decoder-v3 1.0.0 (latest)'
     The workbench version shown is always the baked-in workbench baseline;
     the backend version is the one actually imported at runtime.
     """

@@ -269,6 +269,16 @@ if _HAS_GUI:
                     lines.append(f"{r['kind']:<25} {r['hamming_weight']:>5} {syn_s:>5} {lf_s:>10}  ✓\n")
             self._set_text(self.result_text, "".join(lines))
             self._log(f"Comparison complete: {len(results)} decoders tested", "SUCCESS")
+            try:
+                from history_tab import record_event
+                kinds = [r["kind"] for r in results]
+                record_event("compare", {
+                    "decoders": kinds,
+                    "rate": self.rate_var.get() if hasattr(self, "rate_var") else 0,
+                    "seed": int(self.seed_entry.get() or 0) if hasattr(self, "seed_entry") else 0,
+                })
+            except Exception:
+                pass
 
         def _on_import_syndrome(self) -> None:
             """Import a syndrome from a CSV/JSON/text file and decode it."""
@@ -860,6 +870,17 @@ if _HAS_GUI:
                     "SUCCESS",
                 )
                 self._log_history(p)
+                try:
+                    from history_tab import record_event
+                    record_event("decode", {
+                        "decoder": p.get("kind", "?"),
+                        "rate": p.get("rate", 0),
+                        "seed": p.get("seed", 0),
+                        "hw": p.get("hamming_weight", 0),
+                        "syn_valid": p.get("syndrome_valid", False),
+                    })
+                except Exception:
+                    pass
             except tkinter.TclError:
                 pass
             finally:

@@ -21,3 +21,5 @@ reportlab>=4.0
 # exporter reports the skip and still writes every other format. It must never
 # be worked around by renaming a text file to .docx.
 python-docx>=1.1.0
+# Entra ID is intentionally disabled in the air-gapped product.  No identity
+# SDK or network client is shipped.

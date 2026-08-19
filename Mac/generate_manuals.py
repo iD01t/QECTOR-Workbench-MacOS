@@ -27,7 +27,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import re
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -65,7 +64,6 @@ def esc(text: str) -> str:
 # hand-edited README.txt in the distributed set and no generator knew about them.
 ZENODO_DOIS = [
     ("User Manual & Licensing", "https://doi.org/10.5281/zenodo.21363016"),
-    ("Performance Benchmarks", "https://doi.org/10.5281/zenodo.21339300"),
     ("Architecture Whitepaper", "https://doi.org/10.5281/zenodo.21320543"),
 ]
 
@@ -337,14 +335,16 @@ RULES = [
 # reportlab shared toolkit
 # ===============================================================================
 def _rl():
-    from reportlab.lib.pagesizes import letter
-    from reportlab.lib.units import inch
     from reportlab.lib import colors
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.lib.pagesizes import letter
     from reportlab.lib.enums import TA_CENTER, TA_LEFT
-    from reportlab.platypus import (BaseDocTemplate, PageTemplate, Frame,
-                                    Paragraph, Spacer, Table, TableStyle, PageBreak,
-                                    ListFlowable, ListItem, Preformatted, HRFlowable)
+    from reportlab.platypus import (
+        SimpleDocTemplate, BaseDocTemplate, PageTemplate, Paragraph, Spacer, Table,
+        TableStyle, Image as RLImage, PageBreak, ListFlowable, ListItem,
+        Preformatted, HRFlowable, Frame,
+    )
     from reportlab.platypus.tableofcontents import TableOfContents
     return dict(locals())
 
@@ -695,9 +695,9 @@ def build_user_manual(platform: str, facts: dict, out_path: Path) -> None:
                "evaluation is available and creditable against a licence. The qector-decoder-v3 "
                "backend is licensed separately. Consult the EULA shipped with the application for "
                "full terms."),
-           b.P(f"Buy a licence: {facts['pricing_url']}. The application also has a Buy Licence "
-               "button in the Documentation tab, under Developer and Licensing, alongside the "
-               "maintainer and contact details."),
+            b.P(f"Licensing reference: {facts['pricing_url']}. The application does not open "
+               "websites, email clients, or other external links; use the shipped EULA and an "
+               "approved offline transfer process for licensing administration."),
            b.P(f"Sales and licensing enquiries: {facts['contact_email']}."),
            b.P(f"Project home and support: {facts['project_url']}. Attribution: {facts['author']} "
                f"(ORCID {facts['author_orcid']}).")]
@@ -980,8 +980,8 @@ def build_llm_json(facts: dict, out_path: Path) -> None:
             "contact_email": facts["contact_email"],
             "company": facts["company"],
             "maintainer": facts["maintainer"],
-            "in_app": ("Documentation tab, Developer and Licensing section, with Buy Licence, "
-                       "Contact Sales and Website buttons."),
+            "in_app": ("Documentation tab, Developer and Licensing section, with local licensing "
+                       "information and no external-link buttons."),
         },
         "boot_behaviour": {
             "splash": "A splash screen appears within about a second and closes when the main window "
@@ -1046,7 +1046,7 @@ def build_readme(facts: dict, out_path: Path) -> None:
         f"  {facts['licence_evaluation']}",
         f"  Buy a licence : {facts['pricing_url']}",
         f"  Sales contact : {facts['contact_email']}",
-        "  In the app    : Documentation tab > Developer and Licensing > Buy Licence",
+        "  In the app    : Documentation tab > Developer and Licensing > offline local licensing",
         "",
         f"Project: {facts['project_url']}",
         f"Attribution: {facts['author']}",

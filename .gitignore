@@ -20,6 +20,7 @@ dist_*/
 # --- Virtual environments ---
 .venv/
 venv/
+test_venv/
 
 # --- Logs ---
 logs/
@@ -46,6 +47,12 @@ code_doc_*.svg
 # --- Release staging & runtime state ---
 release_ready/
 mcp_*.json
+release_build/
+Release_v*/
+winzip/
+linuxzip/
+docgen_proof/
+.qector_decoder_site/
 
 # --- SSH deploy keys ---
 deploy_key.pub

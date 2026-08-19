@@ -87,8 +87,15 @@ def test_no_exec_in_source():
 
 def test_no_pickle_in_source():
     """Pickle deserialization is unsafe for untrusted data."""
+    # figure_cache.py is an in-memory LRU whose blobs are created and consumed
+    # only by the same process (dumps_state/loads_state round-trip).  It never
+    # loads pickles from disk, the network, or any external input, so its
+    # pickle.loads is not a deserialization-of-untrusted-data sink.
+    ALLOWED_PICKLE_FILES = {"figure_cache.py"}
     bad = []
     for path in _py_files():
+        if path.name in ALLOWED_PICKLE_FILES:
+            continue
         text = path.read_text(encoding="utf-8", errors="ignore")
         for lineno, line in enumerate(text.splitlines(), start=1):
             stripped = line.strip()

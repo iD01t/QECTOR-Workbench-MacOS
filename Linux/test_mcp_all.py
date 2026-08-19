@@ -59,6 +59,22 @@ async def test_all_mcp_functions():
     rm.allocate_resource("mcp-res-for-get", "test", {"purpose": "get_resource test"})
     rm.allocate_resource("mcp-res-for-delete", "test", {"purpose": "delete test"})
 
+    # Fixtures for tools that consume external files: create real input files.
+    import numpy as np
+    fix_code = mcp_server.be.build_code("rotated_surface", 3)
+    fix_rng = np.random.default_rng(42)
+    fix_synd = np.asarray(
+        fix_code.syndrome(fix_rng.integers(0, 2, size=int(fix_code.n_qubits))),
+        dtype=np.uint8)
+    np.save("mmap_synd.npy", np.tile(fix_synd, (10, 1)))
+    with open("mmap_syndrome.json", "w", encoding="utf-8") as f:
+        json.dump({"syndrome": fix_synd.tolist()}, f)
+    try:
+        import stim  # noqa: F401
+        stim_available = True
+    except ImportError:
+        stim_available = False
+
     # Run a quick benchmark first to get a valid benchmark_id for export_benchmark
     bench_res = await call_mcp_tool(
         "run_benchmark", {"code_family": "repetition", "n_samples": 30, "seed": 7})
@@ -75,6 +91,7 @@ async def test_all_mcp_functions():
         "benchmark_decoder": {"decoder_name": "blossom", "code_family": "repetition",
                               "distance": 5, "error_rate": 0.03, "n_samples": 40, "seed": 9},
         "clear_results": {"confirm": True},
+        "compliance_attestation": {},
         "compare_benchmarks": {"benchmarks": [bench_id]},
         "compatible_decoders": {"family": "rotated_surface", "distance": 3},
         "decode_single": {"family": "rotated_surface", "distance": 5,
@@ -91,7 +108,9 @@ async def test_all_mcp_functions():
         "get_code_properties": {"family_name": "ring", "distance": 5},
         "get_config": {},
         "get_decoder_info": {"decoder_name": "bp_osd"},
+        "get_entra_posture": {},
         "get_hardware_info": {},
+        "get_identity_info": {},
         "get_resource": {"resource_id": "mcp-res-for-get"},
         "get_resources": {},
         "get_results": {"limit": 10},
@@ -152,7 +171,7 @@ async def test_all_mcp_functions():
         "colour_code_decode": {"distance": 3, "max_iter": 30, "osd_order": 0},
         "build_dem": {"family": "rotated_surface", "distance": 3, "noise_model": "circuit", "p": 0.05, "bias": 0.5},
         "decode_dem": {"family": "rotated_surface", "distance": 3, "decoder_kind": "blossom"},
-        "import_stim": {"file_path": "nonexistent.stim", "family": "rotated_surface", "distance": 3, "decoder_name": "blossom"},
+        "import_stim": {"file_path": "mmap_syndrome.stim", "family": "rotated_surface", "distance": 3, "decoder_name": "blossom"},
         "build_code_from_matrix": {"H_matrix": [[1, 1, 0, 0], [0, 1, 1, 0], [0, 0, 1, 1]], "family": "custom", "distance": 3},
         "estimate_threshold": {"family": "repetition", "distance": 3, "decoder_kind": "union_find", "p_min": 0.05, "p_max": 0.15, "n_samples": 20},
         "finite_size_scaling": {"family": "repetition", "decoder_kind": "union_find", "distances": [3, 5], "p_vals": [0.05, 0.1], "n_samples": 20},
@@ -165,11 +184,12 @@ async def test_all_mcp_functions():
         "decode_hyperedge": {"family": "bicycle", "distance": 3, "decoder_name": "bp_osd", "error_rate": 0.05, "seed": 42},
         "decode_syndrome_blossom": {"family": "rotated_surface", "distance": 3, "syndrome": [1, 0, 1, 0]},
         "decode_syndrome_cascade": {"family": "rotated_surface", "distance": 3, "syndrome": [1, 0, 1, 0]},
-        "decode_mmap": {"family": "rotated_surface", "distance": 3, "syndrome_path": "nonexistent.npy", "output_path": "test_out.npy", "decoder_name": "cpu_batch", "batch_size": 1024, "n_shots": 10},
+        "decode_mmap": {"family": "rotated_surface", "distance": 3, "syndrome_path": "mmap_synd.npy", "output_path": "test_out.npy", "decoder_name": "cpu_batch", "batch_size": 1024, "n_shots": 10},
         "analyze_error_patterns": {"family": "repetition", "distance": 3, "error_rate": 0.05, "n_samples": 50, "seed": 42},
         "analyze_logicals": {"family": "repetition", "distance": 3},
         "compare_benchmarks": {"benchmarks": ["test-bench"]},
         "export_session": {"output_path": "test_session.zip", "family": "repetition", "distance": 3, "decoder_name": "union_find", "error_rate": 0.05, "seed": 42},
+        "import_syndrome": {"family": "rotated_surface", "distance": 3, "file_path": "mmap_syndrome.json", "decoder_name": "blossom"}
     }
 
     missing_params = [t for t in tools if t not in test_params]
@@ -181,6 +201,26 @@ async def test_all_mcp_functions():
 
     for tool in tools:
         params = test_params[tool].copy()
+        if tool == "import_stim":
+            # Optional runtime dependency: stim is not bundled with the build.
+            # Without it, the tool must fail with an honest, graceful error.
+            if not stim_available:
+                try:
+                    await call_mcp_tool(tool, params)
+                    results[tool] = (False, "import_stim succeeded without stim installed")
+                    print("   FAIL -> import_stim succeeded without stim installed")
+                except MCPError as exc:
+                    msg = str(exc)
+                    if "Stim not installed" in msg:
+                        results[tool] = (True, {"status": "unavailable",
+                                                "reason": "stim is an optional dependency"})
+                        print("   PASS (graceful optional-dep error)")
+                    else:
+                        results[tool] = (False, msg[:180])
+                        print(f"   FAIL -> {msg[:140]}")
+                continue
+            with open("mmap_syndrome.stim", "w", encoding="utf-8") as f:
+                f.write("STIM\nH 0\nCNOT 0 1\nM 0\nDETECTOR rec[-1]\n")
         if tool in ("compare_benchmarks", "export_benchmark"):
             # clear_results may have wiped the store; get a fresh id.
             bench_res = await call_mcp_tool(

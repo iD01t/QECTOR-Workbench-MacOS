@@ -112,7 +112,7 @@ if _HAS_GUI:
             self._build_official_export_section(scroll)
             # Preview with Search & Toolbar
             self._build_preview_section(scroll)
-            # Developer & Licensing (Buy Licence / Contact Sales / Website)
+            # Developer and licensing details (offline-only; no external actions)
             self._build_licence_section(scroll)
 
         def _build_top_action_bar(self, scroll) -> None:
@@ -404,7 +404,7 @@ if _HAS_GUI:
                 self._set_official_export_enabled(True)
 
         def _build_licence_section(self, scroll) -> None:
-            """Developer/business details and a direct licence-purchase button."""
+            """Developer and licensing details for the offline product."""
             import version as ver
 
             info = ver.business_info()
@@ -436,8 +436,7 @@ if _HAS_GUI:
                 ("Backend", info["backend"]),
                 ("Company", info["company"]),
                 ("Maintainer", f"{info['maintainer']}  (ORCID {info['orcid']})"),
-                ("Contact", info["contact"]),
-                ("Website", info["website"]),
+                ("Licensing", "Offline local licence verification"),
             ]
             for index, (label, value) in enumerate(rows, start=3):
                 ctk.CTkLabel(
@@ -455,38 +454,11 @@ if _HAS_GUI:
             buttons.grid(row=3 + len(rows), column=0, columnspan=2, sticky="w",
                          padx=14, pady=(12, 14))
 
-            ctk.CTkButton(
-                buttons, text="Buy Licence", width=150,
-                command=lambda: self._open_url(info["pricing"], "pricing page"),
-                fg_color=COLORS["accent_dim"], hover_color=COLORS["accent"],
-                text_color=COLORS["text_primary"],
-                font=ctk.CTkFont(size=12, weight="bold"),
+            ctk.CTkLabel(
+                buttons, text="Offline licensing only - no external links",
+                text_color=COLORS["text_secondary"],
+                font=ctk.CTkFont(size=11, weight="bold"),
             ).pack(side="left", padx=(0, 8))
-
-            ctk.CTkButton(
-                buttons, text="Contact Sales", width=130,
-                command=lambda: self._open_url(f"mailto:{info['contact']}"
-                                               "?subject=QECTOR%20licence%20enquiry",
-                                               "email client"),
-                fg_color=COLORS["bg_widget"], hover_color=COLORS["accent_dim"],
-                text_color=COLORS["text_secondary"], font=ctk.CTkFont(size=11),
-            ).pack(side="left", padx=8)
-
-            ctk.CTkButton(
-                buttons, text="Website", width=110,
-                command=lambda: self._open_url(info["website"], "website"),
-                fg_color=COLORS["bg_widget"], hover_color=COLORS["accent_dim"],
-                text_color=COLORS["text_secondary"], font=ctk.CTkFont(size=11),
-            ).pack(side="left", padx=8)
-
-        def _open_url(self, url: str, what: str) -> None:
-            """Open *url* in the user's browser; a failure is logged, never raised."""
-            try:
-                import webbrowser
-                webbrowser.open(url, new=2)
-                self._log(f"Opened {what}: {url}", "INFO")
-            except Exception as exc:
-                self._log(f"Could not open {what} ({url}): {exc}", "WARN")
 
         def _build_format_section(self, scroll) -> None:
             section = ctk.CTkFrame(scroll, fg_color=COLORS["bg_panel_alt"], corner_radius=10)

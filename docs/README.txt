@@ -3,7 +3,7 @@ QECTOR Decoder Workbench - Public Documentation Set
 
 Application version : 1.0.0
 Decoder backend : qector-decoder-v3 1.0.0 (bundled wheel, offline activation on first launch)
-MCP tools : 82
+MCP tools : 83
 Decoders : 17
 Code families : 10
 Generated : 2026-08-04 08:45 UTC
@@ -44,7 +44,7 @@ Licensing:
  60-day commercial evaluation available, creditable against a licence.
  Buy a licence : https://qector.store/pricing
  Sales contact : admin@qector.store
- In the app : Documentation tab > Developer and Licensing > Buy Licence
+ In the app : Documentation tab > Developer and Licensing > offline local licensing
 
 Project: https://www.qector.store
 Attribution: Guillaume Lessard / iD01t Productions

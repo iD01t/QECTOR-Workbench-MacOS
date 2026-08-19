@@ -193,14 +193,14 @@ def main(argv=None) -> int:
     sectioned: list[str] = [
         f"# QECTOR Decoder Workbench v{_version.WORKBENCH_VERSION} — SHA-256 checksums",
         f"# Generated: {datetime.now(timezone.utc).isoformat(timespec='seconds')}",
-        f"# Verify:    sha256sum -c checksums.txt   (or the per-platform file)",
+        "# Verify:    sha256sum -c checksums.txt   (or the per-platform file)",
         "",
     ]
     for key, label in _PLATFORMS:
         members = sorted(groups[key], key=lambda p: p.name.lower())
         sectioned.append(f"## {label}")
         if not members:
-            sectioned.append(f"# (not built for this release)")
+            sectioned.append("# (not built for this release)")
             sectioned.append("")
             continue
         for path in members:

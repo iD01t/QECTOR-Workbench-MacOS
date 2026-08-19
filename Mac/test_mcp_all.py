@@ -170,6 +170,7 @@ async def test_all_mcp_functions():
         "analyze_logicals": {"family": "repetition", "distance": 3},
         "compare_benchmarks": {"benchmarks": ["test-bench"]},
         "export_session": {"output_path": "test_session.zip", "family": "repetition", "distance": 3, "decoder_name": "union_find", "error_rate": 0.05, "seed": 42},
+        "import_syndrome": {"family": "rotated_surface", "distance": 3, "file_path": "nonexistent.json", "decoder_name": "blossom"}
     }
 
     missing_params = [t for t in tools if t not in test_params]

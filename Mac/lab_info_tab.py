@@ -263,6 +263,26 @@ if _HAS_GUI:
             self.tier_label.grid(row=row_idx, column=1, sticky="w", padx=(0, 20), pady=(0, 4))
             row_idx += 1
 
+            # ── Enterprise posture: zero-egress guard + optional Entra ID ──
+            self.posture_label = ctk.CTkLabel(
+                scroll, text=self._enterprise_posture_text(),
+                font=ctk.CTkFont(family=self.fonts.mono, size=10),
+                text_color=theme.c("text_secondary"), justify="left",
+            )
+            self.posture_label.grid(row=row_idx, column=1, sticky="w", padx=(0, 20), pady=(0, 4))
+            # Refresh button: posture changes at runtime (guard install at
+            # launch, CLI `qector entra configure/login/logout`, blocked count).
+            self.posture_refresh_btn = ctk.CTkButton(
+                scroll, text="Refresh posture", width=120, height=22,
+                font=ctk.CTkFont(family=self.fonts.mono, size=10),
+                command=self._refresh_posture,
+            )
+            self.posture_refresh_btn.grid(row=row_idx, column=2, sticky="w", padx=(0, 10), pady=(0, 4))
+            row_idx += 1
+            # Re-query once after the widget tree settles (blocked-attempt
+            # counters may have changed between build time and map time).
+            self._refresh_posture()
+
             # ── License info detail section ──────────────────────────────
             def _get_license_details() -> dict:
                 """Pull raw fields from the decoder, not the formatted summary."""
@@ -404,6 +424,85 @@ if _HAS_GUI:
             )
             self.apply_license_btn.pack(side="left")
 
+            # ---- Entra ID Management Card ----
+            row_idx += 1
+            entra_frame = ctk.CTkFrame(scroll, fg_color=theme.COLORS.get("bg_widget", "#2b2b36"), corner_radius=8)
+            entra_frame.grid(row=row_idx, column=0, columnspan=2, sticky="we", padx=20, pady=10)
+            entra_frame.grid_columnconfigure(1, weight=1)
+
+            ctk.CTkLabel(
+                entra_frame, text="Microsoft Entra ID (Azure AD)",
+                font=ctk.CTkFont(family=self.fonts.ui, size=13, weight="bold"),
+                text_color=theme.c("text_primary"),
+            ).grid(row=0, column=0, columnspan=2, sticky="w", padx=15, pady=(15, 5))
+
+            self.entra_status_lbl = ctk.CTkLabel(
+                entra_frame, text="Checking Entra ID posture...",
+                font=ctk.CTkFont(family=self.fonts.mono, size=11),
+                text_color=theme.c("text_secondary"),
+                justify="left",
+            )
+            self.entra_status_lbl.grid(row=1, column=0, columnspan=2, sticky="w", padx=15, pady=(0, 15))
+
+            self.entra_login_btn = ctk.CTkButton(
+                entra_frame, text="Sign In with Microsoft", command=self._on_entra_login,
+                font=ctk.CTkFont(size=11), width=160, height=26,
+            )
+            self.entra_login_btn.grid(row=2, column=0, sticky="w", padx=(15, 10), pady=(0, 15))
+
+            self.entra_logout_btn = ctk.CTkButton(
+                entra_frame, text="Sign Out", command=self._on_entra_logout,
+                font=ctk.CTkFont(size=11), width=100, height=26,
+                fg_color=theme.COLORS.get("bg_widget", "#3A3D4E"),
+            )
+            self.entra_logout_btn.grid(row=2, column=1, sticky="w", padx=0, pady=(0, 15))
+
+            self._refresh_entra_ui()
+
+
+
+        def _refresh_entra_ui(self) -> None:
+            try:
+                import entra_auth
+                posture = entra_auth.posture()
+                status = posture.get("status", "unknown")
+                if status == "disabled":
+                    self.entra_status_lbl.configure(text="Entra ID is disabled (Air-Gapped / Unconfigured)")
+                    self.entra_login_btn.configure(state="disabled")
+                    self.entra_logout_btn.configure(state="disabled")
+                elif status == "authenticated":
+                    acc = posture.get("account", "User")
+                    self.entra_status_lbl.configure(text=f"Signed in as: {acc}")
+                    self.entra_login_btn.configure(state="disabled")
+                    self.entra_logout_btn.configure(state="normal")
+                else:
+                    self.entra_status_lbl.configure(text="Not signed in (Configured)")
+                    self.entra_login_btn.configure(state="normal")
+                    self.entra_logout_btn.configure(state="disabled")
+            except Exception:
+                pass
+
+        def _on_entra_login(self) -> None:
+            import threading_utils
+            threading_utils.run_in_background(self._entra_login_worker)
+
+        def _entra_login_worker(self) -> None:
+            try:
+                import entra_auth
+                entra_auth.login(flow="browser")
+                if getattr(self, "_ui", None):
+                    self._ui.post(self._refresh_entra_ui)
+            except Exception:
+                pass
+
+        def _on_entra_logout(self) -> None:
+            try:
+                import entra_auth
+                entra_auth.logout()
+                self._refresh_entra_ui()
+            except Exception:
+                pass
+
         def _on_theme_change(self, mode: str) -> None:
             theme.set_appearance_mode(mode)
 
@@ -468,6 +567,35 @@ if _HAS_GUI:
                     else:
                         display = str(raw) if raw is not None else "N/A"
                     lbl.configure(text=display)
+            except Exception:
+                pass
+
+        @staticmethod
+        def _enterprise_posture_text() -> str:
+            """Zero-egress guard + Entra ID readiness summary (never raises)."""
+            lines = []
+            try:
+                import compliance
+                guard = compliance.egress_guard_status()
+                mode = guard.get("mode", "?")
+                state = "ON" if guard.get("active") else "OFF"
+                lines.append(f"Egress guard: {state} ({mode}"
+                             + (f", {guard.get('blocked_attempts')} blocked)" if guard.get("active") else ")"))
+            except Exception:
+                lines.append("Egress guard: unknown")
+            try:
+                import entra_auth
+                p = entra_auth.posture()
+                status = p.get("status", "?")
+                detail = p.get("reason") or ""
+                lines.append(f"Entra ID: {status}{' - ' + detail if detail else ''}")
+            except Exception:
+                lines.append("Entra ID: unknown")
+            return "  |  ".join(lines)
+
+        def _refresh_posture(self) -> None:
+            try:
+                self.posture_label.configure(text=self._enterprise_posture_text())
             except Exception:
                 pass
 

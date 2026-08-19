@@ -124,6 +124,20 @@ def sanitize_export_path(path: Any, base_dir: Any = None) -> tuple[bool, Path]:
         return False, Path("")
     if not p.name:
         return False, p
+    raw = str(p)
+    if "\x00" in raw:
+        return False, p  # embedded NUL bytes are never valid in a filesystem path
+    # Cross-platform traversal guard: on POSIX, backslash is an ordinary
+    # filename character, so pathlib alone cannot catch "..\\..\\..." or a
+    # Windows drive path ("C:\\...").  Normalise to POSIX separators and
+    # validate components so Windows-style traversal is rejected on every OS.
+    norm = raw.replace("\\", "/")
+    norm_parts = norm.split("/")
+    if ".." in norm_parts:
+        return False, p
+    if os.name != "nt" and len(norm_parts) and len(norm_parts[0]) >= 2 and norm_parts[0][1] == ":":
+        return False, p  # drive-letter absolute path (C:/...) on a POSIX host
+    p = Path(norm)
     try:
         if ".." in p.parts:
             return False, p
@@ -275,6 +289,41 @@ def encrypt_license_key(key: str) -> str:
     f = Fernet(get_machine_derived_key())
     return f.encrypt(key.encode("utf-8")).decode("utf-8")
 
+
+def enforce_monotonic_clock() -> bool:
+    """Enforce monotonic sequence timestamp tracking to prevent clock rollback attacks.
+    
+    Returns True if clock is valid, False if a rollback > 24h is detected.
+    """
+    import time
+    try:
+        data_dir = get_data_dir()
+        state_dir = data_dir / "state"
+        state_dir.mkdir(parents=True, exist_ok=True)
+        clock_file = state_dir / "clock_watermark.bin"
+        
+        current_time = time.time()
+        
+        if clock_file.is_file():
+            try:
+                raw = clock_file.read_text()
+                if raw:
+                    last_time = float(decrypt_license_key(raw))
+                    if last_time - current_time > 86400:
+                        import sys
+                        print("SECURITY ALERT: Clock rollback attack detected: System clock is >24h behind last run watermark.", file=sys.stderr)
+                        return False
+            except Exception:
+                pass
+                
+        try:
+            clock_file.write_text(encrypt_license_key(str(current_time)))
+        except Exception:
+            pass
+            
+        return True
+    except Exception:
+        return True
 
 def decrypt_license_key(encrypted_key: str) -> str:
     from cryptography.fernet import Fernet

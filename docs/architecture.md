@@ -1,7 +1,7 @@
-# QECTOR Workbench - Architecture (v1.0.0)
+# QECTOR Workbench - Architecture (v1.0.1)
 
-The MCP server (`mcp_server.py` + `mcp_resources.py`) sits on top of the backend and exposes 
-**82 tools** for external control (tested exhaustively), including `self_diagnostics`, `probe_decoders`, 
+The MCP server (`mcp_server.py` + `mcp_resources.py`) sits on top of the backend and exposes
+**85 tools** for local control, including `self_diagnostics`, `probe_decoders`,
 `resilient_decode`, `version_info`, `diagnostic_decode`, `native_recommend`, `native_streaming`, `list_codes`, 
 `compat_report`, `hybrid_cascade_stats`, `neural_predecoder_train`, `decode_with_options`, `decode_syndrome`, 
 `compatible_decoders`, `batch_decode_gpu`, `gnn_belief_match_decode`, `belief_match_decode`, and the native-feature 
@@ -27,7 +27,7 @@ graph TD
         B -.-> |"native_streaming()"| Q
     end
     
-    subgraph Native["Rust Core (v1.0.0)"]
+    subgraph Native["Rust Core (backend 1.0.0)"]
         Q((qector_decoder_v3))
         C["Decoders: MWPM, fast UF, BPOSD, HybridCascade, GNN-BM..."]
         Q --- C
@@ -57,9 +57,9 @@ graph TD
 
 ## Versioning (offline)
 
-1. `version.py` defines `WORKBENCH_VERSION` (1.0.0), `BACKEND_VERSION` (1.0.0), and `MCP_TOOLS` (56). The product line (0.5.x) is deliberately independent of the backend line (0.7.x).
+1. `version.py` defines `WORKBENCH_VERSION` (1.0.1), `BACKEND_VERSION` (1.0.0), and `MCP_TOOLS` (85).
 2. `version_service.py` reports the workbench baseline and the installed backend version — both resolved locally, with no network access.
-3. `app.py` displays the combined banner in the window title and status bar; any stale on-disk version cache is overwritten so the app never shows a downgraded version.
+3. `app.py` displays the local bundle versions in the window title and status bar; no online version check is performed.
 
 ## Data Flow: Single Decode
 
@@ -76,4 +76,5 @@ graph TD
 1. User sets `n_samples`, `seed` in `benchmark_tab.py`
 2. UI calls `backend.run_benchmark(code, n_samples, seed, decoder_kind, error_rate)`
 3. Backend runs loops measuring decode time with `time.perf_counter`
-4. UI displays throughput and latency statistics
+4. UI displays throughput and latency statistics for the current machine only;
+   no benchmark result is persisted or shipped.

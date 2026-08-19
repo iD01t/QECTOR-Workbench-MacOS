@@ -17,6 +17,8 @@ _CLI_COMMANDS = [
     # New CLI subcommands from finaldev.md tasks 5.1-5.7
     "compare", "batch", "stream", "train", "export", "import", "matrix",
     "serve", "doctor", "completions",
+    # v1.0.1: zero-egress attestation + optional Entra ID SSO
+    "compliance", "entra",
 ]
 
 
@@ -400,6 +402,19 @@ def launch() -> int:
     # Must run before ANY third-party import: see _ensure_std_streams.
     _ensure_std_streams()
 
+    # Air-gap enforcement is mandatory for every runtime.  Loopback stays
+    # allowed for local services; all external DNS/connect attempts are blocked
+    # and logged.  Never raises: a broken guard must not brick the boot.
+    try:
+        import compliance
+        compliance.install_egress_guard()
+            
+        # Also enforce monotonic time to prevent offline clock rollback attacks
+        import utils
+        utils.enforce_monotonic_clock()
+    except Exception:
+        pass
+
     # Load and decrypt stored license key if present (with auto-migration)
     try:
         from pathlib import Path
@@ -435,6 +450,8 @@ def launch() -> int:
     headless = (
         "--mcp" in sys.argv
         or "--cli" in sys.argv
+        or "--version" in sys.argv
+        or "-V" in sys.argv
         or (len(sys.argv) > 1 and sys.argv[1] in _CLI_COMMANDS)
     )
 

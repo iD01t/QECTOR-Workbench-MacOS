@@ -29,7 +29,7 @@ def test_bootstrap_boots_on_bundled_without_touching_managed(monkeypatch):
     activates the managed site or provisions — that is what lets the app run on a
     machine with no Python/pip/network."""
     monkeypatch.setattr(provisioner, "import_ok", lambda: True)
-    monkeypatch.setattr(provisioner, "_imported_version", lambda: "0.7.0")
+    monkeypatch.setattr(provisioner, "_imported_version", lambda: "1.0.0")
     touched = {"activate": False, "ensure": False}
     monkeypatch.setattr(provisioner, "activate_site",
                         lambda: touched.__setitem__("activate", True))
@@ -40,7 +40,7 @@ def test_bootstrap_boots_on_bundled_without_touching_managed(monkeypatch):
 
     assert result["ok"] is True
     assert result["action"] in ("ready", "bundled")
-    assert result["installed"] == "0.7.0"
+    assert result["installed"] == "1.0.0"
     assert touched["activate"] is False and touched["ensure"] is False
 
 
@@ -50,7 +50,7 @@ def test_bootstrap_falls_back_to_managed_when_no_bundle(monkeypatch):
     seq = iter([False, True])  # bundled import fails, managed import succeeds
     monkeypatch.setattr(provisioner, "import_ok", lambda: next(seq))
     monkeypatch.setattr(provisioner, "activate_site", lambda: None)
-    monkeypatch.setattr(provisioner, "scan_version", lambda: "0.7.0")
+    monkeypatch.setattr(provisioner, "scan_version", lambda: "1.0.0")
     monkeypatch.setattr(provisioner, "ensure",
                         lambda **k: (_ for _ in ()).throw(AssertionError("must not provision")))
 
@@ -58,7 +58,7 @@ def test_bootstrap_falls_back_to_managed_when_no_bundle(monkeypatch):
 
     assert result["ok"] is True
     assert result["action"] == "managed"
-    assert result["installed"] == "0.7.0"
+    assert result["installed"] == "1.0.0"
 
 
 def test_frozen_build_reports_missing_compatible_python(monkeypatch):

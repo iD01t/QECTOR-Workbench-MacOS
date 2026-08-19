@@ -34,7 +34,7 @@ sys.path.insert(0, str(REPO))
 
 #: Docs that make factual claims to the public.
 TRACKED = [
-    "README.md", "README_v3.md", "README_LINUX.md", "AGENT.md", "PACKAGING.md",
+    "README.md", "README_LINUX.md", "AGENT.md", "PACKAGING.md",
     "PROJECT_STATUS.md", "RELEASE_REPORT.md",
     "docs/architecture.md", "docs/README.txt", "manuals/README.txt",
 ]

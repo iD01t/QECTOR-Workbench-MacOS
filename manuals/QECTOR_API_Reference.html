@@ -44,9 +44,9 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 </head>
 <body>
 <h1>QECTOR Workbench - Complete API Reference</h1>
-<p><strong>Workbench 0.5.3 - Backend <code>qector_decoder_v3</code> 0.7.0 (min 0.7.0) - 56 MCP tools - 16 decoders - 10 code families</strong></p>
-<p><strong>Decoder package: <code>qector_decoder_v3</code> 0.7.0 (bundled wheel, activated offline on first launch)</strong></p>
-<p>Generated 2026-08-04T08:45:10+00:00Z</p>
+<p><strong>Workbench 1.0.1 - Backend <code>qector_decoder_v3</code> 1.0.0 (min 1.0.0) - 85 MCP tools - 17 decoders - 10 code families</strong></p>
+<p><strong>Decoder package: <code>qector_decoder_v3</code> 1.0.0 (bundled wheel, activated offline on first launch)</strong></p>
+<p>Generated 2026-08-19T13:59:28+00:00Z</p>
 <p>This manual is generated from the live application source so every tool name, decoder kind, code family, and function signature matches the running build exactly.</p>
 <h2>Code families</h2>
 <table>
@@ -101,48 +101,8 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 </tbody>
 </table>
 <p>Unknown keys are ignored with a warning; missing keys use backend defaults.</p>
-<h2>Measured data</h2>
-<p>All figures below were measured on this machine (seeded, n=50, p=0.05, rotated_surface d=5). They are workload- and hardware-dependent.</p>
-<h3>Code family properties</h3>
-<table>
-<thead><tr><th>Family</th><th>Distance</th><th>n_qubits</th><th>n_checks</th><th>max_degree</th><th>compatible decoders</th></tr></thead>
-<tbody>
-<tr><td>repetition</td><td>5</td><td>5</td><td>4</td><td>2</td><td>13</td></tr>
-<tr><td>ring</td><td>5</td><td>5</td><td>5</td><td>2</td><td>13</td></tr>
-<tr><td>rotated_surface</td><td>5</td><td>25</td><td>12</td><td>2</td><td>13</td></tr>
-<tr><td>unrotated_surface</td><td>5</td><td>40</td><td>25</td><td>2</td><td>12</td></tr>
-<tr><td>toric</td><td>5</td><td>50</td><td>25</td><td>2</td><td>12</td></tr>
-<tr><td>heavy_hex</td><td>5</td><td>25</td><td>20</td><td>2</td><td>13</td></tr>
-<tr><td>hypergraph_product</td><td>5</td><td>41</td><td>20</td><td>2</td><td>13</td></tr>
-<tr><td>bicycle</td><td>5</td><td>10</td><td>5</td><td>2</td><td>13</td></tr>
-<tr><td>bivariate_bicycle</td><td>3</td><td>72</td><td>36</td><td>3</td><td>9</td></tr>
-</tbody>
-</table>
-<h3>Decoder benchmark results</h3>
-<table>
-<thead><tr><th>Decoder</th><th>Throughput (decodes/s)</th><th>p50 latency (µs)</th><th>p99 latency (µs)</th><th>logical error rate</th></tr></thead>
-<tbody>
-<tr><td>union_find</td><td>295508</td><td>2.40</td><td>14.54</td><td>0.1</td></tr>
-<tr><td>fast_union_find</td><td>349895</td><td>2.40</td><td>6.25</td><td>0.1</td></tr>
-<tr><td>blossom</td><td>261917</td><td>2.90</td><td>12.02</td><td>0.08</td></tr>
-<tr><td>sparse_blossom</td><td>146757</td><td>4.05</td><td>32.63</td><td>0.08</td></tr>
-<tr><td>bp_osd</td><td>26162</td><td>34.75</td><td>101.55</td><td>0.1</td></tr>
-<tr><td>auto</td><td>61125</td><td>13.60</td><td>73.22</td><td>0.1</td></tr>
-<tr><td>hybrid</td><td>138812</td><td>4.10</td><td>36.70</td><td>0.08</td></tr>
-<tr><td>lookup_table</td><td>337610</td><td>2.40</td><td>8.43</td><td>0.1</td></tr>
-<tr><td>predecoded</td><td>82850</td><td>12.00</td><td>32.98</td><td>0.08</td></tr>
-<tr><td>auto_router</td><td>40</td><td>25457.50</td><td>30758.21</td><td>0.08</td></tr>
-<tr><td>hybrid_cascade</td><td>362845</td><td>2.60</td><td>5.05</td><td>0.1</td></tr>
-<tr><td>gnn_belief_matching</td><td>6520</td><td>147.15</td><td>213.77</td><td>0.08</td></tr>
-<tr><td>belief_matching</td><td>1001</td><td>988.05</td><td>1173.28</td><td>0.02</td></tr>
-</tbody>
-</table>
-<h3>Figures</h3>
-<p><img src="figures/tanner_rotated_surface_d5.png" alt="tanner_rotated_surface_d5.png"></p>
-<p><img src="figures/decoder_throughput.png" alt="decoder_throughput.png"></p>
-<p><img src="figures/decoder_latency.png" alt="decoder_latency.png"></p>
-<p><img src="figures/compatibility_matrix.png" alt="compatibility_matrix.png"></p>
-<p><img src="figures/cascade_stats.png" alt="cascade_stats.png"></p>
+<h2>Performance measurements</h2>
+<p>Benchmark measurements are intentionally not stored or shipped. Run a local benchmark on the target hardware when measurements are needed.</p>
 <h2>backend.py API</h2>
 <h3><code>backend.Any(*args, **kwargs)</code></h3>
 <p>Special type indicating an unconstrained type.</p>
@@ -152,6 +112,10 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <p>Raised for invalid operations in the QECTOR backend.</p>
 <h3><code>backend.build_code(family_key: 'str', param: 'int')</code></h3>
 <p>Build a code from a family and parameter (distance).</p>
+<h3><code>backend.build_code_from_matrix(H_matrix: 'np.ndarray', name: 'str' = 'custom', distance: 'Optional[int]' = None) -&gt; 'Any'</code></h3>
+<p>Build a code from a user-provided parity check matrix.</p>
+<h3><code>backend.build_dem_from_code(code, noise_model: 'str' = 'depolarizing', p: 'float' = 0.05, bias: 'float' = 0.5, correlation: 'Optional[np.ndarray]' = None) -&gt; 'Any'</code></h3>
+<p>Build a Detector Error Model (DEM) from a code and noise model.</p>
 <h3><code>backend.clear_decoder_cache() -&gt; 'bool'</code></h3>
 <p>Clear the native decoder cache in qector_decoder_v3.</p>
 <h3><code>backend.code_summary(code) -&gt; 'dict[str, Any]'</code></h3>
@@ -164,18 +128,50 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <p>Backwards-compatible alias for :func:<code>compute_tanner_layout</code>.</p>
 <h3><code>backend.compute_tanner_layout(n_qubits: 'int', n_checks: 'int', check_matrix) -&gt; 'tuple[list, list]'</code></h3>
 <p>Deterministic bipartite Tanner-graph layout.</p>
+<h3><code>backend.decode_dem(dem, decoder_kind: 'str' = 'bp_osd', decoder_options: 'Optional[dict]' = None, error_rate: 'float' = 0.05, seed: 'Optional[int]' = None) -&gt; 'dict[str, Any]'</code></h3>
+<p>Decode a syndrome using a Detector Error Model (DEM-native decoding).</p>
+<h3><code>backend.decode_syndrome(code, syndrome, decoder_kind: 'str', decoder_options: 'Optional[dict]' = None) -&gt; 'dict[str, Any]'</code></h3>
+<p>Decode a user-supplied syndrome (from an import) with the given decoder.</p>
 <h3><code>backend.deque(...)</code></h3>
 <p>deque([iterable[, maxlen]]) --&gt; deque object</p>
+<h3><code>backend.estimate_threshold(code, decoder_kind: 'str' = 'blossom', p_range: 'tuple' = (0.01, 0.2), n_samples: 'int' = 100, distances: 'list' = None) -&gt; 'dict[str, Any]'</code></h3>
+<p>Estimate the error threshold using binary search on error rate.</p>
+<h3><code>backend.export_figure(code, family: 'str', distance: 'int', output_path: 'str', format: 'str' = 'png', dpi: 'int' = 300) -&gt; 'dict[str, Any]'</code></h3>
+<p>Export a publication-ready figure of the Tanner graph.</p>
+<h3><code>backend.export_session(code_family: 'str', distance: 'int', decoder_name: 'str', error_rate: 'float', seed: 'int', output_path: 'str') -&gt; 'dict[str, Any]'</code></h3>
+<p>Export a complete decode session (code + decode + benchmark + diagnostics) as a single ZIP archive containing JSON and text artifacts.</p>
+<h3><code>backend.export_to_pymatching_shim(code, output_path: 'str') -&gt; 'dict[str, Any]'</code></h3>
+<p>Export code to PyMatching-compatible format.</p>
+<h3><code>backend.export_to_qiskit_plugin(code, output_path: 'str') -&gt; 'dict[str, Any]'</code></h3>
+<p>Export code to Qiskit plugin format.</p>
+<h3><code>backend.export_to_sinter_compat(code, decoder_kind: 'str', output_path: 'str') -&gt; 'dict[str, Any]'</code></h3>
+<p>Export benchmark data in sinter-compatible format.</p>
+<h3><code>backend.finite_size_scaling(code_family: 'str', decoder_kind: 'str' = 'blossom', distances: 'list' = None, p_vals: 'list' = None, n_samples: 'int' = 100) -&gt; 'dict[str, Any]'</code></h3>
+<p>Perform finite-size scaling analysis (LER vs distance at fixed p).</p>
 <h3><code>backend.flush_usage(customer_id: 'Optional[str]' = None, api_key: 'Optional[str]' = None) -&gt; 'dict[str, Any]'</code></h3>
 <p>Flush accumulated usage metrics to Stripe metered billing API.</p>
+<h3><code>backend.generate_parity_check_matrix(family: 'str', distance: 'int') -&gt; 'np.ndarray'</code></h3>
+<p>Generate a parity check matrix for a code family.</p>
+<h3><code>backend.generate_reproducibility_package(code_family: 'str', distance: 'int', decoder_kind: 'str', error_rate: 'float', seed: 'int', output_path: 'str') -&gt; 'dict[str, Any]'</code></h3>
+<p>Generate a complete reproducibility package.</p>
 <h3><code>backend.get_code_family_info(family_key: 'str') -&gt; 'dict[str, str]'</code></h3>
 <p>Return metadata about a code family.</p>
+<h3><code>backend.get_compatibility_matrix() -&gt; 'dict[str, list[str]]'</code></h3>
+<p>Return a mapping of code family to list of compatible decoders.</p>
 <h3><code>backend.get_compatible_decoders(code) -&gt; 'list[dict[str, str]]'</code></h3>
 <p>Return decoder info for the decoders that can construct on this code.</p>
 <h3><code>backend.get_decoder_info(kind: 'str') -&gt; 'dict[str, str]'</code></h3>
 <p>Return human-readable info about a decoder kind.</p>
+<h3><code>backend.get_license_info() -&gt; 'dict[str, Any]'</code></h3>
+<p>Get license info from the decoder.</p>
+<h3><code>backend.get_license_info_with_expiry() -&gt; 'dict[str, Any]'</code></h3>
+<p>Get license info including token expiry details.</p>
 <h3><code>backend.get_tanner_graph_layout(code, family: 'str', distance: 'int') -&gt; 'tuple[list, list]'</code></h3>
 <p>Return qubit and check coordinates for a clean bipartite Tanner graph.</p>
+<h3><code>backend.import_stim_circuit(file_path: 'str') -&gt; 'Any'</code></h3>
+<p>Import a Stim circuit from file and convert to DEM.</p>
+<h3><code>backend.import_syndrome(file_path: 'str') -&gt; 'np.ndarray'</code></h3>
+<p>Load syndrome data from CSV, JSON, or numpy (.npy) file.</p>
 <h3><code>backend.list_available_codes() -&gt; 'dict[str, Any]'</code></h3>
 <p>Code families wired into the workbench plus the backend's native `<code>codes.list_codes()</code>` catalogue.  Pure introspection.</p>
 <h3><code>backend.logical_failure(logicals: 'np.ndarray', error, correction) -&gt; 'bool'</code></h3>
@@ -186,9 +182,9 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <p>Public: construct a decoder of `<code>decoder_kind</code><code> for </code><code>code</code>`.</p>
 <h3><code>backend.native_recommend(family_key: 'Optional[str]' = None, distance: 'Optional[int]' = None, n_qubits: 'Optional[int]' = None, priority: 'str' = 'balanced', batch_size: 'int' = 1) -&gt; 'dict[str, Any]'</code></h3>
 <p>Backend-native decoder recommendation (`<code>recommend</code>`).</p>
-<h3><code>backend.run_batch_decode(code, backend: 'str' = 'cpu', n_samples: 'int' = 100, error_rate: 'float' = 0.05, seed: 'int' = 1) -&gt; 'dict[str, Any]'</code></h3>
+<h3><code>backend.run_batch_decode(code, backend: 'str' = 'cpu', n_samples: 'int' = 100, error_rate: 'float' = 0.05, seed: 'int' = 1, precision: 'str' = 'f32', edge_weights: 'Optional[np.ndarray]' = None, cancel_token=None) -&gt; 'dict[str, Any]'</code></h3>
 <p>Run a batch decode on the given code.</p>
-<h3><code>backend.run_benchmark(code, n_samples: 'int' = 1000, seed: 'int' = 42, decoder_kind: 'str' = 'union_find', error_rate: 'float' = 0.05) -&gt; 'dict[str, Any]'</code></h3>
+<h3><code>backend.run_benchmark(code, n_samples: 'int' = 1000, seed: 'int' = 42, decoder_kind: 'str' = 'union_find', error_rate: 'float' = 0.05, cancel_token=None) -&gt; 'dict[str, Any]'</code></h3>
 <p>Run a decode benchmark on the given code.</p>
 <h3><code>backend.run_diagnostic_decode(code, error_rate: 'float' = 0.05, decoder_kind: 'str' = 'blossom', seed: 'int' = 42) -&gt; 'dict[str, Any]'</code></h3>
 <p>Rich single decode via the backend's `<code>decode_with_diagnostics</code>`.</p>
@@ -196,22 +192,28 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <p>Run system health diagnostic checks via qd.doctor.</p>
 <h3><code>backend.run_hybrid_cascade_stats(code, n_samples: 'int' = 64, error_rate: 'float' = 0.05, seed: 'int' = 1, escalation: 'Optional[str]' = None) -&gt; 'dict[str, Any]'</code></h3>
 <p>Batch-decode with HybridCascadeDecoder and expose its cascade statistics.</p>
+<h3><code>backend.run_ler_benchmark(code, n_samples: 'int' = 1000, error_rate: 'float' = 0.05, decoder_kind: 'str' = 'blossom', seed: 'int' = 42) -&gt; 'dict[str, Any]'</code></h3>
+<p>Run LER benchmark with Wilson confidence intervals (from upstream qector CLI).</p>
 <h3><code>backend.run_native_streaming(code, n_rounds: 'int' = 8, error_rate: 'float' = 0.03, seed: 'int' = 1, window_size: 'int' = 4) -&gt; 'dict[str, Any]'</code></h3>
 <p>Native sliding-window streaming decode (`<code>sliding_window_decode</code>`).</p>
-<h3><code>backend.run_neural_predecoder_training(code, n_samples: 'int' = 200, n_epochs: 'int' = 5, error_rate: 'float' = 0.05, seed: 'int' = 1) -&gt; 'dict[str, Any]'</code></h3>
+<h3><code>backend.run_neural_predecoder_training(code, n_samples: 'int' = 200, n_epochs: 'int' = 5, error_rate: 'float' = 0.05, seed: 'int' = 1, cancel_token=None) -&gt; 'dict[str, Any]'</code></h3>
 <p>Train the NeuralPredecoder on sampled (syndrome, error) pairs (lab tool).</p>
 <h3><code>backend.run_parallel_batch_decode(code, n_samples: 'int' = 64, error_rate: 'float' = 0.05, seed: 'int' = 1, decoder_type: 'str' = 'union_find', n_workers: 'Optional[int]' = None) -&gt; 'dict[str, Any]'</code></h3>
 <p>Multi-process parallel batch decode via `<code>DecoderPool</code>`.</p>
 <h3><code>backend.run_single_decode(code, error_rate: 'float', decoder_kind: 'str', seed: 'int', decoder_options: 'Optional[dict]' = None) -&gt; 'dict[str, Any]'</code></h3>
-<p><em>No docstring.</em></p>
-<h3><code>backend.run_streaming_session(code, window_size: 'int' = 5, n_rounds: 'int' = 10, error_rate: 'float' = 0.03, seed: 'int' = 1, decoder_kind: 'str' = 'union_find') -&gt; 'dict[str, Any]'</code></h3>
+<p>Run a single seeded decode against `<code>code</code>` and report the result.</p>
+<h3><code>backend.run_streaming_session(code, window_size: 'int' = 5, n_rounds: 'int' = 10, error_rate: 'float' = 0.03, seed: 'int' = 1, decoder_kind: 'str' = 'union_find', cancel_token=None) -&gt; 'dict[str, Any]'</code></h3>
 <p>Run a sliding-window streaming decode session.</p>
+<h3><code>backend.run_streaming_session_yield(code, window_size: 'int' = 5, n_rounds: 'int' = 10, error_rate: 'float' = 0.03, seed: 'int' = 1, decoder_kind: 'str' = 'union_find')</code></h3>
+<p>Run a sliding-window streaming decode session and yield progress per round.</p>
 <h3><code>backend.sample_error_and_syndrome(code, error_rate: 'float', seed: 'int')</code></h3>
 <p>Public: sample one seeded error and its syndrome for `<code>code</code>`.</p>
 <h3><code>backend.set_license_key_file(path: 'str') -&gt; 'bool'</code></h3>
 <p>Set license key file path for offline hard-gated verification.</p>
 <h3><code>backend.sparse_blossom_radix_neighbors(code_or_checks, defects: 'list[int]', k: 'int' = 8) -&gt; 'list[tuple[int, int, int, int]]'</code></h3>
 <p>Return k-nearest candidate edges (sorted by distance) for defects via SparseBlossom RadixHeap.</p>
+<h3><code>backend.test_invalid_license_key() -&gt; 'dict[str, Any]'</code></h3>
+<p>Test that an invalid license key raises ValueError.</p>
 <h3><code>backend.validate_parameter(family_key: 'str', param: 'int') -&gt; 'tuple[bool, str]'</code></h3>
 <p>Validate a code family parameter (distance).</p>
 <h3><code>backend.verify_correction(code, syndrome, correction) -&gt; 'bool'</code></h3>
@@ -225,7 +227,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <p>Return the fields of a dataclass instance as a new dictionary mapping field names to field values.</p>
 <h3><code>autodebug.dataclass(cls=None, /, *, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)</code></h3>
 <p>Add dunder methods based on the fields defined in the class.</p>
-<h3><code>autodebug.field(*, default=&lt;dataclasses._MISSING_TYPE object at 0x000002B2FF3345D0&gt;, default_factory=&lt;dataclasses._MISSING_TYPE object at 0x000002B2FF3345D0&gt;, init=True, repr=True, hash=None, compare=True, metadata=None, kw_only=&lt;dataclasses._MISSING_TYPE object at 0x000002B2FF3345D0&gt;)</code></h3>
+<h3><code>autodebug.field(*, default=&lt;dataclasses._MISSING_TYPE object at 0x000001F8DAAC9A60&gt;, default_factory=&lt;dataclasses._MISSING_TYPE object at 0x000001F8DAAC9A60&gt;, init=True, repr=True, hash=None, compare=True, metadata=None, kw_only=&lt;dataclasses._MISSING_TYPE object at 0x000001F8DAAC9A60&gt;)</code></h3>
 <p>Return an object to identify dataclass fields.</p>
 <h3><code>autodebug.probe_decoders(family: 'str', distance: 'int', error_rate: 'float' = 0.05, seed: 'int' = 42, verify: 'bool' = True) -&gt; 'dict'</code></h3>
 <p>Try every wired decoder against one seeded syndrome and report results.</p>
@@ -288,7 +290,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <p>Read the active managed-site pointer; malformed pointers are ignored.</p>
 <h3><code>decoder_provisioner.bootstrap(on_log: 'Optional[Callable[[str], None]]' = None) -&gt; 'dict'</code></h3>
 <p>Blocking pre-import gate used by `<code>main.py</code>` before backend imports.</p>
-<h3><code>decoder_provisioner.ensure(prefer_latest: 'bool' = True, timeout: 'int' = 300, on_log: 'Optional[Callable[[str], None]]' = None, target_version: 'Optional[str]' = None) -&gt; 'dict'</code></h3>
+<h3><code>decoder_provisioner.ensure(prefer_latest: 'bool' = True, timeout: 'Optional[int]' = None, on_log: 'Optional[Callable[[str], None]]' = None, target_version: 'Optional[str]' = None) -&gt; 'dict'</code></h3>
 <p>Ensure an importable decoder, preferring the bundled wheel (offline).</p>
 <h3><code>decoder_provisioner.ensure_async(prefer_latest: 'bool' = True, callback: 'Optional[Callable[[dict], None]]' = None, on_log: 'Optional[Callable[[str], None]]' = None, target_version: 'Optional[str]' = None) -&gt; 'threading.Thread'</code></h3>
 <p>Run :func:<code>ensure</code> on a daemon thread; upgrade takes effect next launch.</p>
@@ -316,7 +318,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <h3><code>doc_generator.latex_escape(value: 'Any') -&gt; 'str'</code></h3>
 <p>Escape LaTeX special characters (\ &amp; % $ # _ { } ~ ^) in `<code>value</code>`.</p>
 <h2>MCP tool reference</h2>
-<p>56 tools via stdio JSON-RPC 2.0.</p>
+<p>85 tools via stdio JSON-RPC 2.0.</p>
 <h3><code>ambiguity_cluster_decode</code></h3>
 <p>Decode using AmbiguityClusterDecoder for high noise or non-graphlike codes</p>
 <p><strong>Parameters</strong></p>
@@ -334,6 +336,23 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <p><strong>Parameters</strong></p>
 <ul>
 <li><code>family_name</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+</ul>
+<h3><code>analyze_error_patterns</code></h3>
+<p>Analyze error patterns: weight distribution, cluster size, correlated errors</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
+<li><code>n_samples</code> (<code>integer</code>, default <code>100</code>) -</li>
+<li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
+</ul>
+<h3><code>analyze_logicals</code></h3>
+<p>Expose logical operator matrix, logical weight distribution, and code distance estimation</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
 <li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
 </ul>
 <h3><code>batch_decode</code></h3>
@@ -371,12 +390,30 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <p>Benchmark a decoder on a code family via backend.run_benchmark (latency percentiles, throughput, logical error rate)</p>
 <p><strong>Parameters</strong></p>
 <ul>
-<li><code>decoder_name</code> (<code>string</code>, default <code>'union_find'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'union_find'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
 <li><code>code_family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
 <li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
 <li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
 <li><code>n_samples</code> (<code>integer</code>, default <code>100</code>) -</li>
 <li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
+</ul>
+<h3><code>build_code_from_matrix</code></h3>
+<p>Build a code from a user-provided parity check matrix</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>H_matrix</code> (<code>array</code>, required) - Binary parity check matrix (n_checks x n_qubits)</li>
+<li><code>family</code> (<code>string</code>, default <code>'custom'</code>) - Family name for the custom code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>3</code>) -</li>
+</ul>
+<h3><code>build_dem</code></h3>
+<p>Build a Detector Error Model (DEM) from a code and noise model</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>noise_model</code> (<code>string</code>, default <code>'depolarizing'</code>) - One of: depolarizing, biased, correlated, circuit</li>
+<li><code>p</code> (<code>number</code>, default <code>0.05</code>) -</li>
+<li><code>bias</code> (<code>number</code>, default <code>0.5</code>) -</li>
 </ul>
 <h3><code>check_updates</code></h3>
 <p>Report whether the installed decoder backend matches the bundled release baseline (offline — no update service)</p>
@@ -403,6 +440,16 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <li><code>syndrome</code> (<code>['array', 'null']</code>, required) -</li>
 <li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
 </ul>
+<h3><code>compare_all_decoders</code></h3>
+<p>Run all compatible decoders on the same code and return comparison table</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
+<li><code>n_samples</code> (<code>integer</code>, default <code>50</code>) -</li>
+<li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
+</ul>
 <h3><code>compare_benchmarks</code></h3>
 <p>Compare stored benchmark results side by side (throughput, p99 latency, logical error rate)</p>
 <p><strong>Parameters</strong></p>
@@ -412,6 +459,9 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <h3><code>compat_report</code></h3>
 <p>Report ecosystem-integration availability (stim/sinter/pymatching/qiskit/ldpc) and research components</p>
 <p><em>No parameters.</em></p>
+<h3><code>compatibility_matrix</code></h3>
+<p>Return the full 16x10 decoder/code compatibility matrix</p>
+<p><em>No parameters.</em></p>
 <h3><code>compatible_decoders</code></h3>
 <p>Live probe: which decoder kinds construct and produce a syndrome-verified correction on this code</p>
 <p><strong>Parameters</strong></p>
@@ -419,13 +469,47 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
 <li><code>distance</code> (<code>integer</code>, default <code>3</code>) -</li>
 </ul>
+<h3><code>compliance_attestation</code></h3>
+<p>Zero-egress / offline compliance attestation for infosec review: AST scan for network and telemetry imports, runtime EgressGuard state, offline license tier, local-only data residency, and optional Entra ID readiness. No network calls.</p>
+<p><em>No parameters.</em></p>
+<h3><code>decode_dem</code></h3>
+<p>Decode using a Detector Error Model (DEM-native decoding)</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>decoder_kind</code> (<code>string</code>, default <code>'bp_osd'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
+<li><code>decoder_options</code> (<code>['object', 'null']</code>, required) - Optional per-decoder construction options: bp_method (exact|min_sum|relay), osd_order (0|1|2), osd_lambda, damping, error_rate, escalation (blossom|bposd), max_accept_weight, gnn_hidden_size, gnn_n_layers</li>
+</ul>
+<h3><code>decode_hyperedge</code></h3>
+<p>Hyperedge / qLDPC decoding via bp_osd or other LDPC-capable decoders</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'bicycle'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>3</code>) -</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'bp_osd'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
+<li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
+<li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
+</ul>
+<h3><code>decode_mmap</code></h3>
+<p>Out-of-core batch decoding via memory-mapped arrays</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) -</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>syndrome_path</code> (<code>string</code>, required) -</li>
+<li><code>output_path</code> (<code>string</code>, required) -</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'cpu_batch'</code>) -</li>
+<li><code>batch_size</code> (<code>integer</code>, default <code>65536</code>) -</li>
+<li><code>n_shots</code> (<code>integer</code>, required) -</li>
+</ul>
 <h3><code>decode_single</code></h3>
 <p>Run one seeded decode and report correction weight, syndrome validity and logical failure</p>
 <p><strong>Parameters</strong></p>
 <ul>
 <li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
 <li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
-<li><code>decoder_name</code> (<code>string</code>, default <code>'union_find'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'union_find'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
 <li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
 <li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
 </ul>
@@ -435,9 +519,25 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <ul>
 <li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
 <li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
-<li><code>decoder_name</code> (<code>string</code>, default <code>'union_find'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'union_find'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
 <li><code>syndrome</code> (<code>array</code>, required) - 0/1 syndrome bits, length must equal the code's n_checks</li>
-<li><code>decoder_options</code> (<code>['object', 'null']</code>, required) - Optional per-decoder construction options: bp_method (exact|min_sum), osd_order (0|1|2), error_rate, escalation (blossom|bposd), max_accept_weight, gnn_hidden_size, gnn_n_layers</li>
+<li><code>decoder_options</code> (<code>['object', 'null']</code>, required) - Optional per-decoder construction options: bp_method (exact|min_sum|relay), osd_order (0|1|2), osd_lambda, damping, error_rate, escalation (blossom|bposd), max_accept_weight, gnn_hidden_size, gnn_n_layers</li>
+</ul>
+<h3><code>decode_syndrome_blossom</code></h3>
+<p>Convenience tool: exact Blossom (MWPM) syndrome decode</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>syndrome</code> (<code>array</code>, required) - Binary syndrome vector</li>
+</ul>
+<h3><code>decode_syndrome_cascade</code></h3>
+<p>Convenience tool: Hybrid cascading syndrome decode (UF pre-filter escalating to Blossom)</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>syndrome</code> (<code>array</code>, required) - Binary syndrome vector</li>
 </ul>
 <h3><code>decode_with_options</code></h3>
 <p>Seeded decode with validated per-decoder construction options (bp_osd bp_method/osd_order, hybrid_cascade escalation, GNN architecture); reports options_applied honestly</p>
@@ -445,10 +545,17 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <ul>
 <li><code>family</code> (<code>string</code>, default <code>'repetition'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
 <li><code>distance</code> (<code>integer</code>, default <code>3</code>) -</li>
-<li><code>decoder_name</code> (<code>string</code>, default <code>'bp_osd'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'bp_osd'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
 <li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
 <li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
-<li><code>decoder_options</code> (<code>['object', 'null']</code>, required) - Optional per-decoder construction options: bp_method (exact|min_sum), osd_order (0|1|2), error_rate, escalation (blossom|bposd), max_accept_weight, gnn_hidden_size, gnn_n_layers</li>
+<li><code>decoder_options</code> (<code>['object', 'null']</code>, required) - Optional per-decoder construction options: bp_method (exact|min_sum|relay), osd_order (0|1|2), osd_lambda, damping, error_rate, escalation (blossom|bposd), max_accept_weight, gnn_hidden_size, gnn_n_layers</li>
+</ul>
+<h3><code>decoder_benchmark_suite</code></h3>
+<p>Run standard benchmark (rotated_surface d=5, p=0.05) across all decoders</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>n_samples</code> (<code>integer</code>, default <code>100</code>) -</li>
+<li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
 </ul>
 <h3><code>delete_resource</code></h3>
 <p>Delete a resource by ID</p>
@@ -463,19 +570,61 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <ul>
 <li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
 <li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
-<li><code>decoder_name</code> (<code>string</code>, default <code>'blossom'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'blossom'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
 <li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
 <li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
 </ul>
 <h3><code>doctor_diagnostics</code></h3>
 <p>Run system health and environment diagnostic checks via qd.doctor</p>
 <p><em>No parameters.</em></p>
+<h3><code>estimate_threshold</code></h3>
+<p>Estimate the error threshold using binary search on error rate</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>decoder_kind</code> (<code>string</code>, default <code>'blossom'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
+<li><code>p_min</code> (<code>number</code>, default <code>0.01</code>) -</li>
+<li><code>p_max</code> (<code>number</code>, default <code>0.2</code>) -</li>
+<li><code>n_samples</code> (<code>integer</code>, default <code>100</code>) -</li>
+</ul>
 <h3><code>export_benchmark</code></h3>
 <p>Export a stored benchmark result (by result_id) to the export directory</p>
 <p><strong>Parameters</strong></p>
 <ul>
 <li><code>benchmark_id</code> (<code>string</code>, required) - result_id returned by the run_benchmark tool</li>
 <li><code>format</code> (<code>string</code>, default <code>'json'</code>) -</li>
+</ul>
+<h3><code>export_figure</code></h3>
+<p>Export a publication-ready figure of the Tanner graph</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>output_path</code> (<code>string</code>, default <code>'tanner_graph.png'</code>) -</li>
+<li><code>format</code> (<code>string</code>, default <code>'png'</code>) - One of: png, pdf, svg, pgf</li>
+<li><code>dpi</code> (<code>integer</code>, default <code>300</code>) -</li>
+</ul>
+<h3><code>export_session</code></h3>
+<p>Export the current session (code + decode + benchmark + diagnostics) as a ZIP archive</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>output_path</code> (<code>['string', 'null']</code>, required) - Optional file path for the ZIP; auto-named if omitted</li>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'blossom'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
+<li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
+<li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
+</ul>
+<h3><code>finite_size_scaling</code></h3>
+<p>Perform finite-size scaling analysis (LER vs distance at fixed p)</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>decoder_kind</code> (<code>string</code>, default <code>'blossom'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
+<li><code>distances</code> (<code>array</code>, default <code>[3, 5, 7, 9, 11]</code>) - Code distances to test</li>
+<li><code>p_vals</code> (<code>array</code>, default <code>[0.01, 0.03, 0.05, 0.07, 0.1]</code>) - Error rates to test</li>
+<li><code>n_samples</code> (<code>integer</code>, default <code>100</code>) -</li>
 </ul>
 <h3><code>flush_usage</code></h3>
 <p>Flush usage metrics to Stripe metered billing API</p>
@@ -492,6 +641,27 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <li><code>param</code> (<code>integer</code>, default <code>6</code>) -</li>
 <li><code>formats</code> (<code>array</code>, default <code>['json']</code>) - Any of: json, markdown, html, latex, pdf</li>
 </ul>
+<h3><code>generate_parity_check</code></h3>
+<p>Generate a parity check matrix for a code family</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+</ul>
+<h3><code>generate_reproducibility_package</code></h3>
+<p>Generate a complete reproducibility package (ZIP)</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'blossom'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
+<li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
+<li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
+<li><code>output_path</code> (<code>string</code>, default <code>'reproducibility_package.zip'</code>) -</li>
+</ul>
+<h3><code>get_backend_health</code></h3>
+<p>7-tier backend health status from AutoDecoder diagnostics</p>
+<p><em>No parameters.</em></p>
 <h3><code>get_code_properties</code></h3>
 <p>Get properties of a code family</p>
 <p><strong>Parameters</strong></p>
@@ -506,10 +676,19 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <p>Get information about a decoder</p>
 <p><strong>Parameters</strong></p>
 <ul>
-<li><code>decoder_name</code> (<code>string</code>, default <code>'bp_osd'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'bp_osd'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
 </ul>
+<h3><code>get_entra_posture</code></h3>
+<p>Return the Microsoft Entra ID posture (enabled, unconfigured, or authenticated).</p>
+<p><em>No parameters.</em></p>
 <h3><code>get_hardware_info</code></h3>
 <p>Get hardware/backend availability</p>
+<p><em>No parameters.</em></p>
+<h3><code>get_identity_info</code></h3>
+<p>Return identity info if signed into Entra ID, else None.</p>
+<p><em>No parameters.</em></p>
+<h3><code>get_license_info</code></h3>
+<p>Get license info from the decoder (tier, key_status, expiry)</p>
 <p><em>No parameters.</em></p>
 <h3><code>get_resource</code></h3>
 <p>Get a specific resource by ID</p>
@@ -526,6 +705,9 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <ul>
 <li><code>limit</code> (<code>integer</code>, default <code>10</code>) -</li>
 </ul>
+<h3><code>get_server_env</code></h3>
+<p>Get effective QECTOR environment variables (tuning vars)</p>
+<p><em>No parameters.</em></p>
 <h3><code>get_statistics</code></h3>
 <p>Get server statistics</p>
 <p><em>No parameters.</em></p>
@@ -554,6 +736,24 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <li><code>seed</code> (<code>integer</code>, default <code>1</code>) -</li>
 <li><code>escalation</code> (<code>['string', 'null']</code>, required) - One of: blossom, bposd (default: backend's blossom)</li>
 </ul>
+<h3><code>import_stim</code></h3>
+<p>Import a Stim circuit from file and convert to DEM</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>file_path</code> (<code>string</code>, required) - Path to Stim circuit file</li>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'blossom'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
+</ul>
+<h3><code>import_syndrome</code></h3>
+<p>Load external syndrome data (CSV, JSON, or .npy) and decode it</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>file_path</code> (<code>string</code>, required) - Path to syndrome file</li>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'blossom'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
+</ul>
 <h3><code>list_clients</code></h3>
 <p>List registered clients</p>
 <p><em>No parameters.</em></p>
@@ -568,6 +768,9 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <p><em>No parameters.</em></p>
 <h3><code>list_tools</code></h3>
 <p>List all available MCP tools</p>
+<p><em>No parameters.</em></p>
+<h3><code>mcp_health</code></h3>
+<p>Server health check: uptime, memory, decoder status, tool count</p>
 <p><em>No parameters.</em></p>
 <h3><code>mcp_status</code></h3>
 <p>Get MCP server status</p>
@@ -603,6 +806,18 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <li><code>n_epochs</code> (<code>integer</code>, default <code>5</code>) -</li>
 <li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
 <li><code>seed</code> (<code>integer</code>, default <code>1</code>) -</li>
+</ul>
+<h3><code>parallel_batch_decode</code></h3>
+<p>Parallel batch decode using multiple processes via backend.run_parallel_batch_decode</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'blossom'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
+<li><code>n_samples</code> (<code>integer</code>, default <code>100</code>) -</li>
+<li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
+<li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
+<li><code>n_workers</code> (<code>integer</code>, default <code>4</code>) -</li>
 </ul>
 <h3><code>probe_decoders</code></h3>
 <p>Probe which decoders produce a valid (syndrome-verified) correction for a code — a self-test across every wired decoder</p>
@@ -641,7 +856,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <ul>
 <li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
 <li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
-<li><code>decoder_name</code> (<code>string</code>, default <code>'union_find'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'union_find'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
 <li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
 <li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
 </ul>
@@ -651,10 +866,21 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <ul>
 <li><code>code_family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
 <li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
-<li><code>decoder_name</code> (<code>string</code>, default <code>'union_find'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'union_find'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
 <li><code>n_samples</code> (<code>integer</code>, default <code>100</code>) -</li>
 <li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
 <li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
+</ul>
+<h3><code>run_ler_benchmark</code></h3>
+<p>Run LER benchmark with Wilson confidence intervals</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>family</code> (<code>string</code>, default <code>'rotated_surface'</code>) - One of: repetition, ring, rotated_surface, unrotated_surface, toric, heavy_hex, bicycle, bivariate_bicycle, hypergraph_product, color_code</li>
+<li><code>distance</code> (<code>integer</code>, default <code>5</code>) -</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'blossom'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
+<li><code>n_samples</code> (<code>integer</code>, default <code>1000</code>) -</li>
+<li><code>error_rate</code> (<code>number</code>, default <code>0.05</code>) -</li>
+<li><code>seed</code> (<code>integer</code>, default <code>42</code>) -</li>
 </ul>
 <h3><code>self_diagnostics</code></h3>
 <p>Run a full environment/decoder/hardware self-diagnostics report (autodebug.run_self_diagnostics)</p>
@@ -690,7 +916,7 @@ hr { border: none; border-top: 1px solid #ddd; margin: 26px 0; }
 <li><code>n_rounds</code> (<code>integer</code>, default <code>10</code>) -</li>
 <li><code>error_rate</code> (<code>number</code>, default <code>0.03</code>) -</li>
 <li><code>seed</code> (<code>integer</code>, default <code>1</code>) -</li>
-<li><code>decoder_name</code> (<code>string</code>, default <code>'union_find'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code</li>
+<li><code>decoder_name</code> (<code>string</code>, default <code>'union_find'</code>) - One of: union_find, fast_union_find, blossom, sparse_blossom, bp_osd, auto, hybrid, lookup_table, predecoded, auto_router, hybrid_cascade, gnn_belief_matching, belief_matching, two_stage, ambiguity_cluster, colour_code, space_time</li>
 </ul>
 <h3><code>two_stage_decode</code></h3>
 <p>Decode using TwoStageDecoder (decoupled X/Z sector decoders)</p>

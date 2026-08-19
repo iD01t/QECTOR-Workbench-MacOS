@@ -12,7 +12,6 @@ function signatures always match the running build exactly.
 from __future__ import annotations
 
 import inspect
-import sys
 import textwrap
 from datetime import datetime, timezone
 from pathlib import Path
@@ -132,38 +131,14 @@ def module_api(title, modname):
 
 
 def measurements_section():
-    import json
-    path = _HERE / "build" / "manual_data" / "measurements.json"
-    if not path.exists():
-        return "## Measured data\n\n*No measured data available. Run the benchmark suite to populate this section.*\n"
-    data = json.load(path.open(encoding="utf-8"))
-    lines = ["## Measured data", "", "All figures below were measured on this machine (seeded, n=50, p=0.05, rotated_surface d=5). They are workload- and hardware-dependent.", ""]
-    lines.append("### Code family properties")
-    lines.append("")
-    lines.append("| Family | Distance | n_qubits | n_checks | max_degree | compatible decoders |")
-    lines.append("|---|---|---|---|---|---|")
-    for fam, info in data["families"].items():
-        if "error" in info:
-            lines.append(f"| {fam} | {info['distance']} | error | - | - | - |")
-        else:
-            s = info["summary"]
-            lines.append(f"| {fam} | {info['distance']} | {s.get('n_qubits')} | {s.get('n_checks')} | {s.get('max_qubit_degree')} | {len(info['compatible'])} |")
-    lines.append("")
-    lines.append("### Decoder benchmark results")
-    lines.append("")
-    lines.append("| Decoder | Throughput (decodes/s) | p50 latency (µs) | p99 latency (µs) | logical error rate |")
-    lines.append("|---|---|---|---|---|")
-    for kind, r in data["benchmarks"].items():
-        if "error" in r:
-            lines.append(f"| {kind} | error | - | - | - |")
-        else:
-            lines.append(f"| {kind} | {r['throughput_decodes_per_s']:.0f} | {r['latency_p50_us']:.2f} | {r['latency_p99_us']:.2f} | {r['logical_error_rate']} |")
-    lines.append("")
-    lines.append("### Figures")
-    lines.append("")
-    for img in ["tanner_rotated_surface_d5.png", "decoder_throughput.png", "decoder_latency.png", "compatibility_matrix.png", "cascade_stats.png"]:
-        lines.append(f"![{img}](figures/{img})")
-        lines.append("")
+    return ("## Performance measurements\n\n"
+            "Benchmark measurements are intentionally not stored or shipped. "
+            "Run a local benchmark on the target hardware when measurements are needed.\n")
+    fig_dir = _HERE / "manuals" / "figures"
+    for img in ["tanner_rotated_surface_d5.png", "compatibility_matrix.png"]:
+        if (fig_dir / img).is_file():
+            lines.append(f"![{img}](figures/{img})")
+            lines.append("")
     return "\n".join(lines)
 
 
@@ -329,7 +304,6 @@ def build_markdown():
 
 
 def md_to_pdf_elements(text: str, outdir: Path):
-    from reportlab.lib.pagesizes import letter
     from reportlab.lib.units import inch
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.platypus import Paragraph, Spacer, Preformatted, PageBreak, Image as RLImage

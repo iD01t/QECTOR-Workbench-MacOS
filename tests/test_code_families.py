@@ -11,7 +11,6 @@ decodes — no mocks.
 
 from __future__ import annotations
 
-import numpy as np
 import pytest
 
 import backend as be
