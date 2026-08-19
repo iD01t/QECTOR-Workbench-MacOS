@@ -73,6 +73,9 @@ QectorWorkbench-Portable.exe --mcp
 ```
 
 Launches a stdio JSON-RPC 2.0 MCP server with all 85 tools. The server is
+
+> **Note for Claude users:** To seamlessly integrate these MCP tools directly into Claude Desktop or Claude Code, check out the official plugin at:
+> [https://github.com/guillaumelessard/qector-claude-plugin](https://github.com/guillaumelessard/qector-claude-plugin)
 local-only and communicates through stdio; it does not open an external network
 connection.
 
