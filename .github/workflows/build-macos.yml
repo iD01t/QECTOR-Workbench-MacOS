@@ -81,6 +81,7 @@ jobs:
           path: |
             Mac/dist/*.dmg
             Mac/dist/SHA256SUMS.txt
+            Mac/dist/SBOM.json
           retention-days: 30
           if-no-files-found: error
 
@@ -91,5 +92,6 @@ jobs:
           files: |
             Mac/dist/*.dmg
             Mac/dist/SHA256SUMS.txt
+            Mac/dist/SBOM.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

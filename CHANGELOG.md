@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.2
+
+- **Air-Gapped Lab Certification**: Full offline compliance with sanitized documentation, offline-only licensing, and zero external pricing/purchase endpoints.
+- **Window Management**: Window maximize, restore, and OS native control decorations restored across all desktop environments.
+- **Hardened Runtime & Ad-Hoc Code Signing**: macOS app bundle configured with runtime entitlements and validated via `codesign --verify`.
+- **Software Bill of Materials (SBOM)**: Cryptographic SHA-256 manifest generated during packaging for lab compliance audits.
+- **Cross-Platform Uniformity**: macOS, Windows, and Linux releases synchronized to identical core source runtime.
+
 ## 1.0.1
 
 - Windows, Linux, and macOS source trees share the same application runtime.

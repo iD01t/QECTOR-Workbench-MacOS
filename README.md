@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.0.1-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-1.0.2-0078D4?style=for-the-badge&logo=windows&logoColor=white" alt="Version"/>
   <img src="https://img.shields.io/badge/backend-v1.0.0_(Rust%2FPyO3)-E44D26?style=for-the-badge&logo=rust&logoColor=white" alt="Backend"/>
   <img src="https://img.shields.io/badge/python-≥3.11-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
   <img src="https://img.shields.io/badge/MCP_Tools-85-8A2BE2?style=for-the-badge" alt="MCP Tools"/>
@@ -36,7 +36,7 @@
 > **Zero Install · Zero Config · Zero Dependencies**
 > Download. Double-click. Decode.
 
-> This repository is a **release-only distribution mirror** of the v1.0.1
+> This repository is a **release-only distribution mirror** of the v1.0.2
 > Windows build. It contains no source files — only the release artifacts listed
 > below. Binary packages are published on the
 > [Releases](https://github.com/qectorlab/qector-decoder-workbench-windows/releases)
@@ -49,7 +49,7 @@
 ### Portable `.exe` (Recommended)
 
 ```
-1.  Download  QectorWorkbench-v1.0.1-Windows-x64-Public.zip  from Releases
+1.  Download  QectorWorkbench-v1.0.2-Windows-x64-Public.zip  from Releases
 2.  Extract the archive to a folder of your choice
 3.  Double-click  QectorWorkbench-Portable.exe  — no installation required
 4.  The bundled decoder activates automatically on first run
@@ -85,13 +85,13 @@ connection. No window is required to run the headless MCP mode.
 
 ## 📥 Downloads
 
-**v1.0.1 release assets** (all available on the
-[Releases](https://github.com/qectorlab/qector-decoder-workbench-windows/releases/tag/v1.0.1)
+**v1.0.2 release assets** (all available on the
+[Releases](https://github.com/qectorlab/qector-decoder-workbench-windows/releases/tag/v1.0.2)
 page, each with SHA-256 digests in `SHA256SUMS.txt`):
 
 | Artifact | Contents |
 |:---------|:---------|
-| **`QectorWorkbench-v1.0.1-Windows-x64-Public.zip`** | `QectorWorkbench-Portable.exe` + the `qector_decoder_v3` 1.0.0 wheel + `manuals/` + `EULA.txt` + `CITATION.cff` + `RELEASE_MANIFEST.txt` + `SHA256SUMS.txt` + `AIR_GAPPED_HARDENING_STATUS.md` |
+| **`QectorWorkbench-v1.0.2-Windows-x64-Public.zip`** | `QectorWorkbench-Portable.exe` + the `qector_decoder_v3` 1.0.0 wheel + `manuals/` + `EULA.txt` + `CITATION.cff` + `RELEASE_MANIFEST.txt` + `SHA256SUMS.txt` + `AIR_GAPPED_HARDENING_STATUS.md` |
 | **`QectorWorkbench-Portable.exe`** | The Windows executable on its own, if you do not want the bundle |
 
 > **Fully local, no network required.** The portable executable embeds the decoder
@@ -108,11 +108,11 @@ macOS requires a build on Apple hardware and is not included until that build
 is produced and signed. Windows and Linux artifacts are built from the same
 air-gapped source policy and include SHA-256 manifests.
 
-### Verified v1.0.1 Build Facts
+### Verified v1.0.2 Build Facts
 
 | Item | Value |
 |:-----|:------|
-| Workbench app | `1.0.1` |
+| Workbench app | `1.0.2` |
 | Decoder backend | `qector-decoder-v3 1.0.0` bundled wheel |
 | MCP server | `85` tools over stdio JSON-RPC 2.0 |
 | MCP protocol | `2024-11-05` |
@@ -386,7 +386,7 @@ The workbench uses a **zero-config runtime provisioner** for the `qector-decoder
 
 ## 🛡️ Air-Gapped Hardening Status
 
-The v1.0.1 public package is designed for offline lab use after download and
+The v1.0.2 public package is designed for offline lab use after download and
 extraction. Implemented in this release:
 
 - Bundled decoder wheel activation works without internet access
@@ -402,7 +402,7 @@ Status tracking ships in the release package as `AIR_GAPPED_HARDENING_STATUS.md`
 
 ## 🤖 Claude Plugin Compatibility
 
-Both the **Windows** and **Linux** v1.0.1 releases of QECTOR Decoder Workbench are
+Both the **Windows** and **Linux** v1.0.2 releases of QECTOR Decoder Workbench are
 **fully compatible** with the official
 [QECTOR Claude Plugin](https://github.com/GuillaumeLessard/qector-claude-plugin)
 (`qector-claude-plugin`) for **Claude Code** and **Claude Desktop**:
@@ -494,7 +494,7 @@ Separately licensed, source-available Rust/Python platform by the same author:
 ---
 
 <p align="center">
-  <strong>QECTOR Decoder Workbench v1.0.1</strong><br/>
+  <strong>QECTOR Decoder Workbench v1.0.2</strong><br/>
   Built on <code>qector-decoder-v3</code> v1.0.0 (Rust/PyO3 core)<br/><br/>
   © 2026 Guillaume Lessard / iD01t Productions<br/>
   ORCID <a href="https://orcid.org/0009-0000-3465-3753">0009-0000-3465-3753</a><br/><br/>

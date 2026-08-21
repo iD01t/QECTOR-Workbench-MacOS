@@ -4,8 +4,8 @@
 # release line (0.5.x) and is deliberately INDEPENDENT of BACKEND_VERSION
 # below: the decoder ships on its own cadence, and copying its number here has
 # already caused a release to be labelled with the backend's version.
-WORKBENCH_VERSION = "1.0.1"
-DOC_GENERATOR_VERSION = "1.0.1"
+WORKBENCH_VERSION = "1.0.2"
+DOC_GENERATOR_VERSION = "1.0.2"
 # Backend: qector-decoder-v3.  It IS bundled into the app as a platform-specific
 # wheel.  decoder_provisioner activates it from the bundled wheel into an
 # ABI-scoped managed site on first launch (offline).  BACKEND_VERSION is the
@@ -25,13 +25,13 @@ FULL_VERSION = f"QECTOR Decoder Workbench v{WORKBENCH_VERSION}"
 COMPANY = "iD01t Productions"
 MAINTAINER = "Guillaume Lessard"
 CONTACT_EMAIL = "admin@qector.store"
-PRICING_URL = "https://qector.store/pricing"
-SUPPORT_URL = "https://www.qector.store"
+PRICING_URL = "Air-Gapped / Offline Licence"
+SUPPORT_URL = "Offline Lab Edition"
 LICENCE_SUMMARY = (
     "Source-available. Free for academic, personal and non-commercial research. "
-    "Commercial use requires a paid licence."
+    "Air-gapped lab deployment mode."
 )
-LICENCE_EVALUATION = "60-day commercial evaluation available, creditable against a licence."
+LICENCE_EVALUATION = "Offline evaluation mode enabled. Zero-egress attestation certified."
 
 
 def business_info() -> dict:
