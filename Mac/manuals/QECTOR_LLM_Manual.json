@@ -3,7 +3,7 @@
   "schema_version": "2.0",
   "generated_utc": "2026-08-19T14:03:48+00:00",
   "product": "QECTOR Decoder Workbench",
-  "application_version": "1.0.1",
+  "application_version": "1.0.2",
   "decoder_backend": {
     "package": "qector-decoder-v3",
     "version": "1.0.0",

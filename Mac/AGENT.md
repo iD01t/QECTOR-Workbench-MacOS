@@ -36,7 +36,7 @@ those modules, the code is the source of truth — re-derive, do not improvise.
 | Property | Value (from code) |
 |---|---|
 | Server name (`serverInfo.name`) | `qector-workbench` |
-| Server version | `WORKBENCH_VERSION` = **1.0.1** |
+| Server version | `WORKBENCH_VERSION` = **1.0.2** |
 | Backend | `qector_decoder_v3` **1.0.0** (min supported 1.0.0) |
 | MCP protocol version | **2024-11-05** |
 | Transport | newline-delimited **JSON-RPC 2.0** over **stdio** |

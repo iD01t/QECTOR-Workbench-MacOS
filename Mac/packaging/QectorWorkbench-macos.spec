@@ -23,7 +23,7 @@ ROOT = os.path.abspath(os.path.join(SPECPATH, os.pardir))
 TARGET_ARCH = os.environ.get('QECTOR_TARGET_ARCH', 'arm64')
 
 _vpath = os.path.join(ROOT, 'VERSION')
-APP_VERSION = open(_vpath, 'r').read().strip() if os.path.exists(_vpath) else '1.0.1'
+APP_VERSION = open(_vpath, 'r').read().strip() if os.path.exists(_vpath) else '1.0.2'
 
 assert _ilu.find_spec('qector_decoder_v3') is not None, (
     "qector_decoder_v3 is not installed in the build interpreter; run "

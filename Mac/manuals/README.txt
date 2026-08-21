@@ -1,7 +1,7 @@
 QECTOR Decoder Workbench - Public Documentation Set
 ====================================================
 
-Application version : 1.0.1
+Application version : 1.0.2
 Decoder backend : qector-decoder-v3 1.0.0 (bundled wheel, offline activation on first launch)
 MCP tools : 85
 Decoders : 17

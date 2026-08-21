@@ -1,5 +1,5 @@
 # QECTOR Workbench - Complete API Reference
-**Workbench 1.0.1 - Backend `qector_decoder_v3` 1.0.0 (min 1.0.0) - 85 MCP tools - 17 decoders - 10 code families**
+**Workbench 1.0.2 - Backend `qector_decoder_v3` 1.0.0 (min 1.0.0) - 85 MCP tools - 17 decoders - 10 code families**
 **Decoder package: `qector_decoder_v3` 1.0.0 (bundled wheel, activated offline on first launch)**
 Generated 2026-08-19T13:59:28+00:00Z
 

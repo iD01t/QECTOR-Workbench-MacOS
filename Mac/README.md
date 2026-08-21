@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-1.0.1-0078D4?style=for-the-badge&logo=apple&logoColor=white" alt="Version"/>
+  <img src="https://img.shields.io/badge/version-1.0.2-0078D4?style=for-the-badge&logo=apple&logoColor=white" alt="Version"/>
   <img src="https://img.shields.io/badge/backend-v1.0.0_(Rust%2FPyO3)-E44D26?style=for-the-badge&logo=rust&logoColor=white" alt="Backend"/>
   <img src="https://img.shields.io/badge/python-≥3.11-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
   <img src="https://img.shields.io/badge/MCP_Tools-85-8A2BE2?style=for-the-badge" alt="MCP Tools"/>
@@ -43,7 +43,7 @@
 
 ### 1. Download & Install Native DMG
 
-1. Download **[`QectorWorkbench-1.0.1-arm64.dmg`](https://github.com/iD01t/QECTOR-Workbench-MacOS/releases/latest)** from Releases.
+1. Download **[`QectorWorkbench-1.0.2-arm64.dmg`](https://github.com/iD01t/QECTOR-Workbench-MacOS/releases/latest)** from Releases.
 2. Double-click the `.dmg` to mount the disk image.
 3. Drag **`QectorWorkbench.app`** into your **`/Applications`** folder.
 4. Launch **QectorWorkbench** from Spotlight, Launchpad, or Applications.
@@ -146,7 +146,7 @@ python3 -m pip install --find-links wheels --prefer-binary -r requirements.txt p
 
 | Metric | Specification |
 |:-------|:--------------|
-| **Workbench Version** | `1.0.1` |
+| **Workbench Version** | `1.0.2` |
 | **Backend Engine** | `qector_decoder_v3` `1.0.0` (Rust / PyO3) |
 | **Target Architecture** | Apple Silicon (`arm64`, macOS 11.0+) |
 | **MCP Server Tools** | 85 Tools (stdio JSON-RPC 2.0) |
