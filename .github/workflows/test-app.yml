@@ -88,8 +88,14 @@ jobs:
       - name: Test Baseline Execution — Benchmark Simulation
         run: |
           BIN="/Volumes/QectorWorkbench/QectorWorkbench.app/Contents/MacOS/QectorWorkbench"
-          echo "--- Running benchmark (Toric d=5, 1000 samples) ---"
-          "$BIN" --cli benchmark --code toric --distance 5 --samples 1000
+          echo "--- Running benchmark (Rotated Surface d=5 Blossom, 100 samples) ---"
+          "$BIN" --cli benchmark --family rotated_surface --distance 5 --decoder blossom --samples 100
+
+      - name: Test Baseline Execution — Probe All Decoders
+        run: |
+          BIN="/Volumes/QectorWorkbench/QectorWorkbench.app/Contents/MacOS/QectorWorkbench"
+          echo "--- Running decoder probe ---"
+          "$BIN" --cli probe --family rotated_surface
 
       - name: Detach DMG Volume
         if: always()
