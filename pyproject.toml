@@ -45,7 +45,7 @@ dev = [
 
 [project.urls]
 Homepage = "https://www.qector.store"
-"Commercial licensing" = "mailto:admin@qector.store"
+"Commercial licensing" = "https://qector.store/pricing"
 
 [project.scripts]
 qector = "main:launch"
