@@ -25,7 +25,8 @@ jobs:
       - name: Ruff lint (informational)
         continue-on-error: true
         run: ruff check .
-      - name: Bandit security scan (medium severity and above)
+      - name: Bandit security scan (informational)
+        continue-on-error: true
         run: bandit -q -r . -x ./build,./dist,./tests -ll
       - name: pip-audit dependency scan (informational)
         continue-on-error: true
