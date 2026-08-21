@@ -23,7 +23,7 @@
   <a href="#-quick-start">Quick Start</a> ·
   <a href="#-features">Features</a> ·
   <a href="#-downloads">Downloads</a> ·
-  <a href="manuals/QECTOR_API_Reference.md">API Reference</a> ·
+  <a href="CHANGELOG.md">CHANGELOG</a> ·
   <a href="#-license">License</a>
 </p>
 
@@ -36,6 +36,12 @@
 > **Zero Install · Zero Config · Zero Dependencies**
 > Download. Run. Decode.
 
+> This repository is a **release-only distribution mirror** of the v1.0.1
+> Linux build. It contains no source files — only the release artifacts listed
+> below. Binary packages are published on the
+> [Releases](https://github.com/qectorlab/qector-decoder-workbench-linux/releases)
+> page.
+
 ---
 
 ## 🚀 Quick Start
@@ -47,15 +53,6 @@
 2.  chmod +x QectorWorkbench-1.0.1-x86_64.AppImage
 3.  ./QectorWorkbench-1.0.1-x86_64.AppImage          — launch the GUI
 4.  The bundled decoder activates automatically on first run
-```
-
-### From Source
-
-```bash
-git clone https://github.com/qectorlab/qector-decoder-workbench-linux.git
-cd qector-decoder-workbench-linux
-pip install -r requirements.txt
-python main.py
 ```
 
 ### CLI Mode
@@ -88,12 +85,17 @@ connection. No display is required to run the headless MCP mode.
 
 ## 📥 Downloads
 
-**v1.0.1 ships two Linux artifacts.** Each contains the EULA, the full manuals set and a release manifest with SHA-256 digests of every file inside it.
+**v1.0.1 release assets** (all available on the
+[Releases](https://github.com/qectorlab/qector-decoder-workbench-linux/releases/tag/v1.0.1)
+page, each with SHA-256 digests in the release notes):
 
 | Artifact | Contents |
 |:---------|:---------|
-| **`QectorWorkbench-1.0.1-x86_64.AppImage`** | Portable Linux application — bundles its own Python runtime, scientific stack and the `qector_decoder_v3` 1.0.0 wheel |
-| **`QectorWorkbench-v1.0.1-Linux-x64-Public.zip`** | AppImage + EULA + `CHANGELOG.md` + `RELEASE_REPORT.md` + `RELEASE_MANIFEST.txt` + full `manuals/` suite + SHA-256 checksums |
+| **`QectorWorkbench-1.0.1-x86_64.AppImage`** | Portable Linux application — bundles its own Python runtime, scientific stack and the `qector_decoder_v3-1.0.0` wheel |
+| **`QectorWorkbench-v1.0.1-Linux-x64-Public.zip`** | AppImage + `EULA.txt` + `CHANGELOG.md` + `RELEASE_REPORT.md` + `RELEASE_MANIFEST.txt` + full `manuals/` suite (API Reference `.md`/`.html`/`.pdf`, MCP Integration Guide, Quick Start Guide, Linux User Manual, Extended Reference Manual, `QECTOR_LLM_Manual.json`) |
+| **`QECTOR_Decoder_v3_v1.0.0_User_Manual.md`** | Backend user manual (standalone) |
+| **`EULA.txt`** | End User License Agreement |
+| **`CHANGELOG.md`** | Complete release history |
 
 > **Fully local, no network required.** The AppImage embeds the decoder wheel
 > and provisions it into a per-user managed site on first launch, so a lab
@@ -107,6 +109,30 @@ Override the location entirely with the `QECTOR_DATA_DIR` environment variable.
 macOS requires a build on Apple hardware and is not included until that build
 is produced and signed. Linux and Windows artifacts are built from the same
 air-gapped source policy and include SHA-256 manifests.
+
+### Verified v1.0.1 Build Facts
+
+| Item | Value |
+|:-----|:------|
+| Workbench app | 1.0.1 |
+| Decoder backend | qector-decoder-v3 1.0.0 bundled wheel |
+| MCP server | 85 tools over stdio JSON-RPC 2.0 |
+| MCP protocol | 2024-11-05 |
+| Decoders | 17 |
+| Code families | 10 |
+| Bundled Python runtime | Python 3.12.0 |
+
+### Repository Files
+
+| File | Purpose |
+|:-----|:--------|
+| `README.md` | This document |
+| `CHANGELOG.md` | Release history |
+| `EULA.txt` | End User License Agreement |
+| `SECURITY.md` | Security policy |
+| `CODE_OF_CONDUCT.md` | Code of conduct |
+| `CONTRIBUTING.md` | Contribution guidelines |
+| `assets/logo_banner.png` | Project banner |
 
 ---
 
@@ -193,7 +219,7 @@ for lab evaluation; live identity sign-in is disabled in the air-gapped build.
 | `two_stage` | Decoupled | Independent X/Z sector decoders for CSS/color codes |
 | `ambiguity_cluster` | Cluster | Partition ambiguous checks into local clusters |
 | `colour_code` | DEM-native | BP-OSD hypergraph decoder for 3-body color codes |
-| `space_time` | Multi-round | Space-time decoder for phenomenological & circuit-level decoding (v1.0.0) |
+| `space_time` | Multi-round | Space-time decoder for phenomenological & circuit-level decoding |
 
 > **Resilient mode:** When enabled, the workbench automatically falls back through compatible decoders if the selected one cannot handle the current code family — and reports exactly what happened.
 
@@ -227,38 +253,6 @@ Full Model Context Protocol integration for headless AI/LLM workflows:
 | **Meta** | `list_tools` |
 
 </details>
-
----
-
-### 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                   QECTOR Workbench v1.0.1               │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────┐  │
-│  │ Code     │  │ Decoder  │  │Benchmark │  │ Batch &│  │
-│  │ Explorer │  │   Lab    │  │  Suite   │  │Streami.│  │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └───┬────┘  │
-│  ┌────┴─────┐  ┌────┴─────┐  ┌────┴─────┐  ┌───┴────┐  │
-│  │ History  │  │ Hardware │  │Diagnosti.│  │  Doc   │  │
-│  │          │  │ & System │  │& AutoDbg │  │ Studio │  │
-│  └────┬─────┘  └────┬─────┘  └────┬─────┘  └───┬────┘  │
-│  ┌────┴─────┐  ┌────┴─────────────┴────────────┴────┐  │
-│  │ Lab Info │  │  Console (Live) + CLI / MCP layers  │  │
-│  └──────────┘  └────────────────────────────────────┘  │
-│                         │                              │
-│              ┌──────────▼──────────┐                   │
-│              │    backend.py       │ ← Python API layer │
-│              │    cli.py           │ ← 22 CLI commands  │
-│              │    mcp_server.py    │ ← 85-tool MCP      │
-│              └──────────┬──────────┘                   │
-│                         │                              │
-│              ┌──────────▼──────────┐                   │
-│              │  qector-decoder-v3  │ ← Rust/PyO3 engine │
-│              │  (compiled wheel)   │                   │
-│              └─────────────────────┘                   │
-└─────────────────────────────────────────────────────────┘
-```
 
 ---
 
@@ -371,62 +365,10 @@ These flags are available on all commands:
 |:----------|:------------|
 | **OS** | Linux x86_64 (glibc ≥ 2.30), Windows 10/11 (x64), macOS 12+ |
 | **Runtime** | None — the AppImage bundles Python, NumPy/SciPy/Matplotlib and the decoder |
-| **Python** | ≥ 3.11 (only for running from source) |
 | **RAM** | 4 GB minimum, 8 GB recommended |
 | **GPU** | Optional — CUDA for GPU-accelerated batch decode |
 | **Disk** | ~130 MB (AppImage) |
 | **Display** | Not required for CLI / MCP headless modes |
-
-### From-Source Dependencies
-
-```
-customtkinter  >= 5.2.0
-numpy          >= 1.24, < 2.3
-scipy          >= 1.9
-matplotlib     >= 3.8
-Pillow         >= 9.0
-psutil         >= 5.9
-cryptography   >= 41.0
-```
-
-Backend: `qector-decoder-v3 == 1.0.0` (bundled wheel, provisioned on first launch)
-
----
-
-## 🏭 Building from Source
-
-### Linux AppImage (this is what v1.0.1 ships)
-
-```bash
-cd Linux && bash compile.sh --docker
-# Output: dist/QectorWorkbench-<version>-x86_64.AppImage
-```
-
-### Linux .deb (built reproducibly in Docker — legacy 1.0.0 path)
-
-```bash
-docker build -f Dockerfile.deb -t qector-deb .
-docker create --name qx qector-deb && docker cp qx:/app/dist/. ./dist/ && docker rm qx
-# Output: dist/qector-workbench_<version>_amd64.deb
-```
-
-### Windows / macOS
-
-```bash
-# Portable .exe (single file) — see the Windows release repository
-pyinstaller --clean -y QectorWorkbench-onefile.spec
-
-# macOS signed .app + .dmg (arm64 + Intel universal)
-cd Mac && bash build_macos.sh
-```
-
-### Public release bundles
-
-```bash
-python scripts/build_public_bundles.py     # refuses payloads older than the sources
-python scripts/update_release_assets.py    # refresh manifest + checksums
-python scripts/check_docs.py               # docs must agree with the code
-```
 
 ---
 
@@ -457,10 +399,8 @@ Both the **Windows** and **Linux** v1.0.1 releases of QECTOR Decoder Workbench a
   (`qector-decoder-v3==1.0.0`).
 - Use the workbench's `--mcp` server, the plugin's two stdio MCP servers, or
   both at once — all are local-only with zero network egress.
-- **Claude Desktop extension:** install `scripts/install_windows_connector.cmd`
-  (Windows) or the equivalent connector on Linux/macOS to register QECTOR as a
-  first-class Extension inside Claude Desktop Settings → Connectors
-  (`manifest_version: 0.3`).
+- **Claude Desktop extension:** register QECTOR as a first-class Extension
+  inside Claude Desktop Settings → Connectors (`manifest_version: 0.3`).
 - **Claude Code marketplace:**
   ```bash
   claude plugin marketplace add GuillaumeLessard/qector-claude-plugin
@@ -472,7 +412,7 @@ Both the **Windows** and **Linux** v1.0.1 releases of QECTOR Decoder Workbench a
   same `H·c ≡ s mod 2` fail-closed verification used by the workbench.
 
 > **Plugin requirements:** Python 3.10+, `qector-decoder-v3==1.0.0`, `mcp==1.2.0`,
-> NumPy. All satisfied by the bundled runtime of the workbench releases.
+> NumPy.
 
 ---
 
@@ -491,18 +431,21 @@ Following the upstream QECTOR Decoder v3 documentation:
 
 ## 📚 Documentation
 
-| Document | Format |
-|:---------|:-------|
-| [Quick Start Guide](docs/QECTOR_Quick_Start_Guide.pdf) | PDF |
-| [Linux User Manual](docs/QECTOR_User_Manual_Linux.pdf) | PDF |
-| [Windows User Manual](docs/QECTOR_User_Manual_Windows.pdf) | PDF |
-| [macOS User Manual](docs/QECTOR_User_Manual_macOS.pdf) | PDF |
-| [API Reference](docs/QECTOR_API_Reference.pdf) | PDF |
-| [API Reference](docs/api.md) | Markdown |
-| [MCP Integration Guide](docs/QECTOR_MCP_Integration_Guide.pdf) | PDF |
-| [Architecture Overview](docs/architecture.md) | Markdown |
-| [LLM Reference Manual](docs/QECTOR_LLM_Manual.json) | JSON |
-| [Packaging Guide](PACKAGING.md) | Markdown |
+| Document | Where |
+|:---------|:------|
+| [Quick Start Guide](manuals/QECTOR_Quick_Start_Guide.pdf) | In the release `.zip` (`manuals/`) |
+| [Linux User Manual](manuals/QECTOR_User_Manual_Linux.pdf) | In the release `.zip` (`manuals/`) |
+| [API Reference](manuals/QECTOR_API_Reference.md) | In the release `.zip` (`manuals/`) |
+| [API Reference PDF](manuals/QECTOR_API_Reference.pdf) | In the release `.zip` (`manuals/`) |
+| [MCP Integration Guide](manuals/QECTOR_MCP_Integration_Guide.pdf) | In the release `.zip` (`manuals/`) |
+| [LLM Reference Manual](manuals/QECTOR_LLM_Manual.json) | In the release `.zip` (`manuals/`) |
+| [Backend User Manual](QECTOR_Decoder_v3_v1.0.0_User_Manual.md) | Standalone release asset |
+| [CHANGELOG](CHANGELOG.md) | This repository |
+| [EULA](EULA.txt) | This repository |
+| [SECURITY](SECURITY.md) | This repository |
+
+> Full documentation is included inside the `manuals/` directory of the release
+> package. This repository is release-only and does not host the docs folder.
 
 ---
 
